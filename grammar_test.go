@@ -2,9 +2,9 @@ package candid_test
 
 import (
 	"fmt"
-	"github.com/di-wu/candid-go"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
+	"github.com/internet-computer/candid-go"
 	"testing"
 )
 

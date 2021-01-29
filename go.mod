@@ -1,4 +1,4 @@
-module github.com/di-wu/candid-go
+module github.com/internet-computer/candid-go
 
 go 1.15
 
