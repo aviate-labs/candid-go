@@ -8,7 +8,7 @@ Actor     <-- 'service' Sp (Id Sp)? ':' Sp (TupType Sp '->' Ws)? (ActorType / Id
 
 ActorType <-- '{' Ws MethType (';' Ws MethType)* ';'? Ws '}'
 MethType  <-- Name Sp ':' Sp (FuncType / Id)
-FuncType  <-- TupType (Sp '->' Ws TupType (Sp FuncAnn)*)?
+FuncType  <-- TupType (Sp '->' Ws TupType (Sp FuncAnn)?)?
 FuncAnn   <-- 'oneway' / 'query'
 TupType   <-- '(' (ArgType (',' Sp ArgType)*)? ')' / ArgType
 ArgType   <-- (Name Sp ':' Sp)? DataType
@@ -48,7 +48,7 @@ Char    <- Utf
           / '\u{' HexNum '}'
 Num     <- digit ('_' digit)*
 Nat    <-- Num / '0x' HexNum
-HexNum  <- digit ('_' hex)*
+HexNum  <- hex ('_' hex)*
 
 Utf      <- ascii / UtfEnc
 UtfEnc   <- [xC2-xDF] utfcont

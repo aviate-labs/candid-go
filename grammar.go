@@ -141,7 +141,7 @@ func FuncType(p *ast.Parser) (*ast.Node, error) {
 						"->",
 						Ws,
 						TupType,
-						op.MinZero(
+						op.Optional(
 							op.And{
 								Sp,
 								FuncAnn,
@@ -510,7 +510,7 @@ func Nat(p *ast.Parser) (*ast.Node, error) {
 func HexNum(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		op.And{
-			Digit,
+			Hex,
 			op.MinZero(
 				op.And{
 					'_',
