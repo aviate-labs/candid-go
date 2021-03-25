@@ -1,6 +1,7 @@
 // Do not edit. This file is auto-generated.
-// Grammar: CANDID (v0.1.0) github.com/di-wu/candid-go/spec
-package candid
+// Grammar: CANDID (v0.1.0) github.com/di-wu/candid-go/grammar
+
+package grammar
 
 import (
 	"github.com/di-wu/parser"
@@ -11,18 +12,21 @@ import (
 func Prog(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: ProgT,
+			Type:        ProgT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				op.MinZero(
 					op.And{
 						Def,
 						';',
+						Ws,
 					},
 				),
 				op.MinZero(
 					op.And{
 						Actor,
 						';',
+						Ws,
 					},
 				),
 			},
@@ -32,23 +36,40 @@ func Prog(p *ast.Parser) (*ast.Node, error) {
 
 func Def(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
+		op.Or{
+			Type,
+			Import,
+		},
+	)
+}
+
+func Type(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
 		ast.Capture{
-			Type: DefT,
-			Value: op.Or{
-				op.And{
-					"type",
-					Sp,
-					Id,
-					Sp,
-					'=',
-					Sp,
-					DataType,
-				},
-				op.And{
-					"import",
-					Sp,
-					Text,
-				},
+			Type:        TypeT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"type",
+				Sp,
+				Id,
+				Sp,
+				'=',
+				Sp,
+				DataType,
+			},
+		},
+	)
+}
+
+func Import(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        ImportT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"import",
+				Sp,
+				Text,
 			},
 		},
 	)
@@ -57,7 +78,8 @@ func Def(p *ast.Parser) (*ast.Node, error) {
 func Actor(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: ActorT,
+			Type:        ActorT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				"service",
 				Sp,
@@ -89,7 +111,8 @@ func Actor(p *ast.Parser) (*ast.Node, error) {
 func ActorType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: ActorTypeT,
+			Type:        ActorTypeT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				'{',
 				Ws,
@@ -114,7 +137,8 @@ func ActorType(p *ast.Parser) (*ast.Node, error) {
 func MethType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: MethTypeT,
+			Type:        MethTypeT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				Name,
 				Sp,
@@ -132,7 +156,8 @@ func MethType(p *ast.Parser) (*ast.Node, error) {
 func FuncType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: FuncTypeT,
+			Type:        FuncTypeT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				TupType,
 				op.Optional(
@@ -157,7 +182,8 @@ func FuncType(p *ast.Parser) (*ast.Node, error) {
 func FuncAnn(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: FuncAnnT,
+			Type:        FuncAnnT,
+			TypeStrings: NodeTypes,
 			Value: op.Or{
 				"oneway",
 				"query",
@@ -169,7 +195,8 @@ func FuncAnn(p *ast.Parser) (*ast.Node, error) {
 func TupType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: TupTypeT,
+			Type:        TupTypeT,
+			TypeStrings: NodeTypes,
 			Value: op.Or{
 				op.And{
 					'(',
@@ -196,7 +223,8 @@ func TupType(p *ast.Parser) (*ast.Node, error) {
 func ArgType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: ArgTypeT,
+			Type:        ArgTypeT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				op.Optional(
 					op.And{
@@ -215,7 +243,8 @@ func ArgType(p *ast.Parser) (*ast.Node, error) {
 func FieldType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: FieldTypeT,
+			Type:        FieldTypeT,
+			TypeStrings: NodeTypes,
 			Value: op.Or{
 				op.And{
 					op.Optional(
@@ -241,7 +270,8 @@ func FieldType(p *ast.Parser) (*ast.Node, error) {
 func DataType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: DataTypeT,
+			Type:        DataTypeT,
+			TypeStrings: NodeTypes,
 			Value: op.Or{
 				ConsType,
 				RefType,
@@ -255,7 +285,8 @@ func DataType(p *ast.Parser) (*ast.Node, error) {
 func PrimType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: PrimTypeT,
+			Type:        PrimTypeT,
+			TypeStrings: NodeTypes,
 			Value: op.Or{
 				NumType,
 				"bool",
@@ -302,8 +333,9 @@ func ConsType(p *ast.Parser) (*ast.Node, error) {
 func Blob(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type:  BlobT,
-			Value: "blob",
+			Type:        BlobT,
+			TypeStrings: NodeTypes,
+			Value:       "blob",
 		},
 	)
 }
@@ -311,7 +343,8 @@ func Blob(p *ast.Parser) (*ast.Node, error) {
 func Opt(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: OptT,
+			Type:        OptT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				"opt",
 				Sp,
@@ -324,7 +357,8 @@ func Opt(p *ast.Parser) (*ast.Node, error) {
 func Vec(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: VecT,
+			Type:        VecT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				"vec",
 				Sp,
@@ -337,7 +371,8 @@ func Vec(p *ast.Parser) (*ast.Node, error) {
 func Record(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: RecordT,
+			Type:        RecordT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				"record",
 				Sp,
@@ -355,7 +390,8 @@ func Record(p *ast.Parser) (*ast.Node, error) {
 func Variant(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: VariantT,
+			Type:        VariantT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				"variant",
 				Sp,
@@ -392,20 +428,51 @@ func Fields(p *ast.Parser) (*ast.Node, error) {
 func RefType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: RefTypeT,
+			Type:        RefTypeT,
+			TypeStrings: NodeTypes,
 			Value: op.Or{
-				op.And{
-					"func",
-					Sp,
-					FuncType,
-				},
-				op.And{
-					"service",
-					Sp,
-					ActorType,
-				},
-				"principal",
+				Func,
+				Service,
+				Principal,
 			},
+		},
+	)
+}
+
+func Func(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        FuncT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"func",
+				Sp,
+				FuncType,
+			},
+		},
+	)
+}
+
+func Service(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        ServiceT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"service",
+				Sp,
+				ActorType,
+			},
+		},
+	)
+}
+
+func Principal(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        PrincipalT,
+			TypeStrings: NodeTypes,
+			Value:       "principal",
 		},
 	)
 }
@@ -422,7 +489,8 @@ func Name(p *ast.Parser) (*ast.Node, error) {
 func Id(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: IdT,
+			Type:        IdT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				op.Or{
 					Letter,
@@ -443,7 +511,8 @@ func Id(p *ast.Parser) (*ast.Node, error) {
 func Text(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: TextT,
+			Type:        TextT,
+			TypeStrings: NodeTypes,
 			Value: op.And{
 				'"',
 				op.MinZero(
@@ -495,7 +564,8 @@ func Num(p *ast.Parser) (*ast.Node, error) {
 func Nat(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type: NatT,
+			Type:        NatT,
+			TypeStrings: NodeTypes,
 			Value: op.Or{
 				Num,
 				op.And{
@@ -652,9 +722,7 @@ func Hex(p *parser.Parser) (*parser.Cursor, bool) {
 
 // Token Definitions
 const (
-	TODO = '\u0000' // TODO: remove this.
-
-	// CANDID (github.com/di-wu/candid-go/spec)
+	// CANDID (github.com/di-wu/candid-go/grammar)
 	ESC = 0x005C // \
 
 )
@@ -663,36 +731,41 @@ const (
 const (
 	Unknown = iota
 
-	// CANDID (github.com/di-wu/candid-go/spec)
+	// CANDID (github.com/di-wu/candid-go/grammar)
 	ProgT      // 001
-	DefT       // 002
-	ActorT     // 003
-	ActorTypeT // 004
-	MethTypeT  // 005
-	FuncTypeT  // 006
-	FuncAnnT   // 007
-	TupTypeT   // 008
-	ArgTypeT   // 009
-	FieldTypeT // 010
-	DataTypeT  // 011
-	PrimTypeT  // 012
-	BlobT      // 013
-	OptT       // 014
-	VecT       // 015
-	RecordT    // 016
-	VariantT   // 017
-	RefTypeT   // 018
-	IdT        // 019
-	TextT      // 020
-	NatT       // 021
+	TypeT      // 002
+	ImportT    // 003
+	ActorT     // 004
+	ActorTypeT // 005
+	MethTypeT  // 006
+	FuncTypeT  // 007
+	FuncAnnT   // 008
+	TupTypeT   // 009
+	ArgTypeT   // 010
+	FieldTypeT // 011
+	DataTypeT  // 012
+	PrimTypeT  // 013
+	BlobT      // 014
+	OptT       // 015
+	VecT       // 016
+	RecordT    // 017
+	VariantT   // 018
+	RefTypeT   // 019
+	FuncT      // 020
+	ServiceT   // 021
+	PrincipalT // 022
+	IdT        // 023
+	TextT      // 024
+	NatT       // 025
 )
 
 var NodeTypes = []string{
 	"UNKNOWN",
 
-	// CANDID (github.com/di-wu/candid-go/spec)
+	// CANDID (github.com/di-wu/candid-go/grammar)
 	"Prog",
-	"Def",
+	"Type",
+	"Import",
 	"Actor",
 	"ActorType",
 	"MethType",
@@ -709,6 +782,9 @@ var NodeTypes = []string{
 	"Record",
 	"Variant",
 	"RefType",
+	"Func",
+	"Service",
+	"Principal",
 	"Id",
 	"Text",
 	"Nat",

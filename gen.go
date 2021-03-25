@@ -9,9 +9,9 @@ import (
 )
 
 func main() {
-	rawGrammar, _ := ioutil.ReadFile("spec/grammar.pegn")
-	if err := pegn.GenerateFromFiles(".", pegn.Config{
-		ModulePath:     "github.com/di-wu/candid-go",
+	rawGrammar, _ := ioutil.ReadFile("grammar/grammar.pegn")
+	if err := pegn.GenerateFromFiles("grammar/", pegn.Config{
+		ModulePath:     "github.com/di-wu/candid-go/grammar",
 		IgnoreReserved: true,
 		TypeSuffix:     "T",
 	}, rawGrammar); err != nil {

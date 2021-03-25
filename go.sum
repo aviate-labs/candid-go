@@ -1,4 +1,7 @@
-github.com/di-wu/parser v0.1.6 h1:RSVcOc1vFDpQVaMMwY/EKr1k7Ucj4L2NSI9IWaIk6cU=
-github.com/di-wu/parser v0.1.6/go.mod h1:SLp58pW6WamdmznrVRrw2NTyn4wAvT9rrEFynKX7nYo=
-github.com/pegn/pegn-go v0.0.0-20210128173842-430947a82c15 h1:lJMsufAeq8xQsW6ehi/6agRcOmTu8OAtANmNi6zM/pI=
-github.com/pegn/pegn-go v0.0.0-20210128173842-430947a82c15/go.mod h1:RT5xmH7rTeeFDTcVNnm+GZ1xmgyi+k4XVHSojbSqlBo=
+github.com/di-wu/parser v0.2.1/go.mod h1:SLp58pW6WamdmznrVRrw2NTyn4wAvT9rrEFynKX7nYo=
+github.com/di-wu/parser v0.2.2 h1:I9oHJ8spBXOeL7Wps0ffkFFFiXJf/pk7NX9lcAMqRMU=
+github.com/di-wu/parser v0.2.2/go.mod h1:SLp58pW6WamdmznrVRrw2NTyn4wAvT9rrEFynKX7nYo=
+github.com/internet-computer/leb128 v0.1.0 h1:RM6rCs853kbYsly1AsjkArqupofMlCSH6nbYhOYK7n4=
+github.com/internet-computer/leb128 v0.1.0/go.mod h1:UuaynEewUx6jEoDnnfU6IGE2DzLACwIM0DyPwoVgwZ4=
+github.com/pegn/pegn-go v0.1.0 h1:HjbtBm2ZNPQrCCjvWyPf+L03IgV4fwI9L7UAwf/qnKY=
+github.com/pegn/pegn-go v0.1.0/go.mod h1:Gc+deIik9V21EpZLKA69w0N+8nwTruJjlCoRXoOGWeM=

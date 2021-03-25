@@ -1,9 +1,10 @@
-# CANDID (v0.1.0) github.com/di-wu/candid-go/spec
+# CANDID (v0.1.0) github.com/di-wu/candid-go/grammar
 
-Prog      <-- (Def ';')*
-              (Actor ';')*
-Def       <-- 'type' Sp Id Sp '=' Sp DataType
-            / 'import' Sp Text
+Prog      <-- (Def ';' Ws)*
+              (Actor ';' Ws)*
+Def        <- Type / Import
+Type      <-- 'type' Sp Id Sp '=' Sp DataType
+Import    <-- 'import' Sp Text
 Actor     <-- 'service' Sp (Id Sp)? ':' Sp (TupType Sp '->' Ws)? (ActorType / Id)
 
 ActorType <-- '{' Ws MethType (';' Ws MethType)* ';'? Ws '}'
@@ -34,9 +35,10 @@ Record    <-- 'record' Sp '{' Fields? Ws '}'
 Variant   <-- 'variant' Sp '{' Fields? Ws '}'
 Fields     <- Ws FieldType (';' Ws FieldType)* ';'?
 
-RefType   <-- 'func' Sp FuncType
-            / 'service' Sp ActorType
-            / 'principal'
+RefType   <-- Func / Service / Principal
+Func      <-- 'func' Sp FuncType
+Service   <-- 'service' Sp ActorType
+Principal <-- 'principal'
 
 Name   <- Id / Text
 Id    <-- (letter / '_') (letter / digit / '_')*
