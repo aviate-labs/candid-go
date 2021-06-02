@@ -31,11 +31,11 @@ ConsType   <- Blob
 Blob      <-- 'blob'
 Opt       <-- 'opt' Sp DataType
 Vec       <-- 'vec' Sp DataType
-Record    <-- 'record' Sp '{' Fields? Ws '}'
-Variant   <-- 'variant' Sp '{' Fields? Ws '}'
-Fields     <- Ws FieldType (';' Ws FieldType)* ';'?
+Record    <-- 'record' Sp '{' Ws Fields? Ws '}'
+Variant   <-- 'variant' Sp '{' Ws Fields? Ws '}'
+Fields     <- FieldType (';' Ws FieldType)* ';'?
 
-RefType   <-- Func / Service / Principal
+RefType    <- Func / Service / Principal
 Func      <-- 'func' Sp FuncType
 Service   <-- 'service' Sp ActorType
 Principal <-- 'principal'
@@ -48,9 +48,9 @@ Char    <- Utf
           / ESC hex{2}
           / ESC escape
           / '\u{' HexNum '}'
-Num     <- digit ('_' digit)*
-Nat    <-- Num / '0x' HexNum
-HexNum  <- hex ('_' hex)*
+Num     <- digit ('_'? digit)*
+HexNum  <- hex   ('_'? hex)*
+Nat    <-- '0x' HexNum / Num
 
 Utf      <- ascii / UtfEnc
 UtfEnc   <- [xC2-xDF] utfcont

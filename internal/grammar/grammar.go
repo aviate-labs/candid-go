@@ -455,14 +455,10 @@ func Fields(p *ast.Parser) (*ast.Node, error) {
 
 func RefType(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
-		ast.Capture{
-			Type:        RefTypeT,
-			TypeStrings: NodeTypes,
-			Value: op.Or{
-				Func,
-				Service,
-				Principal,
-			},
+		op.Or{
+			Func,
+			Service,
+			Principal,
 		},
 	)
 }
@@ -581,8 +577,26 @@ func Num(p *ast.Parser) (*ast.Node, error) {
 			Digit,
 			op.MinZero(
 				op.And{
-					'_',
+					op.Optional(
+						'_',
+					),
 					Digit,
+				},
+			),
+		},
+	)
+}
+
+func HexNum(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			Hex,
+			op.MinZero(
+				op.And{
+					op.Optional(
+						'_',
+					),
+					Hex,
 				},
 			),
 		},
@@ -595,26 +609,12 @@ func Nat(p *ast.Parser) (*ast.Node, error) {
 			Type:        NatT,
 			TypeStrings: NodeTypes,
 			Value: op.Or{
-				Num,
 				op.And{
 					"0x",
 					HexNum,
 				},
+				Num,
 			},
-		},
-	)
-}
-
-func HexNum(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.And{
-			Hex,
-			op.MinZero(
-				op.And{
-					'_',
-					Hex,
-				},
-			),
 		},
 	)
 }
@@ -779,13 +779,12 @@ const (
 	VecT       // 016
 	RecordT    // 017
 	VariantT   // 018
-	RefTypeT   // 019
-	FuncT      // 020
-	ServiceT   // 021
-	PrincipalT // 022
-	IdT        // 023
-	TextT      // 024
-	NatT       // 025
+	FuncT      // 019
+	ServiceT   // 020
+	PrincipalT // 021
+	IdT        // 022
+	TextT      // 023
+	NatT       // 024
 )
 
 var NodeTypes = []string{
@@ -811,7 +810,6 @@ var NodeTypes = []string{
 	"Vec",
 	"Record",
 	"Variant",
-	"RefType",
 	"Func",
 	"Service",
 	"Principal",
