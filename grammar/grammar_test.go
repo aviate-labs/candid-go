@@ -1,18 +1,44 @@
 package grammar_test
 
 import (
+	"embed"
 	"fmt"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
 	"github.com/internet-computer/candid-go/grammar"
+	"io/fs"
+	"strings"
 	"testing"
 )
+
+//go:embed testdata
+var testdata embed.FS
+
+func TestExamples(t *testing.T) {
+	examples, _ := testdata.ReadDir("testdata")
+	for _, example := range examples {
+		t.Run(strings.TrimSuffix(example.Name(), ".did"), func(t *testing.T) {
+			path := fmt.Sprintf("testdata/%s", example.Name())
+			raw, _ := fs.ReadFile(testdata, path)
+			p, err := ast.New(raw)
+			if err != nil {
+				t.Fatal(err)
+			}
+			n, err := grammar.Prog(p)
+			if err != nil {
+				t.Fatal(n, err)
+			}
+			if _, err := p.Expect(parser.EOD); err != nil {
+				t.Error(n, err)
+			}
+		})
+	}
+}
 
 func TestWs(t *testing.T) {
 	p, err := ast.New([]byte("\n  \t\n "))
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	if _, err := grammar.Ws(p); err != nil {
 		t.Error(err)
@@ -28,8 +54,7 @@ func TestName(t *testing.T) {
 	} {
 		p, err := ast.New([]byte(name))
 		if err != nil {
-			t.Error(err)
-			return
+			t.Fatal(err)
 		}
 		if _, err := grammar.Name(p); err != nil {
 			t.Error(err)
@@ -152,12 +177,10 @@ func TestDef_service(t *testing.T) {
 }`
 	p, err := ast.New([]byte(example))
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	if _, err := grammar.Def(p); err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	if _, err := p.Expect(parser.EOD); err != nil {
 		t.Error(err)
@@ -170,12 +193,10 @@ func TestDef_function(t *testing.T) {
 }`
 	p, err := ast.New([]byte(example))
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	if _, err := grammar.Def(p); err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	if _, err := p.Expect(parser.EOD); err != nil {
 		t.Error(err)

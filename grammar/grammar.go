@@ -1,5 +1,5 @@
 // Do not edit. This file is auto-generated.
-// Grammar: CANDID (v0.1.0) github.com/di-wu/candid-go/grammar
+// Grammar: CANDID (v0.1.1) github.com/di-wu/candid-go/grammar
 
 package grammar
 
@@ -15,20 +15,38 @@ func Prog(p *ast.Parser) (*ast.Node, error) {
 			Type:        ProgT,
 			TypeStrings: NodeTypes,
 			Value: op.And{
-				op.MinZero(
+				op.Optional(
 					op.And{
 						Def,
-						';',
-						Ws,
+						op.MinZero(
+							op.And{
+								';',
+								Ws,
+								Def,
+							},
+						),
 					},
 				),
-				op.MinZero(
+				op.Optional(
+					';',
+				),
+				Ws,
+				op.Optional(
 					op.And{
 						Actor,
-						';',
-						Ws,
+						op.MinZero(
+							op.And{
+								';',
+								Ws,
+								Actor,
+							},
+						),
 					},
 				),
+				op.Optional(
+					';',
+				),
+				Ws,
 			},
 		},
 	)
@@ -115,19 +133,23 @@ func ActorType(p *ast.Parser) (*ast.Node, error) {
 			TypeStrings: NodeTypes,
 			Value: op.And{
 				'{',
-				Ws,
-				MethType,
-				op.MinZero(
+				op.Optional(
 					op.And{
-						';',
 						Ws,
 						MethType,
+						op.MinZero(
+							op.And{
+								';',
+								Ws,
+								MethType,
+							},
+						),
+						op.Optional(
+							';',
+						),
+						Ws,
 					},
 				),
-				op.Optional(
-					';',
-				),
-				Ws,
 				'}',
 			},
 		},
@@ -141,7 +163,9 @@ func MethType(p *ast.Parser) (*ast.Node, error) {
 			TypeStrings: NodeTypes,
 			Value: op.And{
 				Name,
-				Sp,
+				op.Optional(
+					Sp,
+				),
 				':',
 				Sp,
 				op.Or{
@@ -229,7 +253,9 @@ func ArgType(p *ast.Parser) (*ast.Node, error) {
 				op.Optional(
 					op.And{
 						Name,
-						Sp,
+						op.Optional(
+							Sp,
+						),
 						':',
 						Sp,
 					},
@@ -253,7 +279,9 @@ func FieldType(p *ast.Parser) (*ast.Node, error) {
 								Nat,
 								Name,
 							},
-							Sp,
+							op.Optional(
+								Sp,
+							),
 							':',
 							Sp,
 						},
@@ -723,8 +751,8 @@ func Hex(p *parser.Parser) (*parser.Cursor, bool) {
 // Token Definitions
 const (
 	// CANDID (github.com/di-wu/candid-go/grammar)
-	ESC = 0x005C // \
 
+	ESC = 0x005C // \
 )
 
 // Node Types
@@ -732,6 +760,7 @@ const (
 	Unknown = iota
 
 	// CANDID (github.com/di-wu/candid-go/grammar)
+
 	ProgT      // 001
 	TypeT      // 002
 	ImportT    // 003
@@ -763,6 +792,7 @@ var NodeTypes = []string{
 	"UNKNOWN",
 
 	// CANDID (github.com/di-wu/candid-go/grammar)
+
 	"Prog",
 	"Type",
 	"Import",
