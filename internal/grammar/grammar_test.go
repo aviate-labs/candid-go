@@ -1,11 +1,11 @@
-package grammar_test
+package candid_test
 
 import (
 	"embed"
 	"fmt"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
-	"github.com/internet-computer/candid-go/grammar"
+	grammar "github.com/internet-computer/candid-go/internal/grammar"
 	"io/fs"
 	"strings"
 	"testing"

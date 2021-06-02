@@ -1,7 +1,7 @@
 // Do not edit. This file is auto-generated.
 // Grammar: CANDID (v0.1.1) github.com/di-wu/candid-go/grammar
 
-package grammar
+package candid
 
 import (
 	"github.com/di-wu/parser"
