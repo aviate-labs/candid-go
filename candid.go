@@ -5,6 +5,7 @@
 package candid
 
 import (
+	"fmt"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
 	grammar "github.com/internet-computer/candid-go/internal/grammar"
@@ -31,6 +32,17 @@ func ParseDID(raw []byte) (Program, error) {
 type Program struct {
 	definitions []Definition
 	actors      []Actor
+}
+
+func (p Program) String() string {
+	var s []string
+	for _, d := range p.definitions {
+		s = append(s, d.String())
+	}
+	for _, a := range p.actors {
+		s = append(s, a.String())
+	}
+	return strings.Join(s, ";\n") + ";"
 }
 
 func convertProgram(n *ast.Node) Program {
@@ -63,6 +75,7 @@ func convertProgram(n *ast.Node) Program {
 
 type Definition interface {
 	def()
+	fmt.Stringer
 }
 
 func (t Type) def()   {}
@@ -71,6 +84,10 @@ func (i Import) def() {}
 type Type struct {
 	Id   string
 	Data Data
+}
+
+func (t Type) String() string {
+	return fmt.Sprintf("type %s = %s", t.Id, t.Data.String())
 }
 
 func convertType(n *ast.Node) Type {
@@ -88,11 +105,31 @@ type Import struct {
 	Text string
 }
 
+func (i Import) String() string {
+	return fmt.Sprintf("import %q", i.Text)
+}
+
 type Actor struct {
 	Id *string
 
 	Methods  []Method
 	MethodId *string
+}
+
+func (a Actor) String() string {
+	s := "service "
+	if id := a.Id; id != nil {
+		s += fmt.Sprintf("%s ", *id)
+	}
+	s += ": "
+	if id := a.MethodId; id != nil {
+		return s + *id
+	}
+	s += "{\n"
+	for _, m := range a.Methods {
+		s += fmt.Sprintf("  %s;\n", m.String())
+	}
+	return s + "}"
 }
 
 func convertActor(n *ast.Node) Actor {
@@ -114,19 +151,21 @@ func convertActor(n *ast.Node) Actor {
 				name := n.FirstChild.Value
 				switch n := n.LastChild; n.Type {
 				case grammar.FuncTypeT:
+					f := convertFunc(n)
 					actor.Methods = append(
 						actor.Methods,
-						MethodFunc{
+						Method{
 							Name: name,
-							Func: convertFunc(n),
+							Func: &f,
 						},
 					)
 				case grammar.IdT, grammar.TextT:
+					id := n.Value
 					actor.Methods = append(
 						actor.Methods,
-						MethodId{
+						Method{
 							Name: name,
-							Id:   n.Value,
+							Id:   &id,
 						},
 					)
 				default:
@@ -140,21 +179,19 @@ func convertActor(n *ast.Node) Actor {
 	return actor
 }
 
-type Method interface {
-	method()
+type Method struct {
+	Name string
+
+	Func *Func
+	Id   *string
 }
 
-func (m MethodId) method()   {}
-func (m MethodFunc) method() {}
-
-type MethodId struct {
-	Name string
-	Id   string
-}
-
-type MethodFunc struct {
-	Name string
-	Func Func
+func (m Method) String() string {
+	s := fmt.Sprintf("%s : ", m.Name)
+	if id := m.Id; id != nil {
+		return s + *id
+	}
+	return s + m.Func.String()
 }
 
 type Func struct {
@@ -162,14 +199,22 @@ type Func struct {
 	Annotation *FuncAnnotation
 }
 
+func (f Func) String() string {
+	s := fmt.Sprintf("%s -> %s", f.From.String(), f.To.String())
+	if f.Annotation != nil {
+		s += fmt.Sprintf(" %s", *f.Annotation)
+	}
+	return s
+}
+
 func convertFunc(n *ast.Node) Func {
 	var f Func
 	for i, n := range n.Children() {
 		switch i {
 		case 0:
-			f.To = convertTuple(n)
-		case 1:
 			f.From = convertTuple(n)
+		case 1:
+			f.To = convertTuple(n)
 		case 2:
 			ann := FuncAnnotation(n.Value)
 			f.Annotation = &ann
@@ -189,6 +234,24 @@ const (
 
 type Tuple []Argument
 
+func (t Tuple) String() string {
+	if len(t) == 1 {
+		s := t[0].String()
+		if strings.Contains(s, " ") {
+			return "(" + s + ")"
+		}
+		return s
+	}
+	s := "("
+	for i, a := range t {
+		s += a.String()
+		if i != len(t)-1 {
+			s += ", "
+		}
+	}
+	return s + ")"
+}
+
 func convertTuple(n *ast.Node) Tuple {
 	var tuple Tuple
 	for _, n := range n.Children() {
@@ -200,6 +263,14 @@ func convertTuple(n *ast.Node) Tuple {
 type Argument struct {
 	Name *string
 	Data Data
+}
+
+func (a Argument) String() string {
+	var s string
+	if a.Name != nil {
+		s += fmt.Sprintf("%s : ", *a.Name)
+	}
+	return s + a.Data.String()
 }
 
 func convertArgument(n *ast.Node) Argument {
@@ -224,6 +295,24 @@ type Field struct {
 	NameData *string
 }
 
+func (f Field) String() string {
+	var s string
+	if n := f.Nat; n != nil {
+		s += fmt.Sprintf("%s : ", n.String())
+	} else if f.Name != nil {
+		s += fmt.Sprintf("%s : ", *f.Name)
+	}
+	if f.Data != nil {
+		d := *f.Data
+		s += d.String()
+	} else if n := f.NatData; n != nil {
+		s += n.String()
+	} else {
+		s += *f.NameData
+	}
+	return s
+}
+
 func convertField(n *ast.Node) Field {
 	var field Field
 	if len(n.Children()) != 1 {
@@ -237,24 +326,27 @@ func convertField(n *ast.Node) Field {
 		}
 	}
 	switch n := n.LastChild; n.Type {
-	case grammar.DataTypeT:
-		data := convertData(n)
-		field.Data = &data
 	case grammar.NatT:
 		field.NatData = convertNat(n)
 	case grammar.IdT:
 		field.NameData = &n.Value
+	default:
+		data := convertData(n)
+		field.Data = &data
 	}
 	return field
 }
 
 type Data interface {
 	data()
+	fmt.Stringer
 }
 
 func (p Primitive) data() {}
 func (i DataId) data()    {}
 func (b Blob) data()      {}
+func (o Optional) data()  {}
+func (v Vector) data()    {}
 func (r Record) data()    {}
 func (v Variant) data()   {}
 
@@ -263,9 +355,13 @@ func convertData(n *ast.Node) Data {
 	case grammar.BlobT:
 		return Blob{}
 	case grammar.OptT:
-		return Optional(convertData(n.FirstChild))
+		return Optional{
+			Data: convertData(n.FirstChild),
+		}
 	case grammar.VecT:
-		return Vector(convertData(n.FirstChild))
+		return Vector{
+			Data: convertData(n.FirstChild),
+		}
 	case grammar.RecordT:
 		var record Record
 		for _, n := range n.Children() {
@@ -301,13 +397,45 @@ func convertData(n *ast.Node) Data {
 
 type Blob struct{}
 
-type Optional Data
+func (b Blob) String() string {
+	return "blob"
+}
 
-type Vector Data
+type Optional struct {
+	Data Data
+}
+
+func (o Optional) String() string {
+	return fmt.Sprintf("opt %s", o.Data.String())
+}
+
+type Vector struct {
+	Data Data
+}
+
+func (v Vector) String() string {
+	return fmt.Sprintf("vec %s", v.Data.String())
+}
 
 type Record []Field
 
+func (r Record) String() string {
+	s := "record {\n"
+	for _, f := range r {
+		s += fmt.Sprintf("  %s;\n", f.String())
+	}
+	return s + "}"
+}
+
 type Variant []Field
+
+func (v Variant) String() string {
+	s := "variant {\n"
+	for _, f := range v {
+		s += fmt.Sprintf("  %s;\n", f.String())
+	}
+	return s + "}"
+}
 
 type Reference interface {
 	data()
@@ -323,9 +451,21 @@ func (p Principal) ref()  {}
 
 type Primitive string
 
+func (p Primitive) String() string {
+	return string(p)
+}
+
 type DataId string
 
+func (i DataId) String() string {
+	return string(i)
+}
+
 type Principal struct{}
+
+func (p Principal) String() string {
+	return "principal"
+}
 
 func convertNat(n *ast.Node) *big.Int {
 	switch n := strings.ReplaceAll(n.Value, "_", ""); {

@@ -1,6 +1,7 @@
 package candid
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -11,8 +12,8 @@ var complexTypes = []byte(`type address = record {
   country : text;
 };
 service address_book : {
-  set_address: (name : text, addr : address) -> ();
-  get_address: (name : text) -> (opt address) query;
+  set_address : (name : text, addr : address) -> ();
+  get_address : (name : text) -> (opt address) query;
 };`)
 
 func TestParseDID(t *testing.T) {
@@ -40,5 +41,9 @@ func TestParseDID(t *testing.T) {
 	}
 	if len(book.Methods) != 2 {
 		t.Error(book.Methods)
+	}
+	if p.String() != string(complexTypes) {
+		fmt.Println(p)
+		t.Error(p)
 	}
 }
