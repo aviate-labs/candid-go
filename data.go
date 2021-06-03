@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// Data is the content of message arguments and results.
 type Data interface {
 	data()
 	fmt.Stringer
@@ -119,11 +120,20 @@ func (v Variant) String() string {
 	return s + "}"
 }
 
+// Field
+// The order in which fields are specified is immaterial.
 type Field struct {
-	Nat  *big.Int
+	// Nat is the field id.
+	// e.g. 0 : nat
+	Nat *big.Int
+	// Name is the name of the field.
+	// e.g. name : text
 	Name *string
 
-	Data     *Data
+	// Data is a single value of specified data type that is carried.
+	Data *Data
+
+	// Only in variants.
 	NatData  *big.Int
 	NameData *string
 }
@@ -170,12 +180,14 @@ func convertField(n *ast.Node) Field {
 	return field
 }
 
+// Primitive describes the possible forms of primitive data.
 type Primitive string
 
 func (p Primitive) String() string {
 	return string(p)
 }
 
+// DataId is an id reference to a data type.
 type DataId string
 
 func (i DataId) String() string {

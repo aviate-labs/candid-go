@@ -5,6 +5,7 @@ import (
 	"github.com/di-wu/parser/ast"
 )
 
+// Definition represents an imports or type definition.
 type Definition interface {
 	def()
 	fmt.Stringer
@@ -13,6 +14,7 @@ type Definition interface {
 func (t Type) def()   {}
 func (i Import) def() {}
 
+// Type represents a named type definition.
 type Type struct {
 	Id   string
 	Data Data
@@ -33,6 +35,7 @@ func convertType(n *ast.Node) Type {
 	}
 }
 
+// Import represents an import declarations from another file.
 type Import struct {
 	Text string
 }

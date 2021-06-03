@@ -6,11 +6,25 @@ import (
 	"github.com/di-wu/parser/ast"
 )
 
-// Service can be used to declare the complete interface of a service.
+// Service can be used to declare the complete interface of a service. A service is a standalone actor on the platform
+// that can communicate with other services via sending and receiving messages. Messages are sent to a service by
+// invoking one of its methods, i.e., functions that the service provides.
+//
+// Example:
+//	service : {
+//		addUser : (name : text, age : nat8) -> (id : nat64);
+//		userName : (id : nat64) -> (text) query;
+//		userAge : (id : nat64) -> (nat8) query;
+//		deleteUser : (id : nat64) -> () oneway;
+//	}
 type Service struct {
+	// Id represents the optional name given to the service. This only serves as documentation.
 	Id *string
 
-	Methods  []Method
+	// Methods is the list of methods that the service provides.
+	Methods []Method
+	// MethodId is the reference to the name of a type definition for an actor reference type.
+	// It is NOT possible to have both a list of methods and a reference.
 	MethodId *string
 }
 
@@ -77,11 +91,16 @@ func convertService(n *ast.Node) Service {
 	return actor
 }
 
+// Method is a public method of a service.
 type Method struct {
+	// Name describes the method.
 	Name string
 
+	// Func is a function type describing its signature.
 	Func *Func
-	Id   *string
+	// Id is a reference to a type definition naming a function reference type.
+	// It is NOT possible to have both a function type and a reference.
+	Id *string
 }
 
 func (m Method) String() string {

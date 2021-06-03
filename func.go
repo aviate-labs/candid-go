@@ -9,8 +9,12 @@ import (
 // Func indicates the function’s signature (argument and results types, annotations),
 // and values of this type are references to functions with that signature.
 type Func struct {
-	ArgTypes, ResTypes Tuple
-	Annotation         *FuncAnnotation
+	// ArgTypes is the list of parameters.
+	ArgTypes Tuple
+	// ResTypes is the list of results.
+	ResTypes Tuple
+	// Annotation indicates an (optional) invocation method.
+	Annotation *FuncAnnotation
 }
 
 func (f Func) String() string {
@@ -81,8 +85,11 @@ func convertTuple(n *ast.Node) Tuple {
 	return tuple
 }
 
+// Argument describes the argument types of a Field.
 type Argument struct {
+	// Name only serves documentation purposes and have no semantic significance.
 	Name *string
+	// Data is the data type of the argument.
 	Data Data
 }
 

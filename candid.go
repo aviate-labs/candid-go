@@ -12,11 +12,11 @@ import (
 	"strings"
 )
 
-// ParseMotoko parses the Motoko (.mo) files and returns the Program that is defined in it.
-func ParseMotoko(path string) (Program, error) {
+// ParseMotoko parses the Motoko (.mo) files and returns the interface description that is defined in it.
+func ParseMotoko(path string) (Description, error) {
 	moc, err := exec.LookPath("moc")
 	if err != nil {
-		return Program{}, err
+		return Description{}, err
 	}
 	var (
 		dir  = filepath.Dir(path)
@@ -28,7 +28,7 @@ func ParseMotoko(path string) (Program, error) {
 		Dir:  dir,
 	}
 	if err := cmd.Run(); err != nil {
-		return Program{}, err
+		return Description{}, err
 	}
 	didFileName := fmt.Sprintf("%s/%s.did", dir, strings.TrimSuffix(base, ".mo"))
 	defer func() {
@@ -36,23 +36,23 @@ func ParseMotoko(path string) (Program, error) {
 	}()
 	raw, err := ioutil.ReadFile(didFileName)
 	if err != nil {
-		return Program{}, err
+		return Description{}, err
 	}
 	return ParseDID(raw)
 }
 
 // ParseDID parses the given raw .did files and returns the Program that is defined in it.
-func ParseDID(raw []byte) (Program, error) {
+func ParseDID(raw []byte) (Description, error) {
 	p, err := ast.New(raw)
 	if err != nil {
-		return Program{}, err
+		return Description{}, err
 	}
 	n, err := spec.Prog(p)
 	if err != nil {
-		return Program{}, err
+		return Description{}, err
 	}
 	if _, err := p.Expect(parser.EOD); err != nil {
-		return Program{}, err
+		return Description{}, err
 	}
-	return convertProgram(n), nil
+	return convertDescription(n), nil
 }
