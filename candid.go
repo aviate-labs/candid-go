@@ -2,9 +2,9 @@ package candid
 
 import (
 	"fmt"
+	spec "github.com/allusion-be/candid-go/internal/grammar"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
-	spec "github.com/internet-computer/candid-go/internal/grammar"
 	"io/ioutil"
 	"os"
 	"os/exec"

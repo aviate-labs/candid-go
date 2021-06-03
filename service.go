@@ -2,8 +2,8 @@ package candid
 
 import (
 	"fmt"
+	spec "github.com/allusion-be/candid-go/internal/grammar"
 	"github.com/di-wu/parser/ast"
-	spec "github.com/internet-computer/candid-go/internal/grammar"
 )
 
 // Service can be used to declare the complete interface of a service.

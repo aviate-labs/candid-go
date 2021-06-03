@@ -1,4 +1,4 @@
-module github.com/internet-computer/candid-go
+module github.com/allusion-be/candid-go
 
 go 1.16
 

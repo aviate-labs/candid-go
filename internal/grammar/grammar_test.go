@@ -3,9 +3,9 @@ package candid_test
 import (
 	"embed"
 	"fmt"
+	grammar "github.com/allusion-be/candid-go/internal/grammar"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
-	grammar "github.com/internet-computer/candid-go/internal/grammar"
 	"io/fs"
 	"strings"
 	"testing"
