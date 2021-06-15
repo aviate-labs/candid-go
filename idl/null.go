@@ -13,12 +13,8 @@ func (Null) Encode() []byte {
 	return bs
 }
 
-func (Null) EncodeValue(v interface{}) []byte {
+func (Null) EncodeValue() []byte {
 	return []byte{}
 }
 
 func (Null) BuildTypeTable(*TypeTable) {}
-
-func (Null) Covariant(v interface{}) bool {
-	return v == nil
-}

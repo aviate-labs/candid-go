@@ -1,30 +1,21 @@
 package idl
 
 import (
-	"fmt"
 	"math/big"
 
 	"github.com/allusion-be/leb128"
 )
 
-func Encode(types []Type, args []interface{}) ([]byte, error) {
-	if len(args) != len(types) {
-		return nil, fmt.Errorf("invalid number of arguments")
-	}
+func Encode(types []Type) ([]byte, error) {
 	tt := new(TypeTable)
-
 	var (
 		ts []byte
 		vs []byte
 	)
-	for i, t := range types {
+	for _, t := range types {
 		t.BuildTypeTable(tt)
 		ts = append(ts, t.Encode()...)
-		a := args[i]
-		if !t.Covariant(a) {
-			return nil, fmt.Errorf("invalid %s argument: %v", t.Name(), a)
-		}
-		vs = append(vs, t.EncodeValue(a)...)
+		vs = append(vs, t.EncodeValue()...)
 	}
 
 	magic := []byte{'D', 'I', 'D', 'L'}
@@ -32,7 +23,7 @@ func Encode(types []Type, args []interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(args))))
+	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(types))))
 	if err != nil {
 		return nil, err
 	}
