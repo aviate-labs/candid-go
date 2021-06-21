@@ -9,7 +9,7 @@ import (
 type Int big.Int
 
 func (Int) Name() string {
-	return "nat"
+	return "int"
 }
 
 func (Int) Encode() []byte {

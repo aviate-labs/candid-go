@@ -1,6 +1,7 @@
 package idl
 
 import (
+	"bytes"
 	"math/big"
 
 	"github.com/allusion-be/leb128"
@@ -38,4 +39,15 @@ func (table TypeTable) Encode() ([]byte, error) {
 		bs = append(bs, t...)
 	}
 	return bs, nil
+}
+
+func NewTable(r *bytes.Reader) (TypeTable, error) {
+	n, err := leb128.DecodeUnsigned(r)
+	if err != nil {
+		return TypeTable{}, err
+	}
+	for i := 0; i < int(n.Int64()); i++ {
+		_ = i // TODO
+	}
+	return TypeTable{}, nil
 }

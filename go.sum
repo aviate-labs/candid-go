@@ -1,6 +1,4 @@
-github.com/allusion-be/leb128 v0.2.1 h1:HX73gO/+lB5MiXccsnXQFEcqEtqQeZ7st49BK24E4k8=
-github.com/allusion-be/leb128 v0.2.1/go.mod h1:9Ckcucoql3UWjG9OC3eCMEyIZScuQ2bCkTwp/t29LAc=
+github.com/allusion-be/leb128 v0.2.1-0.20210621172925-cab13e6b14d1 h1:rmTbEpyXgyqaQd3KxM4TTk+mhxbIjN6hICOPbjqrUgU=
+github.com/allusion-be/leb128 v0.2.1-0.20210621172925-cab13e6b14d1/go.mod h1:9Ckcucoql3UWjG9OC3eCMEyIZScuQ2bCkTwp/t29LAc=
 github.com/di-wu/parser v0.3.0 h1:NMOvy5ifswgt4gsdhySVcKOQtvjC43cHZIfViWctqQY=
 github.com/di-wu/parser v0.3.0/go.mod h1:SLp58pW6WamdmznrVRrw2NTyn4wAvT9rrEFynKX7nYo=
-github.com/internet-computer/leb128 v0.1.0 h1:RM6rCs853kbYsly1AsjkArqupofMlCSH6nbYhOYK7n4=
-github.com/internet-computer/leb128 v0.1.0/go.mod h1:UuaynEewUx6jEoDnnfU6IGE2DzLACwIM0DyPwoVgwZ4=
