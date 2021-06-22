@@ -7,6 +7,8 @@ import (
 )
 
 func TestBool(t *testing.T) {
-	test(t, []idl.Type{idl.Bool(true)}, "4449444c00017e01")
-	test(t, []idl.Type{idl.Bool(false)}, "4449444c00017e00")
+	vt := idl.Bool(true)
+	test(t, []idl.Type{&vt}, "4449444c00017e01")
+	vf := idl.Bool(false)
+	test(t, []idl.Type{&vf}, "4449444c00017e00")
 }

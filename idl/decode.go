@@ -35,37 +35,31 @@ func Decode(bs []byte) ([]Type, error) {
 	}
 	var vs []Type
 	for _, t := range ts {
+		var v Type
 		switch n := (*big.Int)(t).Int64(); n {
 		case -1:
-			vs = append(vs, Null{})
+			v = new(Null)
 		case -2:
-			b, err := rs.ReadByte()
-			if err != nil {
-				return nil, err
-			}
-			switch b {
-			case 0x00:
-				vs = append(vs, Bool(false))
-			case 0x01:
-				vs = append(vs, Bool(true))
-			default:
-				return nil, fmt.Errorf("invalid bool values: %x", b)
-			}
+			v = new(Bool)
 		case -3:
-			n, err := leb128.DecodeUnsigned(rs)
-			if err != nil {
-				return nil, err
-			}
-			vs = append(vs, Nat(*n))
+			v = new(Nat)
 		case -4:
-			n, err := leb128.DecodeSigned(rs)
-			if err != nil {
-				return nil, err
-			}
-			vs = append(vs, Int(*n))
+			v = new(Int)
+		case -5:
+			v = NewNat8(0)
+		case -6:
+			v = NewNat16(0)
+		case -7:
+			v = NewNat32(0)
+		case -8:
+			v = NewNat64(0)
 		default:
 			panic(n)
 		}
+		if err := v.Decode(rs); err != nil {
+			return nil, err
+		}
+		vs = append(vs, v)
 	}
 	return vs, nil
 }

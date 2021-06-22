@@ -2,8 +2,8 @@ package idl_test
 
 import (
 	"encoding/hex"
+	"fmt"
 	"math/big"
-	"reflect"
 	"testing"
 
 	"github.com/allusion-be/candid-go/idl"
@@ -21,9 +21,13 @@ func test(t *testing.T, ts []idl.Type, x string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(ts, ts_) {
-		t.Error(ts_)
+	if !strEqual(ts, ts_) {
+		t.Errorf("%v, %v", ts, ts_)
 	}
+}
+
+func strEqual(a, b interface{}) bool {
+	return fmt.Sprintf("%v", a) == fmt.Sprintf("%v", b)
 }
 
 func newInt(s string) *big.Int {

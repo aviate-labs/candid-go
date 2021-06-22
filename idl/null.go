@@ -1,6 +1,10 @@
 package idl
 
-import "github.com/allusion-be/leb128"
+import (
+	"bytes"
+
+	"github.com/allusion-be/leb128"
+)
 
 type Null struct{}
 
@@ -15,6 +19,10 @@ func (Null) Encode() []byte {
 
 func (Null) EncodeValue() []byte {
 	return []byte{}
+}
+
+func (n *Null) Decode(r *bytes.Reader) error {
+	return nil
 }
 
 func (Null) BuildTypeTable(*TypeTable) {}

@@ -1,6 +1,9 @@
 package idl
 
-import "math/big"
+import (
+	"bytes"
+	"math/big"
+)
 
 type TypeID *big.Int
 
@@ -15,5 +18,6 @@ type Type interface {
 	Name() string
 	Encode() []byte
 	EncodeValue() []byte
+	Decode(*bytes.Reader) error
 	BuildTypeTable(*TypeTable)
 }

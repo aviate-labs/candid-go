@@ -1,6 +1,8 @@
 package idl
 
 import (
+	"bytes"
+	"fmt"
 	"math/big"
 
 	"github.com/allusion-be/leb128"
@@ -23,4 +25,17 @@ func (n Int) EncodeValue() []byte {
 	return bs
 }
 
+func (n *Int) Decode(r *bytes.Reader) error {
+	bi, err := leb128.DecodeSigned(r)
+	if err != nil {
+		return nil
+	}
+	*n = Int(*bi)
+	return nil
+}
+
 func (Int) BuildTypeTable(*TypeTable) {}
+
+func (i Int) String() string {
+	return fmt.Sprintf("int: %v", big.Int(i))
+}

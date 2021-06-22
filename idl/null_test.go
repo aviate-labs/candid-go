@@ -7,5 +7,5 @@ import (
 )
 
 func TestNull(t *testing.T) {
-	test(t, []idl.Type{idl.Null{}}, "4449444c00017f")
+	test(t, []idl.Type{new(idl.Null)}, "4449444c00017f")
 }
