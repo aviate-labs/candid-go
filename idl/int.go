@@ -28,7 +28,7 @@ func (n Int) EncodeValue() []byte {
 func (n *Int) Decode(r *bytes.Reader) error {
 	bi, err := leb128.DecodeSigned(r)
 	if err != nil {
-		return nil
+		return err
 	}
 	*n = Int(*bi)
 	return nil

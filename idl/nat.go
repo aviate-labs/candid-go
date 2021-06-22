@@ -13,6 +13,34 @@ type Nat struct {
 	base uint8
 }
 
+func Nat8() *Nat {
+	return &Nat{
+		i:    new(big.Int),
+		base: 8,
+	}
+}
+
+func Nat16() *Nat {
+	return &Nat{
+		i:    new(big.Int),
+		base: 16,
+	}
+}
+
+func Nat32() *Nat {
+	return &Nat{
+		i:    new(big.Int),
+		base: 32,
+	}
+}
+
+func Nat64() *Nat {
+	return &Nat{
+		i:    new(big.Int),
+		base: 64,
+	}
+}
+
 func NewNat(i *big.Int) *Nat {
 	return &Nat{i: i}
 }
@@ -57,7 +85,7 @@ func (n Nat) Encode() []byte {
 	natXType := new(big.Int).Set(natType)
 	natXType = natXType.Add(
 		natXType,
-		big.NewInt(-int64(log2(n.base/2))),
+		big.NewInt(1-int64(log2(n.base))),
 	)
 	bs, _ := leb128.EncodeSigned(natXType)
 	return bs
@@ -79,7 +107,7 @@ func (n *Nat) Decode(r *bytes.Reader) error {
 	if n.base == 0 {
 		bi, err := leb128.DecodeUnsigned(r)
 		if err != nil {
-			return nil
+			return err
 		}
 		n.i = bi
 		return nil

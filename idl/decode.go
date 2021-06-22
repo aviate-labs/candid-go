@@ -46,13 +46,13 @@ func Decode(bs []byte) ([]Type, error) {
 		case -4:
 			v = new(Int)
 		case -5:
-			v = NewNat8(0)
+			v = Nat8()
 		case -6:
-			v = NewNat16(0)
+			v = Nat16()
 		case -7:
-			v = NewNat32(0)
+			v = Nat32()
 		case -8:
-			v = NewNat64(0)
+			v = Nat64()
 		default:
 			panic(n)
 		}
