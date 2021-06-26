@@ -82,10 +82,10 @@ func (n Nat) Encode() []byte {
 		bs, _ := leb128.EncodeSigned(natType)
 		return bs
 	}
-	natXType := new(big.Int).Set(natType)
+	natXType := new(big.Int).Set(natXType)
 	natXType = natXType.Add(
 		natXType,
-		big.NewInt(1-int64(log2(n.base))),
+		big.NewInt(3-int64(log2(n.base))),
 	)
 	bs, _ := leb128.EncodeSigned(natXType)
 	return bs
@@ -96,11 +96,7 @@ func (n Nat) EncodeValue() []byte {
 		bs, _ := leb128.EncodeUnsigned(n.i)
 		return bs
 	}
-
-	if n.i.Sign() == 0 {
-		return zeros(n.base / 8)
-	}
-	return pad0(n.base/8, reverse(n.i.Bytes()))
+	return writeInt(n.i, int(n.base/8))
 }
 
 func (n *Nat) Decode(r *bytes.Reader) error {
@@ -112,15 +108,11 @@ func (n *Nat) Decode(r *bytes.Reader) error {
 		n.i = bi
 		return nil
 	}
-	var bs []byte
-	for i := 0; i < int(n.base/8); i++ {
-		b, err := r.ReadByte()
-		if err != nil {
-			return err
-		}
-		bs = append(bs, b)
+	bs, err := readUInt(r, int(n.base/8))
+	if err != nil {
+		return err
 	}
-	n.i.SetBytes(reverse(bs))
+	n.i.Set(bs)
 	return nil
 }
 

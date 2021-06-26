@@ -3,6 +3,7 @@ package idl
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/allusion-be/leb128"
@@ -45,30 +46,30 @@ func NewInt(i *big.Int) *Int {
 	return &Int{i: i}
 }
 
-func NewInt8(i uint8) *Int {
+func NewInt8(i int8) *Int {
 	return &Int{
 		i:    big.NewInt(int64(i)),
 		base: 8,
 	}
 }
 
-func NewInt16(i uint16) *Int {
+func NewInt16(i int16) *Int {
 	return &Int{
 		i:    big.NewInt(int64(i)),
 		base: 16,
 	}
 }
 
-func NewInt32(i uint32) *Int {
+func NewInt32(i int32) *Int {
 	return &Int{
 		i:    big.NewInt(int64(i)),
 		base: 32,
 	}
 }
 
-func NewInt64(i uint64) *Int {
+func NewInt64(i *big.Int) *Int {
 	return &Int{
-		i:    big.NewInt(int64(i)),
+		i:    i,
 		base: 64,
 	}
 }
@@ -77,22 +78,45 @@ func (Int) Name() string {
 	return "int"
 }
 
-func (Int) Encode() []byte {
-	bs, _ := leb128.EncodeSigned(intType)
+func (n Int) Encode() []byte {
+	if n.base == 0 {
+		bs, _ := leb128.EncodeSigned(intType)
+		return bs
+	}
+	intXType := new(big.Int).Set(intXType)
+	intXType = intXType.Add(
+		intXType,
+		big.NewInt(3-int64(log2(n.base))),
+	)
+	bs, _ := leb128.EncodeSigned(intXType)
 	return bs
 }
 
 func (n Int) EncodeValue() []byte {
-	bs, _ := leb128.EncodeSigned(n.i)
-	return bs
+	if n.base == 0 {
+		bs, _ := leb128.EncodeSigned(n.i)
+		return bs
+	}
+
+	return writeInt(n.i, int(n.base/8))
 }
 
 func (n *Int) Decode(r *bytes.Reader) error {
-	bi, err := leb128.DecodeSigned(r)
+	if n.base == 0 {
+		bi, err := leb128.DecodeSigned(r)
+		if err != nil {
+			return err
+		}
+		n.i = bi
+		return nil
+	}
+	raw, _ := io.ReadAll(r)
+	*r = *bytes.NewReader(raw)
+	bi, err := readInt(r, int(n.base/8))
 	if err != nil {
 		return err
 	}
-	n.i = bi
+	n.i.Set(bi)
 	return nil
 }
 
