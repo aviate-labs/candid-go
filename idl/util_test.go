@@ -9,7 +9,7 @@ import (
 	"github.com/allusion-be/candid-go/idl"
 )
 
-func test(t *testing.T, ts []idl.Type, x string) {
+func test(t *testing.T, x string, ts ...idl.Type) {
 	bs, err := idl.Encode(ts)
 	if err != nil {
 		t.Fatal(err)
