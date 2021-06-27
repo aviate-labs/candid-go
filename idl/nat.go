@@ -13,13 +13,6 @@ type Nat struct {
 	base uint8
 }
 
-func Nat8() *Nat {
-	return &Nat{
-		i:    new(big.Int),
-		base: 8,
-	}
-}
-
 func Nat16() *Nat {
 	return &Nat{
 		i:    new(big.Int),
@@ -41,15 +34,15 @@ func Nat64() *Nat {
 	}
 }
 
-func NewNat(i *big.Int) *Nat {
-	return &Nat{i: i}
-}
-
-func NewNat8(i uint8) *Nat {
+func Nat8() *Nat {
 	return &Nat{
-		i:    big.NewInt(int64(i)),
+		i:    new(big.Int),
 		base: 8,
 	}
+}
+
+func NewNat(i *big.Int) *Nat {
+	return &Nat{i: i}
 }
 
 func NewNat16(i uint16) *Nat {
@@ -73,8 +66,30 @@ func NewNat64(i uint64) *Nat {
 	}
 }
 
-func (Nat) Name() string {
-	return "nat"
+func NewNat8(i uint8) *Nat {
+	return &Nat{
+		i:    big.NewInt(int64(i)),
+		base: 8,
+	}
+}
+
+func (Nat) BuildTypeTable(*TypeTable) {}
+
+func (n *Nat) Decode(r *bytes.Reader) error {
+	if n.base == 0 {
+		bi, err := leb128.DecodeUnsigned(r)
+		if err != nil {
+			return err
+		}
+		n.i = bi
+		return nil
+	}
+	bs, err := readUInt(r, int(n.base/8))
+	if err != nil {
+		return err
+	}
+	n.i.Set(bs)
+	return nil
 }
 
 func (n Nat) EncodeType() []byte {
@@ -99,24 +114,9 @@ func (n Nat) EncodeValue() []byte {
 	return writeInt(n.i, int(n.base/8))
 }
 
-func (n *Nat) Decode(r *bytes.Reader) error {
-	if n.base == 0 {
-		bi, err := leb128.DecodeUnsigned(r)
-		if err != nil {
-			return err
-		}
-		n.i = bi
-		return nil
-	}
-	bs, err := readUInt(r, int(n.base/8))
-	if err != nil {
-		return err
-	}
-	n.i.Set(bs)
-	return nil
+func (Nat) Name() string {
+	return "nat"
 }
-
-func (Nat) BuildTypeTable(*TypeTable) {}
 
 func (n Nat) String() string {
 	if n.base == 0 {

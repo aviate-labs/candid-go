@@ -12,16 +12,15 @@ type TypeTable struct {
 	indexes map[string]int
 }
 
-func (table TypeTable) Has(t Type) bool {
-	_, ok := table.indexes[t.Name()]
-	return ok
-}
-
-func (table TypeTable) Index(name string) int {
-	if i, ok := table.indexes[name]; ok {
-		return i
+func NewTable(r *bytes.Reader) (TypeTable, error) {
+	n, err := leb128.DecodeUnsigned(r)
+	if err != nil {
+		return TypeTable{}, err
 	}
-	return -1
+	for i := 0; i < int(n.Int64()); i++ {
+		_ = i // TODO
+	}
+	return TypeTable{}, nil
 }
 
 func (table *TypeTable) Add(t Type, bs []byte) {
@@ -41,13 +40,14 @@ func (table TypeTable) Encode() ([]byte, error) {
 	return bs, nil
 }
 
-func NewTable(r *bytes.Reader) (TypeTable, error) {
-	n, err := leb128.DecodeUnsigned(r)
-	if err != nil {
-		return TypeTable{}, err
+func (table TypeTable) Has(t Type) bool {
+	_, ok := table.indexes[t.Name()]
+	return ok
+}
+
+func (table TypeTable) Index(name string) int {
+	if i, ok := table.indexes[name]; ok {
+		return i
 	}
-	for i := 0; i < int(n.Int64()); i++ {
-		_ = i // TODO
-	}
-	return TypeTable{}, nil
+	return -1
 }

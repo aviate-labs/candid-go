@@ -9,6 +9,15 @@ import (
 	"github.com/allusion-be/candid-go/idl"
 )
 
+func newInt(s string) *big.Int {
+	bi, _ := new(big.Int).SetString(s, 10)
+	return bi
+}
+
+func strEqual(a, b interface{}) bool {
+	return fmt.Sprintf("%v", a) == fmt.Sprintf("%v", b)
+}
+
 func test(t *testing.T, x string, ts ...idl.Type) {
 	bs, err := idl.Encode(ts)
 	if err != nil {
@@ -24,13 +33,4 @@ func test(t *testing.T, x string, ts ...idl.Type) {
 	if !strEqual(ts, ts_) {
 		t.Errorf("%v, %v", ts, ts_)
 	}
-}
-
-func strEqual(a, b interface{}) bool {
-	return fmt.Sprintf("%v", a) == fmt.Sprintf("%v", b)
-}
-
-func newInt(s string) *big.Int {
-	bi, _ := new(big.Int).SetString(s, 10)
-	return bi
 }

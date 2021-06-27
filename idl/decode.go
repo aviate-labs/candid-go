@@ -65,6 +65,8 @@ func Decode(bs []byte) ([]Type, error) {
 			v = Float32()
 		case -14:
 			v = Float64()
+		case -15:
+			v = new(Text)
 		default:
 			panic(n)
 		}

@@ -8,8 +8,10 @@ import (
 
 type Null struct{}
 
-func (Null) Name() string {
-	return "null"
+func (Null) BuildTypeTable(*TypeTable) {}
+
+func (n *Null) Decode(r *bytes.Reader) error {
+	return nil
 }
 
 func (Null) EncodeType() []byte {
@@ -21,8 +23,6 @@ func (Null) EncodeValue() []byte {
 	return []byte{}
 }
 
-func (n *Null) Decode(r *bytes.Reader) error {
-	return nil
+func (Null) Name() string {
+	return "null"
 }
-
-func (Null) BuildTypeTable(*TypeTable) {}

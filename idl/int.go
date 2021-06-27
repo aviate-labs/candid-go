@@ -14,13 +14,6 @@ type Int struct {
 	base uint8
 }
 
-func Int8() *Int {
-	return &Int{
-		i:    new(big.Int),
-		base: 8,
-	}
-}
-
 func Int16() *Int {
 	return &Int{
 		i:    new(big.Int),
@@ -42,15 +35,15 @@ func Int64() *Int {
 	}
 }
 
-func NewInt(i *big.Int) *Int {
-	return &Int{i: i}
-}
-
-func NewInt8(i int8) *Int {
+func Int8() *Int {
 	return &Int{
-		i:    big.NewInt(int64(i)),
+		i:    new(big.Int),
 		base: 8,
 	}
+}
+
+func NewInt(i *big.Int) *Int {
+	return &Int{i: i}
 }
 
 func NewInt16(i int16) *Int {
@@ -74,8 +67,32 @@ func NewInt64(i *big.Int) *Int {
 	}
 }
 
-func (Int) Name() string {
-	return "int"
+func NewInt8(i int8) *Int {
+	return &Int{
+		i:    big.NewInt(int64(i)),
+		base: 8,
+	}
+}
+
+func (Int) BuildTypeTable(*TypeTable) {}
+
+func (n *Int) Decode(r *bytes.Reader) error {
+	if n.base == 0 {
+		bi, err := leb128.DecodeSigned(r)
+		if err != nil {
+			return err
+		}
+		n.i = bi
+		return nil
+	}
+	raw, _ := io.ReadAll(r)
+	*r = *bytes.NewReader(raw)
+	bi, err := readInt(r, int(n.base/8))
+	if err != nil {
+		return err
+	}
+	n.i.Set(bi)
+	return nil
 }
 
 func (n Int) EncodeType() []byte {
@@ -101,26 +118,9 @@ func (n Int) EncodeValue() []byte {
 	return writeInt(n.i, int(n.base/8))
 }
 
-func (n *Int) Decode(r *bytes.Reader) error {
-	if n.base == 0 {
-		bi, err := leb128.DecodeSigned(r)
-		if err != nil {
-			return err
-		}
-		n.i = bi
-		return nil
-	}
-	raw, _ := io.ReadAll(r)
-	*r = *bytes.NewReader(raw)
-	bi, err := readInt(r, int(n.base/8))
-	if err != nil {
-		return err
-	}
-	n.i.Set(bi)
-	return nil
+func (Int) Name() string {
+	return "int"
 }
-
-func (Int) BuildTypeTable(*TypeTable) {}
 
 func (n Int) String() string {
 	return fmt.Sprintf("int: %s", n.i)

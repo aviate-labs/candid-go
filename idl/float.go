@@ -41,8 +41,15 @@ func NewFloat64(f float64) *Float {
 	}
 }
 
-func (Float) Name() string {
-	return "float"
+func (Float) BuildTypeTable(*TypeTable) {}
+
+func (f *Float) Decode(r *bytes.Reader) error {
+	f64, err := readFloat(r, int(f.base/8))
+	if err != nil {
+		return err
+	}
+	*f.f = *f64
+	return nil
 }
 
 func (f Float) EncodeType() []byte {
@@ -58,16 +65,9 @@ func (f Float) EncodeValue() []byte {
 	return writeFloat(f.f, int(f.base/8))
 }
 
-func (f *Float) Decode(r *bytes.Reader) error {
-	f64, err := readFloat(r, int(f.base/8))
-	if err != nil {
-		return err
-	}
-	*f.f = *f64
-	return nil
+func (Float) Name() string {
+	return "float"
 }
-
-func (Float) BuildTypeTable(*TypeTable) {}
 
 func (f Float) String() string {
 	return fmt.Sprintf("float%d: %v", f.base, f.f)
