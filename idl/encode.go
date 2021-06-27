@@ -14,7 +14,7 @@ func Encode(types []Type) ([]byte, error) {
 	)
 	for _, t := range types {
 		t.BuildTypeTable(tt)
-		ts = append(ts, t.Encode()...)
+		ts = append(ts, t.EncodeType()...)
 		vs = append(vs, t.EncodeValue()...)
 	}
 

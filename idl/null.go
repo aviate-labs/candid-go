@@ -12,7 +12,7 @@ func (Null) Name() string {
 	return "null"
 }
 
-func (Null) Encode() []byte {
+func (Null) EncodeType() []byte {
 	bs, _ := leb128.EncodeSigned(nullType)
 	return bs
 }

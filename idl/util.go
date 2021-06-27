@@ -2,6 +2,8 @@ package idl
 
 import (
 	"bytes"
+	"encoding/binary"
+	"io"
 	"math"
 	"math/big"
 )
@@ -99,4 +101,42 @@ func twosCompl(bi *big.Int) *big.Int {
 	}
 	bi.SetBytes(inv)
 	return bi.Add(bi, big.NewInt(1))
+}
+
+func writeFloat(f *big.Float, n int) []byte {
+	bs := make([]byte, n)
+	switch n {
+	case 4:
+		f32, _ := f.Float32()
+		binary.LittleEndian.PutUint32(bs, math.Float32bits(f32))
+	default:
+		f64, _ := f.Float64()
+		binary.LittleEndian.PutUint64(bs, math.Float64bits(f64))
+	}
+	return bs
+}
+
+func readFloat(r *bytes.Reader, n int) (*big.Float, error) {
+	bs := make([]byte, n)
+	i, err := r.Read(bs)
+	if err != nil {
+		return nil, err
+	}
+	if i != n {
+		return nil, io.EOF
+	}
+	switch n {
+	case 4:
+		return big.NewFloat(
+			float64(math.Float32frombits(
+				binary.LittleEndian.Uint32(bs),
+			)),
+		), nil
+	default:
+		return big.NewFloat(
+			math.Float64frombits(
+				binary.LittleEndian.Uint64(bs),
+			),
+		), nil
+	}
 }

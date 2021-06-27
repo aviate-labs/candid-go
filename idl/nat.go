@@ -77,7 +77,7 @@ func (Nat) Name() string {
 	return "nat"
 }
 
-func (n Nat) Encode() []byte {
+func (n Nat) EncodeType() []byte {
 	if n.base == 0 {
 		bs, _ := leb128.EncodeSigned(natType)
 		return bs

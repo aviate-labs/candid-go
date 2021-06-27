@@ -13,7 +13,7 @@ func (Bool) Name() string {
 	return "bool"
 }
 
-func (Bool) Encode() []byte {
+func (Bool) EncodeType() []byte {
 	bs, _ := leb128.EncodeSigned(boolType)
 	return bs
 }

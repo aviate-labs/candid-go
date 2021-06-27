@@ -78,7 +78,7 @@ func (Int) Name() string {
 	return "int"
 }
 
-func (n Int) Encode() []byte {
+func (n Int) EncodeType() []byte {
 	if n.base == 0 {
 		bs, _ := leb128.EncodeSigned(intType)
 		return bs
