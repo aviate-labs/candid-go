@@ -11,6 +11,7 @@ import (
 type Nat struct {
 	i    *big.Int
 	base uint8
+	primType
 }
 
 func Nat16() *Nat {
@@ -72,8 +73,6 @@ func NewNat8(i uint8) *Nat {
 		base: 8,
 	}
 }
-
-func (Nat) BuildTypeTable(*TypeTable) {}
 
 func (n *Nat) Decode(r *bytes.Reader) error {
 	if n.base == 0 {

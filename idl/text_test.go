@@ -7,8 +7,6 @@ import (
 )
 
 func TestText(t *testing.T) {
-	e := idl.Text("")
-	test(t, "4449444c00017100", &e)
-	s := idl.Text("Motoko")
-	test(t, "4449444c000171064d6f746f6b6f", &s)
+	test(t, "4449444c00017100", idl.NewText(""))
+	test(t, "4449444c000171064d6f746f6b6f", idl.NewText("Motoko"))
 }

@@ -6,9 +6,9 @@ import (
 	"github.com/allusion-be/leb128"
 )
 
-type Empty struct{}
-
-func (Empty) BuildTypeTable(*TypeTable) {}
+type Empty struct {
+	primType
+}
 
 func (Empty) Decode(*bytes.Reader) error {
 	return nil

@@ -7,9 +7,16 @@ import (
 	"github.com/allusion-be/leb128"
 )
 
-type Bool bool
+type Bool struct {
+	v bool
+	primType
+}
 
-func (Bool) BuildTypeTable(*TypeTable) {}
+func NewBool(b bool) *Bool {
+	return &Bool{
+		v: b,
+	}
+}
 
 func (b *Bool) Decode(r *bytes.Reader) error {
 	v, err := r.ReadByte()
@@ -18,9 +25,9 @@ func (b *Bool) Decode(r *bytes.Reader) error {
 	}
 	switch v {
 	case 0x00:
-		*b = Bool(false)
+		*b = Bool{v: false}
 	case 0x01:
-		*b = Bool(true)
+		*b = Bool{v: true}
 	default:
 		return fmt.Errorf("invalid bool values: %x", b)
 	}
@@ -33,7 +40,7 @@ func (Bool) EncodeType() []byte {
 }
 
 func (b Bool) EncodeValue() []byte {
-	if b {
+	if b.v {
 		return []byte{0x01}
 	}
 	return []byte{0x00}

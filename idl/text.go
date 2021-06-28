@@ -9,9 +9,16 @@ import (
 	"github.com/allusion-be/leb128"
 )
 
-type Text string
+type Text struct {
+	v string
+	primType
+}
 
-func (Text) BuildTypeTable(*TypeTable) {}
+func NewText(s string) *Text {
+	return &Text{
+		v: s,
+	}
+}
 
 func (t *Text) Decode(r *bytes.Reader) error {
 	n, err := leb128.DecodeUnsigned(r)
@@ -26,7 +33,7 @@ func (t *Text) Decode(r *bytes.Reader) error {
 	if i != int(n.Int64()) {
 		return io.EOF
 	}
-	*t = Text(string(bs))
+	*t = Text{v: string(bs)}
 	return nil
 }
 
@@ -36,8 +43,8 @@ func (t Text) EncodeType() []byte {
 }
 
 func (t Text) EncodeValue() []byte {
-	bs, _ := leb128.EncodeUnsigned(big.NewInt(int64(len(t))))
-	bs = append(bs, []byte(t)...)
+	bs, _ := leb128.EncodeUnsigned(big.NewInt(int64(len(t.v))))
+	bs = append(bs, []byte(t.v)...)
 	return bs
 }
 
@@ -46,5 +53,5 @@ func (Text) Name() string {
 }
 
 func (t Text) String() string {
-	return fmt.Sprintf("text: %s", string(t))
+	return fmt.Sprintf("text: %s", t.v)
 }

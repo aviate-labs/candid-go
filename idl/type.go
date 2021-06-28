@@ -27,3 +27,13 @@ var (
 	reservedType TypeID = big.NewInt(-16)
 	emptyType    TypeID = big.NewInt(-17)
 )
+
+type PrimType interface {
+	prim()
+}
+
+type primType struct{}
+
+func (primType) prim() {}
+
+func (primType) BuildTypeTable(_ *TypeTable) {}

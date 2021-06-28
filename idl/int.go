@@ -12,6 +12,7 @@ import (
 type Int struct {
 	i    *big.Int
 	base uint8
+	primType
 }
 
 func Int16() *Int {
@@ -73,8 +74,6 @@ func NewInt8(i int8) *Int {
 		base: 8,
 	}
 }
-
-func (Int) BuildTypeTable(*TypeTable) {}
 
 func (n *Int) Decode(r *bytes.Reader) error {
 	if n.base == 0 {

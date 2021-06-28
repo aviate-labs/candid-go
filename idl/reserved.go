@@ -6,9 +6,9 @@ import (
 	"github.com/allusion-be/leb128"
 )
 
-type Reserved struct{}
-
-func (Reserved) BuildTypeTable(*TypeTable) {}
+type Reserved struct {
+	primType
+}
 
 func (Reserved) Decode(*bytes.Reader) error {
 	return nil

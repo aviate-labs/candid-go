@@ -11,6 +11,7 @@ import (
 type Float struct {
 	f    *big.Float
 	base uint8
+	primType
 }
 
 func Float32() *Float {
@@ -40,8 +41,6 @@ func NewFloat64(f float64) *Float {
 		base: 64,
 	}
 }
-
-func (Float) BuildTypeTable(*TypeTable) {}
 
 func (f *Float) Decode(r *bytes.Reader) error {
 	f64, err := readFloat(r, int(f.base/8))
