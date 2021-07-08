@@ -7,4 +7,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.16'
+      - uses: allusion-be/setup-dfx@main
+        with:
+          dfx-version: 0.7.2
       - run: go test -v ./...
