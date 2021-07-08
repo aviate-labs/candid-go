@@ -2,7 +2,8 @@ package candid
 
 import (
 	"fmt"
-	spec "github.com/allusion-be/candid-go/internal/grammar"
+
+	"github.com/allusion-be/candid-go/internal/candid"
 	"github.com/di-wu/parser/ast"
 )
 
@@ -48,7 +49,7 @@ func convertService(n *ast.Node) Service {
 	var actor Service
 	for _, n := range n.Children() {
 		switch n.Type {
-		case spec.IdT:
+		case candid.IdT:
 			id := n.Value
 			if actor.Id == nil {
 				actor.Id = &id
@@ -56,13 +57,13 @@ func convertService(n *ast.Node) Service {
 			}
 			actor.MethodId = &id
 			break
-		case spec.TupTypeT:
+		case candid.TupTypeT:
 			// TODO: what does this even do?
-		case spec.ActorTypeT:
+		case candid.ActorTypeT:
 			for _, n := range n.Children() {
 				name := n.FirstChild.Value
 				switch n := n.LastChild; n.Type {
-				case spec.FuncTypeT:
+				case candid.FuncTypeT:
 					f := convertFunc(n)
 					actor.Methods = append(
 						actor.Methods,
@@ -71,7 +72,7 @@ func convertService(n *ast.Node) Service {
 							Func: &f,
 						},
 					)
-				case spec.IdT, spec.TextT:
+				case candid.IdT, candid.TextT:
 					id := n.Value
 					actor.Methods = append(
 						actor.Methods,

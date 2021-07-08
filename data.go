@@ -2,11 +2,12 @@ package candid
 
 import (
 	"fmt"
-	spec "github.com/allusion-be/candid-go/internal/grammar"
-	"github.com/di-wu/parser/ast"
 	"math/big"
 	"strconv"
 	"strings"
+
+	"github.com/allusion-be/candid-go/internal/candid"
+	"github.com/di-wu/parser/ast"
 )
 
 // Data is the content of message arguments and results.
@@ -28,17 +29,17 @@ func (p Principal) data() {}
 
 func convertData(n *ast.Node) Data {
 	switch n.Type {
-	case spec.BlobT:
+	case candid.BlobT:
 		return Blob{}
-	case spec.OptT:
+	case candid.OptT:
 		return Optional{
 			Data: convertData(n.FirstChild),
 		}
-	case spec.VecT:
+	case candid.VecT:
 		return Vector{
 			Data: convertData(n.FirstChild),
 		}
-	case spec.RecordT:
+	case candid.RecordT:
 		var record Record
 		for _, n := range n.Children() {
 			record = append(
@@ -47,7 +48,7 @@ func convertData(n *ast.Node) Data {
 			)
 		}
 		return record
-	case spec.VariantT:
+	case candid.VariantT:
 		var variant Variant
 		for _, n := range n.Children() {
 			variant = append(
@@ -56,15 +57,15 @@ func convertData(n *ast.Node) Data {
 			)
 		}
 		return variant
-	case spec.FuncT:
+	case candid.FuncT:
 		return convertFunc(n.FirstChild)
-	case spec.ServiceT:
+	case candid.ServiceT:
 		return convertService(n.FirstChild)
-	case spec.PrincipalT:
+	case candid.PrincipalT:
 		return Principal{}
-	case spec.PrimTypeT:
+	case candid.PrimTypeT:
 		return Primitive(n.Value)
-	case spec.IdT:
+	case candid.IdT:
 		return DataId(n.Value)
 	default:
 		panic(n)
@@ -160,18 +161,18 @@ func convertField(n *ast.Node) Field {
 	var field Field
 	if len(n.Children()) != 1 {
 		switch n := n.FirstChild; n.Type {
-		case spec.NatT:
+		case candid.NatT:
 			field.Nat = convertNat(n)
-		case spec.TextT, spec.IdT:
+		case candid.TextT, candid.IdT:
 			field.Name = &n.Value
 		default:
 			panic(n)
 		}
 	}
 	switch n := n.LastChild; n.Type {
-	case spec.NatT:
+	case candid.NatT:
 		field.NatData = convertNat(n)
-	case spec.IdT:
+	case candid.IdT:
 		field.NameData = &n.Value
 	default:
 		data := convertData(n)

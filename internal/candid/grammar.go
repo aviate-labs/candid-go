@@ -1,5 +1,5 @@
 // Do not edit. This file is auto-generated.
-// Grammar: CANDID (v0.1.1) github.com/di-wu/candid-go/grammar
+// Grammar: CANDID (v0.1.1) github.com/di-wu/candid-go/internal/candid
 
 package candid
 
@@ -405,6 +405,7 @@ func Record(p *ast.Parser) (*ast.Node, error) {
 				"record",
 				Sp,
 				'{',
+				Ws,
 				op.Optional(
 					Fields,
 				),
@@ -424,6 +425,7 @@ func Variant(p *ast.Parser) (*ast.Node, error) {
 				"variant",
 				Sp,
 				'{',
+				Ws,
 				op.Optional(
 					Fields,
 				),
@@ -437,7 +439,6 @@ func Variant(p *ast.Parser) (*ast.Node, error) {
 func Fields(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		op.And{
-			Ws,
 			FieldType,
 			op.MinZero(
 				op.And{
@@ -750,7 +751,7 @@ func Hex(p *parser.Parser) (*parser.Cursor, bool) {
 
 // Token Definitions
 const (
-	// CANDID (github.com/di-wu/candid-go/grammar)
+	// CANDID (github.com/di-wu/candid-go/internal/candid)
 
 	ESC = 0x005C // \
 )
@@ -759,7 +760,7 @@ const (
 const (
 	Unknown = iota
 
-	// CANDID (github.com/di-wu/candid-go/grammar)
+	// CANDID (github.com/di-wu/candid-go/internal/candid)
 
 	ProgT      // 001
 	TypeT      // 002
@@ -790,7 +791,7 @@ const (
 var NodeTypes = []string{
 	"UNKNOWN",
 
-	// CANDID (github.com/di-wu/candid-go/grammar)
+	// CANDID (github.com/di-wu/candid-go/internal/candid)
 
 	"Prog",
 	"Type",

@@ -3,19 +3,30 @@
 package main
 
 import (
-	"github.com/pegn/pegn-go"
+	"fmt"
 	"io/ioutil"
 	"log"
+
+	"github.com/pegn/pegn-go"
 )
 
 func main() {
-	rawGrammar, _ := ioutil.ReadFile("internal/grammar/grammar.pegn")
-	if err := pegn.GenerateFromFiles("internal/grammar/", pegn.Config{
-		ModulePath:     "github.com/di-wu/candid-go/grammar",
-		IgnoreReserved: true,
-		TypeSuffix:     "T",
-	}, rawGrammar); err != nil {
-		log.Fatal(err)
+	for _, grammar := range []struct {
+		path string
+		name string
+	}{
+		{path: "internal/candid"},
+		{path: "internal/candid_test", name: "test"},
+	} {
+		rawGrammar, _ := ioutil.ReadFile(fmt.Sprintf("%s/grammar.pegn", grammar.path))
+		if err := pegn.GenerateFromFiles(fmt.Sprintf("%s/", grammar.path), pegn.Config{
+			ModulePath:     fmt.Sprintf("github.com/di-wu/candid-go/%s", grammar.path),
+			ModuleName:     grammar.name,
+			IgnoreReserved: true,
+			TypeSuffix:     "T",
+		}, rawGrammar); err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("Successfully generated the %s sub-module.\n", grammar.path)
 	}
-	log.Println("Successfully generated the pegn sub-module.")
 }

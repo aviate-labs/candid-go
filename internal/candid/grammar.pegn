@@ -1,4 +1,4 @@
-# CANDID (v0.1.1) github.com/di-wu/candid-go/grammar
+# CANDID (v0.1.1) github.com/di-wu/candid-go/internal/candid
 
 Prog      <-- (Def (';' Ws Def)*)?     ';'? Ws
               (Actor (';' Ws Actor)*)? ';'? Ws

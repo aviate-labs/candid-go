@@ -3,12 +3,13 @@ package candid_test
 import (
 	"embed"
 	"fmt"
-	grammar "github.com/allusion-be/candid-go/internal/grammar"
-	"github.com/di-wu/parser"
-	"github.com/di-wu/parser/ast"
 	"io/fs"
 	"strings"
 	"testing"
+
+	"github.com/allusion-be/candid-go/internal/candid"
+	"github.com/di-wu/parser"
+	"github.com/di-wu/parser/ast"
 )
 
 //go:embed testdata
@@ -24,7 +25,7 @@ func TestExamples(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			n, err := grammar.Prog(p)
+			n, err := candid.Prog(p)
 			if err != nil {
 				t.Fatal(n, err)
 			}
@@ -40,7 +41,7 @@ func TestWs(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := grammar.Ws(p); err != nil {
+	if _, err := candid.Ws(p); err != nil {
 		t.Error(err)
 	}
 	if _, err := p.Expect(parser.EOD); err != nil {
@@ -56,7 +57,7 @@ func TestName(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if _, err := grammar.Name(p); err != nil {
+		if _, err := candid.Name(p); err != nil {
 			t.Error(err)
 		}
 	}
@@ -67,9 +68,9 @@ func ExampleArgType() {
 		p, _ := ast.New([]byte(s))
 		return p
 	}
-	fmt.Println(grammar.ArgType(p("name : text")))
-	fmt.Println(grammar.ArgType(p("age : nat8")))
-	fmt.Println(grammar.ArgType(p("id : nat64")))
+	fmt.Println(candid.ArgType(p("name : text")))
+	fmt.Println(candid.ArgType(p("age : nat8")))
+	fmt.Println(candid.ArgType(p("id : nat64")))
 	// output:
 	// ["ArgType",[["Id","name"],["PrimType","text"]]] <nil>
 	// ["ArgType",[["Id","age"],["PrimType","nat8"]]] <nil>
@@ -83,7 +84,7 @@ func ExampleTupType() {
 		"()",
 	} {
 		p, _ := ast.New([]byte(tuple))
-		n, err := grammar.TupType(p)
+		n, err := candid.TupType(p)
 		fmt.Println(n, err)
 	}
 	// output:
@@ -100,7 +101,7 @@ func ExampleMethType() {
 		"deleteUser : (id : nat64) -> () oneway",
 	} {
 		p, _ := ast.New([]byte(method))
-		fmt.Println(grammar.MethType(p))
+		fmt.Println(candid.MethType(p))
 	}
 	// output:
 	// ["MethType",[["Id","addUser"],["FuncType",[["TupType",[["ArgType",[["Id","name"],["PrimType","text"]]],["ArgType",[["Id","age"],["PrimType","nat8"]]]]],["TupType",[["ArgType",[["Id","id"],["PrimType","nat64"]]]]]]]]] <nil>
@@ -117,7 +118,7 @@ func ExampleActorType() {
 	deleteUser : (id : nat64) -> () oneway;
 }`
 	p, _ := ast.New([]byte(example))
-	actor, _ := grammar.ActorType(p)
+	actor, _ := candid.ActorType(p)
 	fmt.Println(len(actor.Children()))
 	// output:
 	// 4
@@ -130,7 +131,7 @@ func ExampleFuncType() {
 		"(name : text, address : text, nr : nat16) -> (nick : text, id : nat64)",
 	} {
 		p, _ := ast.New([]byte(function))
-		fmt.Println(grammar.FuncType(p))
+		fmt.Println(candid.FuncType(p))
 	}
 	// output:
 	// ["FuncType",[["TupType",[["ArgType",[["PrimType","text"]]],["ArgType",[["PrimType","text"]]],["ArgType",[["PrimType","nat16"]]]]],["TupType",[["ArgType",[["PrimType","text"]]],["ArgType",[["PrimType","nat64"]]]]]]] <nil>
@@ -145,7 +146,7 @@ func ExampleConsType() {
 		"record { 0 : nat; 1 : nat }",
 	} {
 		p, _ := ast.New([]byte(record))
-		fmt.Println(grammar.ConsType(p))
+		fmt.Println(candid.ConsType(p))
 	}
 	// output:
 	// ["Record",[["FieldType",[["Id","num"],["PrimType","nat"]]]]] <nil>
@@ -161,7 +162,7 @@ func ExampleDef() {
 		"type stream = opt record {head : nat; next : func () -> stream}",
 	} {
 		p, _ := ast.New([]byte(def))
-		fmt.Println(grammar.Def(p))
+		fmt.Println(candid.Def(p))
 	}
 	// output:
 	// ["Type",[["Id","list"],["Opt",[["Id","node"]]]]] <nil>
@@ -179,7 +180,7 @@ func TestDef_service(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := grammar.Def(p); err != nil {
+	if _, err := candid.Def(p); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := p.Expect(parser.EOD); err != nil {
@@ -195,7 +196,7 @@ func TestDef_function(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := grammar.Def(p); err != nil {
+	if _, err := candid.Def(p); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := p.Expect(parser.EOD); err != nil {

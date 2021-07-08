@@ -2,14 +2,15 @@ package candid
 
 import (
 	"fmt"
-	spec "github.com/allusion-be/candid-go/internal/grammar"
-	"github.com/di-wu/parser"
-	"github.com/di-wu/parser/ast"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/allusion-be/candid-go/internal/candid"
+	"github.com/di-wu/parser"
+	"github.com/di-wu/parser/ast"
 )
 
 // ParseMotoko parses the Motoko (.mo) files and returns the interface description that is defined in it.
@@ -47,7 +48,7 @@ func ParseDID(raw []byte) (Description, error) {
 	if err != nil {
 		return Description{}, err
 	}
-	n, err := spec.Prog(p)
+	n, err := candid.Prog(p)
 	if err != nil {
 		return Description{}, err
 	}
