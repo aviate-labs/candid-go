@@ -2,8 +2,20 @@ package idl
 
 import (
 	"bytes"
+	"fmt"
 	"math/big"
+	"strings"
 )
+
+type Tuple []Type
+
+func (ts Tuple) String() string {
+	var s []string
+	for _, t := range ts {
+		s = append(s, t.String())
+	}
+	return fmt.Sprintf("(%s)", strings.Join(s, ", "))
+}
 
 type Type interface {
 	BuildTypeTable(*TypeTable)
@@ -11,6 +23,8 @@ type Type interface {
 	EncodeType() []byte
 	EncodeValue() []byte
 	Name() string
+
+	fmt.Stringer
 }
 
 type TypeID *big.Int

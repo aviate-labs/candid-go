@@ -30,7 +30,7 @@ func test(t *testing.T, x string, ts ...idl.Type) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strEqual(ts, ts_) {
+	if ts := idl.Tuple(ts); !strEqual(ts, ts_) {
 		t.Errorf("%v, %v", ts, ts_)
 	}
 }

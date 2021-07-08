@@ -26,3 +26,7 @@ func (Null) EncodeValue() []byte {
 func (Null) Name() string {
 	return "null"
 }
+
+func (n Null) String() string {
+	return n.Name()
+}

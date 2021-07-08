@@ -2,21 +2,33 @@ package idl
 
 import (
 	"bytes"
-	"fmt"
 	"math/big"
 
 	"github.com/allusion-be/leb128"
 )
 
-func Decode(bs []byte) ([]Type, error) {
+func Decode(bs []byte) (Tuple, error) {
+	if len(bs) == 0 {
+		return nil, &FormatError{
+			Description: "empty",
+		}
+	}
+
 	rs := bytes.NewReader(bs)
 	magic := make([]byte, 4)
 	n, err := rs.Read(magic)
 	if err != nil {
 		return nil, err
 	}
-	if n < 4 || !bytes.Equal(magic, []byte{'D', 'I', 'D', 'L'}) {
-		return nil, fmt.Errorf("invalid magic number: %x", magic)
+	if n < 4 {
+		return nil, &FormatError{
+			Description: "no magic bytes",
+		}
+	}
+	if !bytes.Equal(magic, []byte{'D', 'I', 'D', 'L'}) {
+		return nil, &FormatError{
+			Description: "wrong magic bytes",
+		}
 	}
 	if _, err := NewTable(rs); err != nil {
 		return nil, err
