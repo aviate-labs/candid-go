@@ -1,10 +1,10 @@
-package test_test
+package candidtest_test
 
 import (
 	"io/ioutil"
 	"testing"
 
-	test "github.com/allusion-be/candid-go/internal/candid_test"
+	"github.com/allusion-be/candid-go/internal/candidtest"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
 )
@@ -12,7 +12,7 @@ import (
 func TestData(t *testing.T) {
 	rawDid, _ := ioutil.ReadFile("testdata/prim.test.did")
 	p, _ := ast.New(rawDid)
-	if _, err := test.TestData(p); err != nil {
+	if _, err := candidtest.TestData(p); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := p.Expect(parser.EOD); err != nil {

@@ -3,6 +3,7 @@ package idl
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"math"
 	"math/big"
@@ -51,11 +52,13 @@ func readFloat(r *bytes.Reader, n int) (*big.Float, error) {
 			)),
 		), nil
 	default:
-		return big.NewFloat(
-			math.Float64frombits(
-				binary.LittleEndian.Uint64(bs),
-			),
-		), nil
+		f := math.Float64frombits(
+			binary.LittleEndian.Uint64(bs),
+		)
+		if math.IsNaN(f) {
+			return nil, fmt.Errorf("float: NaN")
+		}
+		return big.NewFloat(f), nil
 	}
 }
 

@@ -80,7 +80,9 @@ func Decode(bs []byte) (Tuple, error) {
 		case -15:
 			v = new(Text)
 		default:
-			panic(n)
+			return nil, &FormatError{
+				Description: "wrong type",
+			}
 		}
 		if err := v.Decode(rs); err != nil {
 			return nil, err

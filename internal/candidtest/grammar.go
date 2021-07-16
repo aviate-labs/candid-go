@@ -1,7 +1,7 @@
 // Do not edit. This file is auto-generated.
 // Grammar: CANDID-TEST (v0.1.0) github.com/di-wu/candid-go/internal/candid_test
 
-package test
+package candidtest
 
 import (
 	"github.com/di-wu/parser"
@@ -118,7 +118,7 @@ func Test(p *ast.Parser) (*ast.Node, error) {
 				op.Or{
 					TestGoodTmpl,
 					TestBadTmpl,
-					TestTestTmpl,
+					TestTest,
 				},
 				op.Optional(
 					op.And{
@@ -137,7 +137,17 @@ func TestGoodTmpl(p *ast.Parser) (*ast.Node, error) {
 		op.And{
 			':',
 			Ws,
-			ValuesBr,
+			TestGood,
+		},
+	)
+}
+
+func TestGood(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        TestGoodT,
+			TypeStrings: NodeTypes,
+			Value:       ValuesBr,
 		},
 	)
 }
@@ -145,20 +155,37 @@ func TestGoodTmpl(p *ast.Parser) (*ast.Node, error) {
 func TestBadTmpl(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		op.And{
-			'!',
-			TestGoodTmpl,
+			"!:",
+			Ws,
+			TestBad,
 		},
 	)
 }
 
-func TestTestTmpl(p *ast.Parser) (*ast.Node, error) {
+func TestBad(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
-		op.And{
-			"==",
-			Ws,
-			Input,
-			Ws,
-			TestGoodTmpl,
+		ast.Capture{
+			Type:        TestBadT,
+			TypeStrings: NodeTypes,
+			Value:       ValuesBr,
+		},
+	)
+}
+
+func TestTest(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        TestTestT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"==",
+				Ws,
+				Input,
+				Ws,
+				':',
+				Ws,
+				ValuesBr,
+			},
 		},
 	)
 }
@@ -319,8 +346,18 @@ func Opt(p *ast.Parser) (*ast.Node, error) {
 func Input(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		op.Or{
-			BlobInput,
+			BlobInputTmpl,
+			TextInputTmpl,
+		},
+	)
+}
+
+func TextInputTmpl(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			'"',
 			TextInput,
+			'"',
 		},
 	)
 }
@@ -330,7 +367,17 @@ func TextInput(p *ast.Parser) (*ast.Node, error) {
 		ast.Capture{
 			Type:        TextInputT,
 			TypeStrings: NodeTypes,
-			Value:       QuotedString,
+			Value:       String,
+		},
+	)
+}
+
+func BlobInputTmpl(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			"blob \"",
+			BlobInput,
+			'"',
 		},
 	)
 }
@@ -340,10 +387,7 @@ func BlobInput(p *ast.Parser) (*ast.Node, error) {
 		ast.Capture{
 			Type:        BlobInputT,
 			TypeStrings: NodeTypes,
-			Value: op.And{
-				"blob ",
-				QuotedString,
-			},
+			Value:       String,
 		},
 	)
 }
@@ -353,17 +397,11 @@ func Description(p *ast.Parser) (*ast.Node, error) {
 		ast.Capture{
 			Type:        DescriptionT,
 			TypeStrings: NodeTypes,
-			Value:       QuotedString,
-		},
-	)
-}
-
-func QuotedString(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.And{
-			'"',
-			String,
-			'"',
+			Value: op.And{
+				'"',
+				String,
+				'"',
+			},
 		},
 	)
 }
@@ -535,19 +573,22 @@ const (
 	TestDataT    // 001
 	CommentTextT // 002
 	TestT        // 003
-	NullT        // 004
-	BoolT        // 005
-	NatT         // 006
-	IntT         // 007
-	FloatT       // 008
-	BaseT        // 009
-	TextT        // 010
-	ReservedT    // 011
-	EmptyT       // 012
-	OptT         // 013
-	TextInputT   // 014
-	BlobInputT   // 015
-	DescriptionT // 016
+	TestGoodT    // 004
+	TestBadT     // 005
+	TestTestT    // 006
+	NullT        // 007
+	BoolT        // 008
+	NatT         // 009
+	IntT         // 010
+	FloatT       // 011
+	BaseT        // 012
+	TextT        // 013
+	ReservedT    // 014
+	EmptyT       // 015
+	OptT         // 016
+	TextInputT   // 017
+	BlobInputT   // 018
+	DescriptionT // 019
 )
 
 var NodeTypes = []string{
@@ -558,6 +599,9 @@ var NodeTypes = []string{
 	"TestData",
 	"CommentText",
 	"Test",
+	"TestGood",
+	"TestBad",
+	"TestTest",
 	"Null",
 	"Bool",
 	"Nat",

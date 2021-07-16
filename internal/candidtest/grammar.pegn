@@ -11,10 +11,12 @@ MultiComment  <- (!'*/' CommentText? EndLine)*
 Ws          <- (' ' / x09 / EndLine)*
 EndLine     <- x0A / x0D / (x0D x0A)
 
-Test         <-- 'assert ' Input Ws (TestGoodTmpl / TestBadTmpl / TestTestTmpl) (' ' Description)? ';'
-TestGoodTmpl  <- ':' Ws ValuesBr
-TestBadTmpl   <- '!' TestGoodTmpl
-TestTestTmpl  <- '==' Ws Input Ws TestGoodTmpl
+Test         <-- 'assert ' Input Ws (TestGoodTmpl / TestBadTmpl / TestTest) (' ' Description)? ';'
+TestGoodTmpl  <- ':' Ws TestGood
+TestGood     <-- ValuesBr
+TestBadTmpl   <- '!:' Ws TestBad
+TestBad      <-- ValuesBr
+TestTest     <-- '==' Ws Input Ws ':' Ws ValuesBr
 ValuesBr      <- '()' / '(' Values (', ' Values)* ')'
 Values        <- Null / Bool / Nat / Int / Float / Text / Reserved / Empty / Opt
 
@@ -29,13 +31,14 @@ Reserved <-- 'reserved'
 Empty    <-- 'empty'
 Opt      <-- 'opt ' Values
 
-Input         <- BlobInput / TextInput
-TextInput    <-- QuotedString
-BlobInput    <-- 'blob ' QuotedString
+Input          <- BlobInputTmpl / TextInputTmpl
+TextInputTmpl  <- '"' TextInput '"'
+TextInput     <-- String
+BlobInputTmpl  <- 'blob "' BlobInput '"'
+BlobInput     <-- String
 
-Description  <-- QuotedString
+Description  <-- '"' String '"'
 
-QuotedString  <- '"' String '"'
 String        <- Char*
 
 # Copy/Pasted from Candid Grammar
