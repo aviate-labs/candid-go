@@ -93,10 +93,10 @@ func (n *Nat) Decode(r *bytes.Reader) error {
 
 func (n Nat) EncodeType() []byte {
 	if n.base == 0 {
-		bs, _ := leb128.EncodeSigned(natType)
+		bs, _ := leb128.EncodeSigned(big.NewInt(natType))
 		return bs
 	}
-	natXType := new(big.Int).Set(natXType)
+	natXType := new(big.Int).Set(big.NewInt(natXType))
 	natXType = natXType.Add(
 		natXType,
 		big.NewInt(3-int64(log2(n.base))),

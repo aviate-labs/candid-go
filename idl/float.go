@@ -52,7 +52,7 @@ func (f *Float) Decode(r *bytes.Reader) error {
 }
 
 func (f Float) EncodeType() []byte {
-	floatXType := new(big.Int).Set(floatXType)
+	floatXType := new(big.Int).Set(big.NewInt(floatXType))
 	if f.base == 64 {
 		floatXType.Add(floatXType, big.NewInt(-1))
 	}

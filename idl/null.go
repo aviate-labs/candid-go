@@ -2,6 +2,7 @@ package idl
 
 import (
 	"bytes"
+	"math/big"
 
 	"github.com/allusion-be/leb128"
 )
@@ -15,7 +16,7 @@ func (n *Null) Decode(_ *bytes.Reader) error {
 }
 
 func (Null) EncodeType() []byte {
-	bs, _ := leb128.EncodeSigned(nullType)
+	bs, _ := leb128.EncodeSigned(big.NewInt(nullType))
 	return bs
 }
 

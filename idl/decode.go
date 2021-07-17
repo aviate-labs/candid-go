@@ -2,6 +2,7 @@ package idl
 
 import (
 	"bytes"
+	"io"
 	"math/big"
 
 	"github.com/allusion-be/leb128"
@@ -14,6 +15,7 @@ func Decode(bs []byte) (Tuple, error) {
 		}
 	}
 
+	// Validate the magic number (DIDL).
 	rs := bytes.NewReader(bs)
 	magic := make([]byte, 4)
 	n, err := rs.Read(magic)
@@ -30,6 +32,7 @@ func Decode(bs []byte) (Tuple, error) {
 			Description: "wrong magic bytes",
 		}
 	}
+
 	if _, err := NewTable(rs); err != nil {
 		return nil, err
 	}
@@ -37,57 +40,34 @@ func Decode(bs []byte) (Tuple, error) {
 	if err != nil {
 		return nil, err
 	}
-	var ts []TypeID
+	var ts []int64
 	for i := new(big.Int).Set(l); i.Sign() > 0; i.Add(i, big.NewInt(-1)) {
 		t, err := leb128.DecodeSigned(rs)
 		if err != nil {
 			return nil, err
 		}
-		ts = append(ts, t)
+		ts = append(ts, t.Int64())
 	}
 	var vs []Type
 	for _, t := range ts {
-		var v Type
-		switch n := (*big.Int)(t).Int64(); n {
-		case -1:
-			v = new(Null)
-		case -2:
-			v = new(Bool)
-		case -3:
-			v = new(Nat)
-		case -4:
-			v = new(Int)
-		case -5:
-			v = Nat8()
-		case -6:
-			v = Nat16()
-		case -7:
-			v = Nat32()
-		case -8:
-			v = Nat64()
-		case -9:
-			v = Int8()
-		case -10:
-			v = Int16()
-		case -11:
-			v = Int32()
-		case -12:
-			v = Int64()
-		case -13:
-			v = Float32()
-		case -14:
-			v = Float64()
-		case -15:
-			v = new(Text)
-		default:
-			return nil, &FormatError{
-				Description: "wrong type",
-			}
+		v, err := getType(t)
+		if err != nil {
+			return nil, err
 		}
 		if err := v.Decode(rs); err != nil {
+			if err == io.EOF {
+				return nil, &FormatError{
+					Description: "end of data",
+				}
+			}
 			return nil, err
 		}
 		vs = append(vs, v)
+	}
+	if rs.Len() != 0 {
+		return nil, &FormatError{
+			Description: "too long",
+		}
 	}
 	return vs, nil
 }

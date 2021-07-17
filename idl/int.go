@@ -96,10 +96,10 @@ func (n *Int) Decode(r *bytes.Reader) error {
 
 func (n Int) EncodeType() []byte {
 	if n.base == 0 {
-		bs, _ := leb128.EncodeSigned(intType)
+		bs, _ := leb128.EncodeSigned(big.NewInt(intType))
 		return bs
 	}
-	intXType := new(big.Int).Set(intXType)
+	intXType := new(big.Int).Set(big.NewInt(intXType))
 	intXType = intXType.Add(
 		intXType,
 		big.NewInt(3-int64(log2(n.base))),

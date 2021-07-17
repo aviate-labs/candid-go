@@ -38,7 +38,7 @@ func (t *Text) Decode(r *bytes.Reader) error {
 }
 
 func (t Text) EncodeType() []byte {
-	bs, _ := leb128.EncodeSigned(textType)
+	bs, _ := leb128.EncodeSigned(big.NewInt(textType))
 	return bs
 }
 
