@@ -91,26 +91,23 @@ func (n *Nat) Decode(r *bytes.Reader) error {
 	return nil
 }
 
-func (n Nat) EncodeType() []byte {
+func (n Nat) EncodeType(_ *TypeTable) ([]byte, error) {
 	if n.base == 0 {
-		bs, _ := leb128.EncodeSigned(big.NewInt(natType))
-		return bs
+		return leb128.EncodeSigned(big.NewInt(natType))
 	}
 	natXType := new(big.Int).Set(big.NewInt(natXType))
 	natXType = natXType.Add(
 		natXType,
 		big.NewInt(3-int64(log2(n.base))),
 	)
-	bs, _ := leb128.EncodeSigned(natXType)
-	return bs
+	return leb128.EncodeSigned(natXType)
 }
 
-func (n Nat) EncodeValue() []byte {
+func (n Nat) EncodeValue() ([]byte, error) {
 	if n.base == 0 {
-		bs, _ := leb128.EncodeUnsigned(n.i)
-		return bs
+		return leb128.EncodeUnsigned(n.i)
 	}
-	return writeInt(n.i, int(n.base/8))
+	return writeInt(n.i, int(n.base/8)), nil
 }
 
 func (Nat) Name() string {

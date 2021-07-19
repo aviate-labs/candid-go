@@ -37,15 +37,16 @@ func (t *Text) Decode(r *bytes.Reader) error {
 	return nil
 }
 
-func (t Text) EncodeType() []byte {
-	bs, _ := leb128.EncodeSigned(big.NewInt(textType))
-	return bs
+func (t Text) EncodeType(_ *TypeTable) ([]byte, error) {
+	return leb128.EncodeSigned(big.NewInt(textType))
 }
 
-func (t Text) EncodeValue() []byte {
-	bs, _ := leb128.EncodeUnsigned(big.NewInt(int64(len(t.v))))
-	bs = append(bs, []byte(t.v)...)
-	return bs
+func (t Text) EncodeValue() ([]byte, error) {
+	bs, err := leb128.EncodeUnsigned(big.NewInt(int64(len(t.v))))
+	if err != nil {
+		return nil, err
+	}
+	return append(bs, []byte(t.v)...), nil
 }
 
 func (Text) Name() string {

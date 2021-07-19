@@ -35,16 +35,15 @@ func (b *Bool) Decode(r *bytes.Reader) error {
 	return nil
 }
 
-func (Bool) EncodeType() []byte {
-	bs, _ := leb128.EncodeSigned(big.NewInt(boolType))
-	return bs
+func (Bool) EncodeType(_ *TypeTable) ([]byte, error) {
+	return leb128.EncodeSigned(big.NewInt(boolType))
 }
 
-func (b Bool) EncodeValue() []byte {
+func (b Bool) EncodeValue() ([]byte, error) {
 	if b.v {
-		return []byte{0x01}
+		return []byte{0x01}, nil
 	}
-	return []byte{0x00}
+	return []byte{0x00}, nil
 }
 
 func (Bool) Name() string {

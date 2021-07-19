@@ -94,27 +94,24 @@ func (n *Int) Decode(r *bytes.Reader) error {
 	return nil
 }
 
-func (n Int) EncodeType() []byte {
+func (n Int) EncodeType(_ *TypeTable) ([]byte, error) {
 	if n.base == 0 {
-		bs, _ := leb128.EncodeSigned(big.NewInt(intType))
-		return bs
+		return leb128.EncodeSigned(big.NewInt(intType))
 	}
 	intXType := new(big.Int).Set(big.NewInt(intXType))
 	intXType = intXType.Add(
 		intXType,
 		big.NewInt(3-int64(log2(n.base))),
 	)
-	bs, _ := leb128.EncodeSigned(intXType)
-	return bs
+	return leb128.EncodeSigned(intXType)
 }
 
-func (n Int) EncodeValue() []byte {
+func (n Int) EncodeValue() ([]byte, error) {
 	if n.base == 0 {
-		bs, _ := leb128.EncodeSigned(n.i)
-		return bs
+		return leb128.EncodeSigned(n.i)
 	}
 
-	return writeInt(n.i, int(n.base/8))
+	return writeInt(n.i, int(n.base/8)), nil
 }
 
 func (Int) Name() string {

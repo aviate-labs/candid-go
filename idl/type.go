@@ -6,26 +6,6 @@ import (
 	"strings"
 )
 
-type Tuple []Type
-
-func (ts Tuple) String() string {
-	var s []string
-	for _, t := range ts {
-		s = append(s, t.String())
-	}
-	return fmt.Sprintf("(%s)", strings.Join(s, ", "))
-}
-
-type Type interface {
-	BuildTypeTable(*TypeTable)
-	Decode(*bytes.Reader) error
-	EncodeType() []byte
-	EncodeValue() []byte
-	Name() string
-
-	fmt.Stringer
-}
-
 var (
 	nullType      int64 = -1
 	boolType      int64 = -2
@@ -45,6 +25,40 @@ var (
 	serviceType   int64 = -23
 	principalType int64 = -24
 )
+
+type PrimType interface {
+	prim()
+}
+
+type Tuple []Type
+
+func (ts Tuple) String() string {
+	var s []string
+	for _, t := range ts {
+		s = append(s, t.String())
+	}
+	return fmt.Sprintf("(%s)", strings.Join(s, ", "))
+}
+
+type Type interface {
+	// BuildTypeTable adds itself to the typetable.
+	// Not the case for PrimType.
+	BuildTypeTable(*TypeTable) error
+
+	// Decodes the value from the reader.
+	Decode(*bytes.Reader) error
+
+	// Encodes the type.
+	EncodeType(tt *TypeTable) ([]byte, error)
+
+	// Encodes the value.
+	EncodeValue() ([]byte, error)
+
+	// Name of the type.
+	Name() string
+
+	fmt.Stringer
+}
 
 func getType(t int64) (Type, error) {
 	switch t {
@@ -94,12 +108,11 @@ func getType(t int64) (Type, error) {
 	}
 }
 
-type PrimType interface {
-	prim()
-}
-
 type primType struct{}
 
-func (primType) prim() {}
+func (primType) BuildTypeTable(_ *TypeTable) error {
+	// Nothing to add to the typetable from prim types.
+	return nil
+}
 
-func (primType) BuildTypeTable(_ *TypeTable) {}
+func (primType) prim() {}

@@ -106,12 +106,15 @@ func NewTable(r *bytes.Reader) (TypeTable, error) {
 	return TypeTable{}, nil
 }
 
+// Add saves the encoded data in the typetable based on type's name.
 func (table *TypeTable) Add(t Type, bs []byte) {
 	i := len(table.types)
 	table.indexes[t.Name()] = i
 	table.types = append(table.types, bs)
 }
 
+// Encode encodes the typetable itself.
+// T*(<X>^N) = leb128(N) T(<X>)^N
 func (table TypeTable) Encode() ([]byte, error) {
 	bs, err := leb128.EncodeUnsigned(big.NewInt(int64(len(table.types))))
 	if err != nil {
@@ -123,13 +126,15 @@ func (table TypeTable) Encode() ([]byte, error) {
 	return bs, nil
 }
 
+// Has checks whether the typetable contains the given type.
 func (table TypeTable) Has(t Type) bool {
 	_, ok := table.indexes[t.Name()]
 	return ok
 }
 
-func (table TypeTable) Index(name string) int {
-	if i, ok := table.indexes[name]; ok {
+// Index returns the index of the given type if present, -1 otherwise.
+func (table TypeTable) Index(t Type) int {
+	if i, ok := table.indexes[t.Name()]; ok {
 		return i
 	}
 	return -1

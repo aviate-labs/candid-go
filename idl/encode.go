@@ -14,8 +14,16 @@ func Encode(types []Type) ([]byte, error) {
 	)
 	for _, t := range types {
 		t.BuildTypeTable(tt)
-		ts = append(ts, t.EncodeType()...)
-		vs = append(vs, t.EncodeValue()...)
+		ts_, err := t.EncodeType(tt)
+		if err != nil {
+			return nil, err
+		}
+		ts = append(ts, ts_...)
+		vs_, err := t.EncodeValue()
+		if err != nil {
+			return nil, err
+		}
+		vs = append(vs, vs_...)
 	}
 
 	magic := []byte{'D', 'I', 'D', 'L'}

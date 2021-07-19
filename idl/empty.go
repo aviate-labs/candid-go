@@ -15,13 +15,12 @@ func (Empty) Decode(*bytes.Reader) error {
 	return nil
 }
 
-func (Empty) EncodeType() []byte {
-	bs, _ := leb128.EncodeSigned(big.NewInt(emptyType))
-	return bs
+func (Empty) EncodeType(_ *TypeTable) ([]byte, error) {
+	return leb128.EncodeSigned(big.NewInt(emptyType))
 }
 
-func (Empty) EncodeValue() []byte {
-	return []byte{}
+func (Empty) EncodeValue() ([]byte, error) {
+	return []byte{}, nil
 }
 
 func (Empty) Name() string {

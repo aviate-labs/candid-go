@@ -51,17 +51,16 @@ func (f *Float) Decode(r *bytes.Reader) error {
 	return nil
 }
 
-func (f Float) EncodeType() []byte {
+func (f Float) EncodeType(_ *TypeTable) ([]byte, error) {
 	floatXType := new(big.Int).Set(big.NewInt(floatXType))
 	if f.base == 64 {
 		floatXType.Add(floatXType, big.NewInt(-1))
 	}
-	bs, _ := leb128.EncodeSigned(floatXType)
-	return bs
+	return leb128.EncodeSigned(floatXType)
 }
 
-func (f Float) EncodeValue() []byte {
-	return writeFloat(f.f, int(f.base/8))
+func (f Float) EncodeValue() ([]byte, error) {
+	return writeFloat(f.f, int(f.base/8)), nil
 }
 
 func (Float) Name() string {
