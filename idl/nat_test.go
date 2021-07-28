@@ -16,7 +16,7 @@ func ExampleNat() {
 		return bi
 	}()})
 	// Output:
-	// can not leb128 encode negative values
+	// enc: can not leb128 encode negative values
 	// 4449444c00017d00
 	// 4449444c00017d2a
 	// 4449444c00017dd285d8cc04
@@ -32,7 +32,7 @@ func ExampleNat8() {
 	// 4449444c00017b00
 	// 4449444c00017b2a
 	// 4449444c00017bff
-	// invalid value: 256
+	// enc: invalid value: 256
 }
 
 func ExampleNat16() {
@@ -44,7 +44,7 @@ func ExampleNat16() {
 	// 4449444c00017a0000
 	// 4449444c00017a2a00
 	// 4449444c00017affff
-	// invalid value: 65536
+	// enc: invalid value: 65536
 }
 
 func ExampleNat32() {
@@ -56,7 +56,7 @@ func ExampleNat32() {
 	// 4449444c00017900000000
 	// 4449444c0001792a000000
 	// 4449444c000179ffffffff
-	// invalid value: 4294967296
+	// enc: invalid value: 4294967296
 }
 
 func ExampleNat64() {

@@ -34,14 +34,30 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 		}
 	}
 
+	var tds []Type
 	{ // T
 		tdtl, err := leb128.DecodeUnsigned(r)
 		if err != nil {
 			return nil, nil, err
 		}
-		_ = tdtl
-		var types []Type
-		_ = types
+		for i := 0; i < int(tdtl.Int64()); i++ {
+			tid, err := leb128.DecodeSigned(r)
+			if err != nil {
+				return nil, nil, err
+			}
+			switch tid.Int64() {
+			case optType:
+				tid, err := leb128.DecodeSigned(r)
+				if err != nil {
+					return nil, nil, err
+				}
+				v, err := getType(tid.Int64(), tds)
+				if err != nil {
+					return nil, nil, err
+				}
+				tds = append(tds, &Opt{v})
+			}
+		}
 	}
 
 	tsl, err := leb128.DecodeUnsigned(r)
@@ -56,7 +72,7 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 			if err != nil {
 				return nil, nil, err
 			}
-			t, err := getType(tid.Int64())
+			t, err := getType(tid.Int64(), tds)
 			if err != nil {
 				return nil, nil, err
 			}

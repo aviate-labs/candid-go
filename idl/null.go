@@ -16,7 +16,7 @@ func (n *Null) Decode(_ *bytes.Reader) (interface{}, error) {
 	return nil, nil
 }
 
-func (Null) EncodeType() ([]byte, error) {
+func (Null) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(nullType))
 }
 

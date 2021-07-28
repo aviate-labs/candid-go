@@ -44,7 +44,7 @@ func (n *Nat) Decode(r *bytes.Reader) (interface{}, error) {
 	return readUInt(r, int(n.base/8))
 }
 
-func (n Nat) EncodeType() ([]byte, error) {
+func (n Nat) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	if n.base == 0 {
 		return leb128.EncodeSigned(big.NewInt(natType))
 	}

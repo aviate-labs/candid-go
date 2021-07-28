@@ -29,7 +29,7 @@ func (t *Text) Decode(r *bytes.Reader) (interface{}, error) {
 	return string(bs), nil
 }
 
-func (t Text) EncodeType() ([]byte, error) {
+func (t Text) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(textType))
 }
 

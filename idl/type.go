@@ -17,6 +17,7 @@ var (
 	textType     int64 = -15 // 0x71
 	reservedType int64 = -16 // 0x70
 	emptyType    int64 = -17 // 0x6f
+	optType      int64 = -18 // 0x6e
 )
 
 type PrimType interface {
@@ -41,7 +42,7 @@ type Type interface {
 	Decode(*bytes.Reader) (interface{}, error)
 
 	// Encodes the type.
-	EncodeType() ([]byte, error)
+	EncodeType(*TypeDefinitionTable) ([]byte, error)
 
 	// Encodes the value.
 	EncodeValue(v interface{}) ([]byte, error)
@@ -49,7 +50,14 @@ type Type interface {
 	fmt.Stringer
 }
 
-func getType(t int64) (Type, error) {
+func getType(t int64, tds []Type) (Type, error) {
+	if t >= 0 {
+		if int(t) >= len(tds) {
+			return nil, fmt.Errorf("type index out of range: %d", t)
+		}
+		return tds[t], nil
+	}
+
 	switch t {
 	case nullType:
 		return new(Null), nil

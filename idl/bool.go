@@ -27,7 +27,7 @@ func (b Bool) Decode(r *bytes.Reader) (interface{}, error) {
 	}
 }
 
-func (Bool) EncodeType() ([]byte, error) {
+func (Bool) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(boolType))
 }
 

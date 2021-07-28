@@ -29,7 +29,7 @@ func (f *Float) Decode(r *bytes.Reader) (interface{}, error) {
 	return readFloat(r, int(f.base/8))
 }
 
-func (f Float) EncodeType() ([]byte, error) {
+func (f Float) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	floatXType := new(big.Int).Set(big.NewInt(floatXType))
 	if f.base == 64 {
 		floatXType.Add(floatXType, big.NewInt(-1))

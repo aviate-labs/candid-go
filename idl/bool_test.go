@@ -12,6 +12,6 @@ func ExampleBool() {
 	// Output:
 	// 4449444c00017e01
 	// 4449444c00017e00
-	// invalid argument: 0
-	// invalid argument: false
+	// enc: invalid argument: 0
+	// enc: invalid argument: false
 }

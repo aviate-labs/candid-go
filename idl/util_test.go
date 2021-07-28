@@ -10,14 +10,14 @@ import (
 func test(types []idl.Type, args []interface{}) {
 	e, err := idl.Encode(types, args)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("enc:", err)
 		return
 	}
 	fmt.Printf("%x\n", e)
 
 	ts, vs, err := idl.Decode(e)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("dec:", err)
 		return
 	}
 	if !reflect.DeepEqual(ts, types) {

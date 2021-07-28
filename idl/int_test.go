@@ -34,7 +34,7 @@ func ExampleInt8() {
 	test([]idl.Type{idl.Int8()}, []interface{}{big.NewInt(127)})
 	test([]idl.Type{idl.Int8()}, []interface{}{big.NewInt(128)})
 	// Output:
-	// invalid value: -129
+	// enc: invalid value: -129
 	// 4449444c00017780
 	// 4449444c000177d6
 	// 4449444c000177ff
@@ -42,7 +42,7 @@ func ExampleInt8() {
 	// 4449444c00017701
 	// 4449444c0001772a
 	// 4449444c0001777f
-	// invalid value: 128
+	// enc: invalid value: 128
 }
 
 func ExampleInt32() {

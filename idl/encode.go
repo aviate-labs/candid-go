@@ -13,12 +13,21 @@ func Encode(argumentTypes []Type, arguments []interface{}) ([]byte, error) {
 	}
 
 	// T
-	tdt := new(TypeDefinitionTable)
-	tdtl, err := leb128.EncodeSigned(big.NewInt(int64(len(tdt.Types))))
+	tdt := &TypeDefinitionTable{
+		Indexes: make(map[string]int),
+	}
+	for _, t := range argumentTypes {
+		t.AddTypeDefinition(tdt)
+	}
+
+	tdtl, err := leb128.EncodeSigned(big.NewInt(int64(len(tdt.Indexes))))
 	if err != nil {
 		return nil, err
 	}
 	var tdte []byte
+	for _, t := range tdt.Types {
+		tdte = append(tdte, t...)
+	}
 
 	tsl, err := leb128.EncodeSigned(big.NewInt(int64(len(argumentTypes))))
 	if err != nil {
@@ -30,7 +39,7 @@ func Encode(argumentTypes []Type, arguments []interface{}) ([]byte, error) {
 	)
 	for i, t := range argumentTypes {
 		{ // I
-			t, err := t.EncodeType()
+			t, err := t.EncodeType(tdt)
 			if err != nil {
 				return nil, err
 			}
