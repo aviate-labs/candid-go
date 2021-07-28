@@ -1,36 +1,29 @@
 package idl_test
 
 import (
-	"encoding/hex"
 	"fmt"
-	"math/big"
-	"testing"
+	"reflect"
 
 	"github.com/allusion-be/candid-go/idl"
 )
 
-func newInt(s string) *big.Int {
-	bi, _ := new(big.Int).SetString(s, 10)
-	return bi
-}
-
-func strEqual(a, b interface{}) bool {
-	return fmt.Sprintf("%v", a) == fmt.Sprintf("%v", b)
-}
-
-func test(t *testing.T, x string, ts ...idl.Type) {
-	bs, err := idl.Encode(ts)
+func test(types []idl.Type, args []interface{}) {
+	e, err := idl.Encode(types, args)
 	if err != nil {
-		t.Fatal(err)
+		fmt.Println(err)
+		return
 	}
-	if h := hex.EncodeToString(bs); h != x {
-		t.Error(x, h)
-	}
-	ts_, err := idl.Decode(bs)
+	fmt.Printf("%x\n", e)
+
+	ts, vs, err := idl.Decode(e)
 	if err != nil {
-		t.Fatal(err)
+		fmt.Println(err)
+		return
 	}
-	if ts := idl.Tuple(ts); !strEqual(ts, ts_) {
-		t.Errorf("%v, %v", ts, ts_)
+	if !reflect.DeepEqual(ts, types) {
+		fmt.Println("types:", types, ts)
+	}
+	if !reflect.DeepEqual(vs, args) {
+		fmt.Println("args", args, vs)
 	}
 }

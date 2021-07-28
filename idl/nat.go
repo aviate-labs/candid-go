@@ -9,89 +9,42 @@ import (
 )
 
 type Nat struct {
-	i    *big.Int
 	base uint8
 	primType
 }
 
 func Nat16() *Nat {
 	return &Nat{
-		i:    new(big.Int),
 		base: 16,
 	}
 }
 
 func Nat32() *Nat {
 	return &Nat{
-		i:    new(big.Int),
 		base: 32,
 	}
 }
 
 func Nat64() *Nat {
 	return &Nat{
-		i:    new(big.Int),
 		base: 64,
 	}
 }
 
 func Nat8() *Nat {
 	return &Nat{
-		i:    new(big.Int),
 		base: 8,
 	}
 }
 
-func NewNat(i *big.Int) *Nat {
-	return &Nat{i: i}
-}
-
-func NewNat16(i uint16) *Nat {
-	return &Nat{
-		i:    big.NewInt(int64(i)),
-		base: 16,
-	}
-}
-
-func NewNat32(i uint32) *Nat {
-	return &Nat{
-		i:    big.NewInt(int64(i)),
-		base: 32,
-	}
-}
-
-func NewNat64(i uint64) *Nat {
-	return &Nat{
-		i:    big.NewInt(int64(i)),
-		base: 64,
-	}
-}
-
-func NewNat8(i uint8) *Nat {
-	return &Nat{
-		i:    big.NewInt(int64(i)),
-		base: 8,
-	}
-}
-
-func (n *Nat) Decode(r *bytes.Reader) error {
+func (n *Nat) Decode(r *bytes.Reader) (interface{}, error) {
 	if n.base == 0 {
-		bi, err := leb128.DecodeUnsigned(r)
-		if err != nil {
-			return err
-		}
-		n.i = bi
-		return nil
+		return leb128.DecodeUnsigned(r)
 	}
-	bs, err := readUInt(r, int(n.base/8))
-	if err != nil {
-		return err
-	}
-	n.i.Set(bs)
-	return nil
+	return readUInt(r, int(n.base/8))
 }
 
-func (n Nat) EncodeType(_ *TypeTable) ([]byte, error) {
+func (n Nat) EncodeType() ([]byte, error) {
 	if n.base == 0 {
 		return leb128.EncodeSigned(big.NewInt(natType))
 	}
@@ -103,20 +56,27 @@ func (n Nat) EncodeType(_ *TypeTable) ([]byte, error) {
 	return leb128.EncodeSigned(natXType)
 }
 
-func (n Nat) EncodeValue() ([]byte, error) {
-	if n.base == 0 {
-		return leb128.EncodeUnsigned(n.i)
+func (n Nat) EncodeValue(v interface{}) ([]byte, error) {
+	v_, ok := v.(*big.Int)
+	if !ok {
+		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
-	return writeInt(n.i, int(n.base/8)), nil
-}
-
-func (Nat) Name() string {
-	return "nat"
+	if n.base == 0 {
+		return leb128.EncodeUnsigned(v_)
+	}
+	{
+		lim := big.NewInt(2)
+		lim = lim.Exp(lim, big.NewInt(int64(n.base)), nil)
+		if lim.Cmp(v_) <= 0 {
+			return nil, fmt.Errorf("invalid value: %s", v_)
+		}
+	}
+	return writeInt(v_, int(n.base/8)), nil
 }
 
 func (n Nat) String() string {
 	if n.base == 0 {
-		return fmt.Sprintf("nat: %s", n.i)
+		return "nat"
 	}
-	return fmt.Sprintf("nat%d: %s", n.base, n.i)
+	return fmt.Sprintf("nat%d", n.base)
 }

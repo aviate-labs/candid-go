@@ -7,23 +7,16 @@ import (
 )
 
 var (
-	nullType      int64 = -1
-	boolType      int64 = -2
-	natType       int64 = -3
-	intType       int64 = -4
-	natXType      int64 = -5
-	intXType      int64 = -9
-	floatXType    int64 = -13
-	textType      int64 = -15
-	reservedType  int64 = -16
-	emptyType     int64 = -17
-	optType       int64 = -18
-	vecType       int64 = -19
-	recordType    int64 = -20
-	variantType   int64 = -21
-	funcType      int64 = -22
-	serviceType   int64 = -23
-	principalType int64 = -24
+	nullType     int64 = -1  // 0x7f
+	boolType     int64 = -2  // 0x7e
+	natType      int64 = -3  // 0x7d
+	intType      int64 = -4  // 0x7c
+	natXType     int64 = -5  // 0x7b-0x78
+	intXType     int64 = -9  // 0x77-0x73
+	floatXType   int64 = -13 // 0x72
+	textType     int64 = -15 // 0x71
+	reservedType int64 = -16 // 0x70
+	emptyType    int64 = -17 // 0x6f
 )
 
 type PrimType interface {
@@ -41,21 +34,17 @@ func (ts Tuple) String() string {
 }
 
 type Type interface {
-	// BuildTypeTable adds itself to the typetable.
-	// Not the case for PrimType.
-	BuildTypeTable(*TypeTable) error
+	// AddTypeDefinition adds itself to the definition table if it is not a primitive type.
+	AddTypeDefinition(*TypeDefinitionTable) error
 
 	// Decodes the value from the reader.
-	Decode(*bytes.Reader) error
+	Decode(*bytes.Reader) (interface{}, error)
 
 	// Encodes the type.
-	EncodeType(tt *TypeTable) ([]byte, error)
+	EncodeType() ([]byte, error)
 
 	// Encodes the value.
-	EncodeValue() ([]byte, error)
-
-	// Name of the type.
-	Name() string
+	EncodeValue(v interface{}) ([]byte, error)
 
 	fmt.Stringer
 }
@@ -110,9 +99,8 @@ func getType(t int64) (Type, error) {
 
 type primType struct{}
 
-func (primType) BuildTypeTable(_ *TypeTable) error {
-	// Nothing to add to the typetable from prim types.
-	return nil
+func (primType) AddTypeDefinition(_ *TypeDefinitionTable) error {
+	return nil // No need to add primitive types to the type definition table.
 }
 
 func (primType) prim() {}

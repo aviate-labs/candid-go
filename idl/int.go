@@ -3,98 +3,48 @@ package idl
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"math/big"
 
 	"github.com/allusion-be/leb128"
 )
 
 type Int struct {
-	i    *big.Int
 	base uint8
 	primType
 }
 
 func Int16() *Int {
 	return &Int{
-		i:    new(big.Int),
 		base: 16,
 	}
 }
 
 func Int32() *Int {
 	return &Int{
-		i:    new(big.Int),
 		base: 32,
 	}
 }
 
 func Int64() *Int {
 	return &Int{
-		i:    new(big.Int),
 		base: 64,
 	}
 }
 
 func Int8() *Int {
 	return &Int{
-		i:    new(big.Int),
 		base: 8,
 	}
 }
 
-func NewInt(i *big.Int) *Int {
-	return &Int{i: i}
-}
-
-func NewInt16(i int16) *Int {
-	return &Int{
-		i:    big.NewInt(int64(i)),
-		base: 16,
-	}
-}
-
-func NewInt32(i int32) *Int {
-	return &Int{
-		i:    big.NewInt(int64(i)),
-		base: 32,
-	}
-}
-
-func NewInt64(i *big.Int) *Int {
-	return &Int{
-		i:    i,
-		base: 64,
-	}
-}
-
-func NewInt8(i int8) *Int {
-	return &Int{
-		i:    big.NewInt(int64(i)),
-		base: 8,
-	}
-}
-
-func (n *Int) Decode(r *bytes.Reader) error {
+func (n *Int) Decode(r *bytes.Reader) (interface{}, error) {
 	if n.base == 0 {
-		bi, err := leb128.DecodeSigned(r)
-		if err != nil {
-			return err
-		}
-		n.i = bi
-		return nil
+		return leb128.DecodeSigned(r)
 	}
-	raw, _ := io.ReadAll(r)
-	*r = *bytes.NewReader(raw)
-	bi, err := readInt(r, int(n.base/8))
-	if err != nil {
-		return err
-	}
-	n.i.Set(bi)
-	return nil
+	return readInt(r, int(n.base/8))
 }
 
-func (n Int) EncodeType(_ *TypeTable) ([]byte, error) {
+func (n Int) EncodeType() ([]byte, error) {
 	if n.base == 0 {
 		return leb128.EncodeSigned(big.NewInt(intType))
 	}
@@ -106,18 +56,32 @@ func (n Int) EncodeType(_ *TypeTable) ([]byte, error) {
 	return leb128.EncodeSigned(intXType)
 }
 
-func (n Int) EncodeValue() ([]byte, error) {
-	if n.base == 0 {
-		return leb128.EncodeSigned(n.i)
+func (n Int) EncodeValue(v interface{}) ([]byte, error) {
+	v_, ok := v.(*big.Int)
+	if !ok {
+		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
-
-	return writeInt(n.i, int(n.base/8)), nil
-}
-
-func (Int) Name() string {
-	return "int"
+	if n.base == 0 {
+		return leb128.EncodeSigned(v_)
+	}
+	{
+		exp := big.NewInt(int64(n.base) - 1)
+		lim := big.NewInt(2)
+		lim = lim.Exp(lim, exp, nil)
+		min := new(big.Int).Set(lim)
+		min = min.Mul(min, big.NewInt(-1))
+		max := new(big.Int).Set(lim)
+		max = max.Add(max, big.NewInt(-1))
+		if v_.Cmp(min) < 0 || max.Cmp(v_) < 0 {
+			return nil, fmt.Errorf("invalid value: %s", v_)
+		}
+	}
+	return writeInt(v_, int(n.base/8)), nil
 }
 
 func (n Int) String() string {
-	return fmt.Sprintf("int: %s", n.i)
+	if n.base == 0 {
+		return "int"
+	}
+	return fmt.Sprintf("int%d", n.base)
 }

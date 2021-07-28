@@ -11,20 +11,16 @@ type Empty struct {
 	primType
 }
 
-func (Empty) Decode(*bytes.Reader) error {
-	return nil
+func (Empty) Decode(*bytes.Reader) (interface{}, error) {
+	return nil, nil
 }
 
-func (Empty) EncodeType(_ *TypeTable) ([]byte, error) {
+func (Empty) EncodeType() ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(emptyType))
 }
 
-func (Empty) EncodeValue() ([]byte, error) {
+func (Empty) EncodeValue(_ interface{}) ([]byte, error) {
 	return []byte{}, nil
-}
-
-func (Empty) Name() string {
-	return "empty"
 }
 
 func (Empty) String() string {

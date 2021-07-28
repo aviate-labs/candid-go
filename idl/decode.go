@@ -2,72 +2,78 @@ package idl
 
 import (
 	"bytes"
-	"io"
-	"math/big"
 
 	"github.com/allusion-be/leb128"
 )
 
-func Decode(bs []byte) (Tuple, error) {
+func Decode(bs []byte) ([]Type, []interface{}, error) {
 	if len(bs) == 0 {
-		return nil, &FormatError{
+		return nil, nil, &FormatError{
 			Description: "empty",
 		}
 	}
 
-	// Validate the magic number (DIDL).
-	rs := bytes.NewReader(bs)
-	magic := make([]byte, 4)
-	n, err := rs.Read(magic)
-	if err != nil {
-		return nil, err
-	}
-	if n < 4 {
-		return nil, &FormatError{
-			Description: "no magic bytes",
+	r := bytes.NewReader(bs)
+
+	{ // 'DIDL'
+
+		magic := make([]byte, 4)
+		n, err := r.Read(magic)
+		if err != nil {
+			return nil, nil, err
 		}
-	}
-	if !bytes.Equal(magic, []byte{'D', 'I', 'D', 'L'}) {
-		return nil, &FormatError{
-			Description: "wrong magic bytes",
+		if n < 4 {
+			return nil, nil, &FormatError{
+				Description: "no magic bytes",
+			}
+		}
+		if !bytes.Equal(magic, []byte{'D', 'I', 'D', 'L'}) {
+			return nil, nil, &FormatError{
+				Description: "wrong magic bytes",
+			}
 		}
 	}
 
-	if _, err := NewTable(rs); err != nil {
-		return nil, err
+	{ // T
+		tdtl, err := leb128.DecodeUnsigned(r)
+		if err != nil {
+			return nil, nil, err
+		}
+		_ = tdtl
+		var types []Type
+		_ = types
 	}
-	l, err := leb128.DecodeUnsigned(rs)
+
+	tsl, err := leb128.DecodeUnsigned(r)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var ts []int64
-	for i := new(big.Int).Set(l); i.Sign() > 0; i.Add(i, big.NewInt(-1)) {
-		t, err := leb128.DecodeSigned(rs)
-		if err != nil {
-			return nil, err
-		}
-		ts = append(ts, t.Int64())
-	}
-	var vs []Type
-	for _, t := range ts {
-		v, err := getType(t)
-		if err != nil {
-			return nil, err
-		}
-		if err := v.Decode(rs); err != nil {
-			if err == io.EOF {
-				return nil, &FormatError{
-					Description: "end of data",
-				}
+
+	var ts []Type
+	{ // I
+		for i := 0; i < int(tsl.Int64()); i++ {
+			tid, err := leb128.DecodeSigned(r)
+			if err != nil {
+				return nil, nil, err
 			}
-			return nil, err
-		}
-		vs = append(vs, v)
-	}
-	if rs.Len() != 0 {
-		return nil, &FormatError{
-			Description: "too long",
+			t, err := getType(tid.Int64())
+			if err != nil {
+				return nil, nil, err
+			}
+			ts = append(ts, t)
 		}
 	}
-	return vs, nil
+
+	var vs []interface{}
+	{ // M
+		for i := 0; i < int(tsl.Int64()); i++ {
+			v, err := ts[i].Decode(r)
+			if err != nil {
+				return nil, nil, err
+			}
+			vs = append(vs, v)
+		}
+	}
+
+	return ts, vs, nil
 }

@@ -9,47 +9,39 @@ import (
 )
 
 type Bool struct {
-	v bool
 	primType
 }
 
-func NewBool(b bool) *Bool {
-	return &Bool{
-		v: b,
-	}
-}
-
-func (b *Bool) Decode(r *bytes.Reader) error {
+func (b Bool) Decode(r *bytes.Reader) (interface{}, error) {
 	v, err := r.ReadByte()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	switch v {
 	case 0x00:
-		*b = Bool{v: false}
+		return false, nil
 	case 0x01:
-		*b = Bool{v: true}
+		return true, nil
 	default:
-		return fmt.Errorf("invalid bool values: %x", b)
+		return nil, fmt.Errorf("invalid bool values: %x", b)
 	}
-	return nil
 }
 
-func (Bool) EncodeType(_ *TypeTable) ([]byte, error) {
+func (Bool) EncodeType() ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(boolType))
 }
 
-func (b Bool) EncodeValue() ([]byte, error) {
-	if b.v {
+func (b Bool) EncodeValue(v interface{}) ([]byte, error) {
+	v_, ok := v.(bool)
+	if !ok {
+		return nil, fmt.Errorf("invalid argument: %v", v)
+	}
+	if v_ {
 		return []byte{0x01}, nil
 	}
 	return []byte{0x00}, nil
 }
 
-func (Bool) Name() string {
+func (Bool) String() string {
 	return "bool"
-}
-
-func (b Bool) String() string {
-	return fmt.Sprintf("bool: %t", b)
 }

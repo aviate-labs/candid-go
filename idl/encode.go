@@ -1,39 +1,58 @@
 package idl
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/allusion-be/leb128"
 )
 
-func Encode(types []Type) ([]byte, error) {
-	tt := new(TypeTable)
+func Encode(argumentTypes []Type, arguments []interface{}) ([]byte, error) {
+	if len(arguments) != len(argumentTypes) {
+		return nil, fmt.Errorf("invalid number of arguments")
+	}
+
+	// T
+	tdt := new(TypeDefinitionTable)
+	tdtl, err := leb128.EncodeSigned(big.NewInt(int64(len(tdt.Types))))
+	if err != nil {
+		return nil, err
+	}
+	var tdte []byte
+
+	tsl, err := leb128.EncodeSigned(big.NewInt(int64(len(argumentTypes))))
+	if err != nil {
+		return nil, err
+	}
 	var (
 		ts []byte
 		vs []byte
 	)
-	for _, t := range types {
-		t.BuildTypeTable(tt)
-		ts_, err := t.EncodeType(tt)
-		if err != nil {
-			return nil, err
+	for i, t := range argumentTypes {
+		{ // I
+			t, err := t.EncodeType()
+			if err != nil {
+				return nil, err
+			}
+			ts = append(ts, t...)
 		}
-		ts = append(ts, ts_...)
-		vs_, err := t.EncodeValue()
-		if err != nil {
-			return nil, err
+		{ // M
+			v, err := t.EncodeValue(arguments[i])
+			if err != nil {
+				return nil, err
+			}
+			vs = append(vs, v...)
 		}
-		vs = append(vs, vs_...)
 	}
 
-	magic := []byte{'D', 'I', 'D', 'L'}
-	table, err := tt.Encode()
-	if err != nil {
-		return nil, err
-	}
-	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(types))))
-	if err != nil {
-		return nil, err
-	}
-	return concat(magic, table, l, ts, vs), nil
+	return concat(
+		// magic number
+		[]byte{'D', 'I', 'D', 'L'},
+		// type definition table: T*(<datatype>*)
+		tdtl, tdte,
+		// types of the argument list: I*(<datatype>*)
+		tsl, ts,
+		// values of argument list: M(<datatype>*)
+		vs,
+	), nil
 }

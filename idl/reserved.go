@@ -11,20 +11,16 @@ type Reserved struct {
 	primType
 }
 
-func (Reserved) Decode(*bytes.Reader) error {
-	return nil
+func (Reserved) Decode(*bytes.Reader) (interface{}, error) {
+	return nil, nil
 }
 
-func (Reserved) EncodeType(_ *TypeTable) ([]byte, error) {
+func (Reserved) EncodeType() ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(reservedType))
 }
 
-func (Reserved) EncodeValue() ([]byte, error) {
+func (Reserved) EncodeValue(_ interface{}) ([]byte, error) {
 	return []byte{}, nil
-}
-
-func (Reserved) Name() string {
-	return "reserved"
 }
 
 func (Reserved) String() string {
