@@ -23,6 +23,18 @@ func ExampleInt() {
 	// 4449444c00017c808098f4e9b5caea00
 }
 
+func ExampleInt32() {
+	test([]idl.Type{idl.Int32()}, []interface{}{big.NewInt(-1234567890)})
+	test([]idl.Type{idl.Int32()}, []interface{}{big.NewInt(-42)})
+	test([]idl.Type{idl.Int32()}, []interface{}{big.NewInt(42)})
+	test([]idl.Type{idl.Int32()}, []interface{}{big.NewInt(1234567890)})
+	// Output:
+	// 4449444c0001752efd69b6
+	// 4449444c000175d6ffffff
+	// 4449444c0001752a000000
+	// 4449444c000175d2029649
+}
+
 func ExampleInt8() {
 	test([]idl.Type{idl.Int8()}, []interface{}{big.NewInt(-129)})
 	test([]idl.Type{idl.Int8()}, []interface{}{big.NewInt(-128)})
@@ -43,16 +55,4 @@ func ExampleInt8() {
 	// 4449444c0001772a
 	// 4449444c0001777f
 	// enc: invalid value: 128
-}
-
-func ExampleInt32() {
-	test([]idl.Type{idl.Int32()}, []interface{}{big.NewInt(-1234567890)})
-	test([]idl.Type{idl.Int32()}, []interface{}{big.NewInt(-42)})
-	test([]idl.Type{idl.Int32()}, []interface{}{big.NewInt(42)})
-	test([]idl.Type{idl.Int32()}, []interface{}{big.NewInt(1234567890)})
-	// Output:
-	// 4449444c0001752efd69b6
-	// 4449444c000175d6ffffff
-	// 4449444c0001752a000000
-	// 4449444c000175d2029649
 }

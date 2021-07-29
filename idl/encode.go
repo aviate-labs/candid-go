@@ -8,7 +8,7 @@ import (
 )
 
 func Encode(argumentTypes []Type, arguments []interface{}) ([]byte, error) {
-	if len(arguments) != len(argumentTypes) {
+	if len(arguments) < len(argumentTypes) {
 		return nil, fmt.Errorf("invalid number of arguments")
 	}
 

@@ -3,7 +3,6 @@ package idl
 import (
 	"bytes"
 	"fmt"
-	"strings"
 )
 
 var (
@@ -18,20 +17,16 @@ var (
 	reservedType int64 = -16 // 0x70
 	emptyType    int64 = -17 // 0x6f
 	optType      int64 = -18 // 0x6e
+	vecType      int64 = -19 // 0x6d
+	recType      int64 = -20 // 0x6c
 )
+
+type ConstructType interface {
+	cons()
+}
 
 type PrimType interface {
 	prim()
-}
-
-type Tuple []Type
-
-func (ts Tuple) String() string {
-	var s []string
-	for _, t := range ts {
-		s = append(s, t.String())
-	}
-	return fmt.Sprintf("(%s)", strings.Join(s, ", "))
 }
 
 type Type interface {

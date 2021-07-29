@@ -23,18 +23,6 @@ func ExampleNat() {
 	// 4449444c00017d808098f4e9b5ca6a
 }
 
-func ExampleNat8() {
-	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(0)})
-	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(42)})
-	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(255)})
-	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(256)})
-	// Output:
-	// 4449444c00017b00
-	// 4449444c00017b2a
-	// 4449444c00017bff
-	// enc: invalid value: 256
-}
-
 func ExampleNat16() {
 	test([]idl.Type{idl.Nat16()}, []interface{}{big.NewInt(0)})
 	test([]idl.Type{idl.Nat16()}, []interface{}{big.NewInt(42)})
@@ -67,4 +55,16 @@ func ExampleNat64() {
 	// 4449444c0001780000000000000000
 	// 4449444c0001782a00000000000000
 	// 4449444c000178d202964900000000
+}
+
+func ExampleNat8() {
+	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(0)})
+	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(42)})
+	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(255)})
+	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(256)})
+	// Output:
+	// 4449444c00017b00
+	// 4449444c00017b2a
+	// 4449444c00017bff
+	// enc: invalid value: 256
 }

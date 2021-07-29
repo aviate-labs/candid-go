@@ -2,10 +2,26 @@ package idl_test
 
 import (
 	"fmt"
+	"math/big"
 	"reflect"
+	"testing"
 
 	"github.com/allusion-be/candid-go/idl"
 )
+
+func test_(types []idl.Type, args []interface{}) {
+	e, err := idl.Encode(types, args)
+	if err != nil {
+		fmt.Println("enc:", err)
+		return
+	}
+	fmt.Printf("%x\n", e)
+
+	if _, _, err := idl.Decode(e); err != nil {
+		fmt.Println("dec:", err)
+		return
+	}
+}
 
 func test(types []idl.Type, args []interface{}) {
 	e, err := idl.Encode(types, args)
@@ -24,6 +40,15 @@ func test(types []idl.Type, args []interface{}) {
 		fmt.Println("types:", types, ts)
 	}
 	if !reflect.DeepEqual(vs, args) {
-		fmt.Println("args", args, vs)
+		fmt.Println("args:", args, vs)
+	}
+}
+
+func TestHash(t *testing.T) {
+	if h := idl.Hash("foo"); h.Cmp(big.NewInt(5097222)) != 0 {
+		t.Errorf("expected '5097222', got '%s'", h)
+	}
+	if h := idl.Hash("bar"); h.Cmp(big.NewInt(4895187)) != 0 {
+		t.Errorf("expected '4895187', got '%s'", h)
 	}
 }
