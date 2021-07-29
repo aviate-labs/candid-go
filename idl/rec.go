@@ -4,29 +4,33 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"sort"
 	"strings"
 
 	"github.com/allusion-be/leb128"
 )
 
 type Rec struct {
-	fields []field
+	fields []Field
 }
 
 func NewRec(fields map[string]Type) *Rec {
 	var rec Rec
 	for k, v := range fields {
-		rec.fields = append(rec.fields, field{
-			s: k,
-			t: v,
+		rec.fields = append(rec.fields, Field{
+			Name: k,
+			Type: v,
 		})
 	}
+	sort.Slice(rec.fields, func(i, j int) bool {
+		return Hash(rec.fields[i].Name).Cmp(Hash(rec.fields[j].Name)) < 0
+	})
 	return &rec
 }
 
 func (r Rec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	for _, f := range r.fields {
-		if err := f.t.AddTypeDefinition(tdt); err != nil {
+		if err := f.Type.AddTypeDefinition(tdt); err != nil {
 			return err
 		}
 	}
@@ -41,11 +45,11 @@ func (r Rec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	}
 	var vs []byte
 	for _, f := range r.fields {
-		l, err := leb128.EncodeUnsigned(Hash(f.s))
+		l, err := leb128.EncodeUnsigned(Hash(f.Name))
 		if err != nil {
 			return nil
 		}
-		t, err := f.t.EncodeType(tdt)
+		t, err := f.Type.EncodeType(tdt)
 		if err != nil {
 			return nil
 		}
@@ -60,11 +64,11 @@ func (r Rec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 func (r Rec) Decode(r_ *bytes.Reader) (interface{}, error) {
 	rec := make(map[string]interface{})
 	for _, f := range r.fields {
-		v, err := f.t.Decode(r_)
+		v, err := f.Type.Decode(r_)
 		if err != nil {
 			return nil, err
 		}
-		rec[f.s] = v
+		rec[f.Name] = v
 	}
 	if len(rec) == 0 {
 		return nil, nil
@@ -90,11 +94,11 @@ func (r Rec) EncodeValue(v interface{}) ([]byte, error) {
 	}
 	var vs_ []interface{}
 	for _, f := range r.fields {
-		vs_ = append(vs_, fs[f.s])
+		vs_ = append(vs_, fs[f.Name])
 	}
 	var vs []byte
 	for i, f := range r.fields {
-		v_, err := f.t.EncodeValue(vs_[i])
+		v_, err := f.Type.EncodeValue(vs_[i])
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +110,7 @@ func (r Rec) EncodeValue(v interface{}) ([]byte, error) {
 func (r Rec) String() string {
 	var s []string
 	for _, f := range r.fields {
-		s = append(s, fmt.Sprintf("%s:%s", f.s, f.t.String()))
+		s = append(s, fmt.Sprintf("%s:%s", f.Name, f.Type.String()))
 	}
 	return fmt.Sprintf("record {%s}", strings.Join(s, "; "))
 }

@@ -158,7 +158,12 @@ func zeros(n int) []byte {
 	return z
 }
 
-type field struct {
-	s string
-	t Type
+type Field struct {
+	Name string
+	Type Type
+}
+
+type FieldValue struct {
+	Name  string
+	Value interface{}
 }

@@ -71,7 +71,7 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 				if err != nil {
 					return nil, nil, err
 				}
-				var fields []field
+				var fields []Field
 				for i := 0; i < int(l.Int64()); i++ {
 					h, err := leb128.DecodeUnsigned(r)
 					if err != nil {
@@ -85,12 +85,37 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 					if err != nil {
 						return nil, nil, err
 					}
-					fields = append(fields, field{
-						s: h.String(),
-						t: v,
+					fields = append(fields, Field{
+						Name: h.String(),
+						Type: v,
 					})
 				}
 				tds = append(tds, &Rec{fields: fields})
+			case varType:
+				l, err := leb128.DecodeUnsigned(r)
+				if err != nil {
+					return nil, nil, err
+				}
+				var fields []Field
+				for i := 0; i < int(l.Int64()); i++ {
+					h, err := leb128.DecodeUnsigned(r)
+					if err != nil {
+						return nil, nil, err
+					}
+					tid, err := leb128.DecodeSigned(r)
+					if err != nil {
+						return nil, nil, err
+					}
+					v, err := getType(tid.Int64(), tds)
+					if err != nil {
+						return nil, nil, err
+					}
+					fields = append(fields, Field{
+						Name: h.String(),
+						Type: v,
+					})
+				}
+				tds = append(tds, &Variant{fields: fields})
 			}
 		}
 	}

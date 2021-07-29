@@ -19,11 +19,8 @@ var (
 	optType      int64 = -18 // 0x6e
 	vecType      int64 = -19 // 0x6d
 	recType      int64 = -20 // 0x6c
+	varType      int64 = -21 // 0x6b
 )
-
-type ConstructType interface {
-	cons()
-}
 
 type PrimType interface {
 	prim()
