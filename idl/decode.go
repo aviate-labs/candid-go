@@ -116,6 +116,56 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 					})
 				}
 				tds = append(tds, &Variant{fields: fields})
+			case funcType:
+				la, err := leb128.DecodeUnsigned(r)
+				if err != nil {
+					return nil, nil, err
+				}
+				var args []Type
+				for i := 0; i < int(la.Int64()); i++ {
+					tid, err = leb128.DecodeSigned(r)
+					if err != nil {
+						return nil, nil, err
+					}
+					v, err := getType(tid.Int64(), tds)
+					if err != nil {
+						return nil, nil, err
+					}
+					args = append(args, v)
+				}
+				lr, err := leb128.DecodeUnsigned(r)
+				if err != nil {
+					return nil, nil, err
+				}
+				var rets []Type
+				for i := 0; i < int(lr.Int64()); i++ {
+					tid, err = leb128.DecodeSigned(r)
+					if err != nil {
+						return nil, nil, err
+					}
+					v, err := getType(tid.Int64(), tds)
+					if err != nil {
+						return nil, nil, err
+					}
+					rets = append(rets, v)
+				}
+				l, err := leb128.DecodeUnsigned(r)
+				if err != nil {
+					return nil, nil, err
+				}
+				ann := make([]byte, l.Int64())
+				if _, err := r.Read(ann); err != nil {
+					return nil, nil, err
+				}
+				var anns []string
+				if len(ann) != 0 {
+					anns = append(anns, string(ann))
+				}
+				tds = append(tds, &Func{
+					argTypes: args,
+					retTypes: rets,
+					ann:      anns,
+				})
 			}
 		}
 	}

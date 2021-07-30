@@ -20,6 +20,7 @@ var (
 	vecType      int64 = -19 // 0x6d
 	recType      int64 = -20 // 0x6c
 	varType      int64 = -21 // 0x6b
+	funcType     int64 = -22 // 0x6a
 )
 
 type PrimType interface {
