@@ -6,6 +6,35 @@ import (
 	"strings"
 )
 
+// Argument describes the argument types of a Field.
+type Argument struct {
+	// Name only serves documentation purposes and have no semantic significance.
+	Name *string
+	// Data is the data type of the argument.
+	Data Data
+}
+
+func convertArgument(n *ast.Node) Argument {
+	data := convertData(n.LastChild)
+	if len(n.Children()) == 1 {
+		return Argument{
+			Data: data,
+		}
+	}
+	return Argument{
+		Name: &n.FirstChild.Value,
+		Data: data,
+	}
+}
+
+func (a Argument) String() string {
+	var s string
+	if a.Name != nil {
+		s += fmt.Sprintf("%s : ", *a.Name)
+	}
+	return s + a.Data.String()
+}
+
 // Func indicates the function’s signature (argument and results types, annotations),
 // and values of this type are references to functions with that signature.
 type Func struct {
@@ -15,14 +44,6 @@ type Func struct {
 	ResTypes Tuple
 	// Annotation indicates an (optional) invocation method.
 	Annotation *FuncAnnotation
-}
-
-func (f Func) String() string {
-	s := fmt.Sprintf("%s -> %s", f.ArgTypes.String(), f.ResTypes.String())
-	if f.Annotation != nil {
-		s += fmt.Sprintf(" %s", *f.Annotation)
-	}
-	return s
 }
 
 func convertFunc(n *ast.Node) Func {
@@ -43,6 +64,14 @@ func convertFunc(n *ast.Node) Func {
 	return f
 }
 
+func (f Func) String() string {
+	s := fmt.Sprintf("%s -> %s", f.ArgTypes.String(), f.ResTypes.String())
+	if f.Annotation != nil {
+		s += fmt.Sprintf(" %s", *f.Annotation)
+	}
+	return s
+}
+
 // FuncAnnotation represents a function annotation.
 type FuncAnnotation string
 
@@ -58,6 +87,14 @@ const (
 
 // Tuple represents one or more arguments.
 type Tuple []Argument
+
+func convertTuple(n *ast.Node) Tuple {
+	var tuple Tuple
+	for _, n := range n.Children() {
+		tuple = append(tuple, convertArgument(n))
+	}
+	return tuple
+}
 
 func (t Tuple) String() string {
 	if len(t) == 1 {
@@ -75,41 +112,4 @@ func (t Tuple) String() string {
 		}
 	}
 	return s + ")"
-}
-
-func convertTuple(n *ast.Node) Tuple {
-	var tuple Tuple
-	for _, n := range n.Children() {
-		tuple = append(tuple, convertArgument(n))
-	}
-	return tuple
-}
-
-// Argument describes the argument types of a Field.
-type Argument struct {
-	// Name only serves documentation purposes and have no semantic significance.
-	Name *string
-	// Data is the data type of the argument.
-	Data Data
-}
-
-func (a Argument) String() string {
-	var s string
-	if a.Name != nil {
-		s += fmt.Sprintf("%s : ", *a.Name)
-	}
-	return s + a.Data.String()
-}
-
-func convertArgument(n *ast.Node) Argument {
-	data := convertData(n.LastChild)
-	if len(n.Children()) == 1 {
-		return Argument{
-			Data: data,
-		}
-	}
-	return Argument{
-		Name: &n.FirstChild.Value,
-		Data: data,
-	}
 }

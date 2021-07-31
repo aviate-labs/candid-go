@@ -10,6 +10,22 @@ import (
 	"github.com/allusion-be/leb128"
 )
 
+func encodeTypes(ts []Type, tdt *TypeDefinitionTable) ([]byte, error) {
+	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(ts))))
+	if err != nil {
+		return nil, err
+	}
+	var vs []byte
+	for _, t := range ts {
+		v, err := t.EncodeType(tdt)
+		if err != nil {
+			return nil, err
+		}
+		vs = append(vs, v...)
+	}
+	return concat(l, vs), nil
+}
+
 type Func struct {
 	argTypes []Type
 	retTypes []Type
@@ -64,22 +80,6 @@ func (f Func) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func encodeTypes(ts []Type, tdt *TypeDefinitionTable) ([]byte, error) {
-	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(ts))))
-	if err != nil {
-		return nil, err
-	}
-	var vs []byte
-	for _, t := range ts {
-		v, err := t.EncodeType(tdt)
-		if err != nil {
-			return nil, err
-		}
-		vs = append(vs, v...)
-	}
-	return concat(l, vs), nil
-}
-
 func (f Func) Decode(r *bytes.Reader) (interface{}, error) {
 	{
 		bs := make([]byte, 2)
@@ -125,6 +125,14 @@ func (f Func) Decode(r *bytes.Reader) (interface{}, error) {
 	}, nil
 }
 
+func (f Func) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
+	idx, ok := tdt.Indexes[f.String()]
+	if !ok {
+		return nil, fmt.Errorf("missing type index for: %s", f)
+	}
+	return leb128.EncodeSigned(big.NewInt(int64(idx)))
+}
+
 func (f Func) EncodeValue(v interface{}) ([]byte, error) {
 	pm, ok := v.(PrincipalMethod)
 	if !ok {
@@ -139,14 +147,6 @@ func (f Func) EncodeValue(v interface{}) ([]byte, error) {
 		return nil, err
 	}
 	return concat([]byte{0x01, 0x01}, l, pm.Principal, lm, []byte(pm.Method)), nil
-}
-
-func (f Func) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
-	idx, ok := tdt.Indexes[f.String()]
-	if !ok {
-		return nil, fmt.Errorf("missing type index for: %s", f)
-	}
-	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
 func (f Func) String() string {

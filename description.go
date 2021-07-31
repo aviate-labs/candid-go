@@ -16,17 +16,6 @@ type Description struct {
 	Services []Service
 }
 
-func (p Description) String() string {
-	var s []string
-	for _, d := range p.Definitions {
-		s = append(s, d.String())
-	}
-	for _, a := range p.Services {
-		s = append(s, a.String())
-	}
-	return strings.Join(s, ";\n")
-}
-
 func convertDescription(n *ast.Node) Description {
 	var desc Description
 	for _, n := range n.Children() {
@@ -53,4 +42,15 @@ func convertDescription(n *ast.Node) Description {
 		}
 	}
 	return desc
+}
+
+func (p Description) String() string {
+	var s []string
+	for _, d := range p.Definitions {
+		s = append(s, d.String())
+	}
+	for _, a := range p.Services {
+		s = append(s, a.String())
+	}
+	return strings.Join(s, ";\n")
 }

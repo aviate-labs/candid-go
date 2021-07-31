@@ -13,6 +13,22 @@ import (
 	"github.com/di-wu/parser/ast"
 )
 
+// ParseDID parses the given raw .did files and returns the Program that is defined in it.
+func ParseDID(raw []byte) (Description, error) {
+	p, err := ast.New(raw)
+	if err != nil {
+		return Description{}, err
+	}
+	n, err := candid.Prog(p)
+	if err != nil {
+		return Description{}, err
+	}
+	if _, err := p.Expect(parser.EOD); err != nil {
+		return Description{}, err
+	}
+	return convertDescription(n), nil
+}
+
 // ParseMotoko parses the Motoko (.mo) files and returns the interface description that is defined in it.
 func ParseMotoko(path string) (Description, error) {
 	moc, err := exec.LookPath("moc")
@@ -40,20 +56,4 @@ func ParseMotoko(path string) (Description, error) {
 		return Description{}, err
 	}
 	return ParseDID(raw)
-}
-
-// ParseDID parses the given raw .did files and returns the Program that is defined in it.
-func ParseDID(raw []byte) (Description, error) {
-	p, err := ast.New(raw)
-	if err != nil {
-		return Description{}, err
-	}
-	n, err := candid.Prog(p)
-	if err != nil {
-		return Description{}, err
-	}
-	if _, err := p.Expect(parser.EOD); err != nil {
-		return Description{}, err
-	}
-	return convertDescription(n), nil
 }

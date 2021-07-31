@@ -10,23 +10,29 @@ import (
 	"github.com/di-wu/parser/ast"
 )
 
+func convertNat(n *ast.Node) *big.Int {
+	switch n := strings.ReplaceAll(n.Value, "_", ""); {
+	case strings.HasPrefix(n, "0x"):
+		n = strings.TrimPrefix(n, "0x")
+		i, _ := strconv.ParseInt(n, 16, 64)
+		return big.NewInt(i)
+	default:
+		i, _ := strconv.ParseInt(n, 10, 64)
+		return big.NewInt(i)
+	}
+}
+
+// Blob can be used for binary data, that is, sequences of bytes.
+type Blob struct{}
+func (b Blob) String() string {
+	return "blob"
+}
+func (b Blob) data()      {}
 // Data is the content of message arguments and results.
 type Data interface {
 	data()
 	fmt.Stringer
 }
-
-func (p Primitive) data() {}
-func (i DataId) data()    {}
-func (b Blob) data()      {}
-func (o Optional) data()  {}
-func (v Vector) data()    {}
-func (r Record) data()    {}
-func (v Variant) data()   {}
-func (f Func) data()      {}
-func (a Service) data()   {}
-func (p Principal) data() {}
-
 func convertData(n *ast.Node) Data {
 	switch n.Type {
 	case candid.BlobT:
@@ -71,56 +77,12 @@ func convertData(n *ast.Node) Data {
 		panic(n)
 	}
 }
-
-// Blob can be used for binary data, that is, sequences of bytes.
-type Blob struct{}
-
-func (b Blob) String() string {
-	return "blob"
+// DataId is an id reference to a data type.
+type DataId string
+func (i DataId) String() string {
+	return string(i)
 }
-
-// Optional is used to express that some value is optional, meaning that data might
-// be present as some value of type t, or might be absent as the value null.
-type Optional struct {
-	Data Data
-}
-
-func (o Optional) String() string {
-	return fmt.Sprintf("opt %s", o.Data.String())
-}
-
-// Vector represents vectors (sequences, lists, arrays).
-// e.g. 'vec bool', 'vec nat8', 'vec vec text', etc
-type Vector struct {
-	Data Data
-}
-
-func (v Vector) String() string {
-	return fmt.Sprintf("vec %s", v.Data.String())
-}
-
-// Record a collection of labeled values.
-type Record []Field
-
-func (r Record) String() string {
-	s := "record {\n"
-	for _, f := range r {
-		s += fmt.Sprintf("  %s;\n", f.String())
-	}
-	return s + "}"
-}
-
-// Variant represents a value that is from exactly one of the given cases, or tags.
-type Variant []Field
-
-func (v Variant) String() string {
-	s := "variant {\n"
-	for _, f := range v {
-		s += fmt.Sprintf("  %s;\n", f.String())
-	}
-	return s + "}"
-}
-
+func (i DataId) data()    {}
 // Field
 // The order in which fields are specified is immaterial.
 type Field struct {
@@ -138,25 +100,6 @@ type Field struct {
 	NatData  *big.Int
 	NameData *string
 }
-
-func (f Field) String() string {
-	var s string
-	if n := f.Nat; n != nil {
-		s += fmt.Sprintf("%s : ", n.String())
-	} else if f.Name != nil {
-		s += fmt.Sprintf("%s : ", *f.Name)
-	}
-	if f.Data != nil {
-		d := *f.Data
-		s += d.String()
-	} else if n := f.NatData; n != nil {
-		s += n.String()
-	} else {
-		s += *f.NameData
-	}
-	return s
-}
-
 func convertField(n *ast.Node) Field {
 	var field Field
 	if len(n.Children()) != 1 {
@@ -181,6 +124,38 @@ func convertField(n *ast.Node) Field {
 	return field
 }
 
+func (f Field) String() string {
+	var s string
+	if n := f.Nat; n != nil {
+		s += fmt.Sprintf("%s : ", n.String())
+	} else if f.Name != nil {
+		s += fmt.Sprintf("%s : ", *f.Name)
+	}
+	if f.Data != nil {
+		d := *f.Data
+		s += d.String()
+	} else if n := f.NatData; n != nil {
+		s += n.String()
+	} else {
+		s += *f.NameData
+	}
+	return s
+}
+
+func (f Func) data()      {}
+
+// Optional is used to express that some value is optional, meaning that data might
+// be present as some value of type t, or might be absent as the value null.
+type Optional struct {
+	Data Data
+}
+
+func (o Optional) String() string {
+	return fmt.Sprintf("opt %s", o.Data.String())
+}
+
+func (o Optional) data()  {}
+
 // Primitive describes the possible forms of primitive data.
 type Primitive string
 
@@ -188,12 +163,7 @@ func (p Primitive) String() string {
 	return string(p)
 }
 
-// DataId is an id reference to a data type.
-type DataId string
-
-func (i DataId) String() string {
-	return string(i)
-}
+func (p Primitive) data() {}
 
 // Principal is the common scheme to identify canisters, users, and other entities.
 type Principal struct{}
@@ -202,14 +172,44 @@ func (p Principal) String() string {
 	return "principal"
 }
 
-func convertNat(n *ast.Node) *big.Int {
-	switch n := strings.ReplaceAll(n.Value, "_", ""); {
-	case strings.HasPrefix(n, "0x"):
-		n = strings.TrimPrefix(n, "0x")
-		i, _ := strconv.ParseInt(n, 16, 64)
-		return big.NewInt(i)
-	default:
-		i, _ := strconv.ParseInt(n, 10, 64)
-		return big.NewInt(i)
+func (p Principal) data() {}
+
+// Record a collection of labeled values.
+type Record []Field
+
+func (r Record) String() string {
+	s := "record {\n"
+	for _, f := range r {
+		s += fmt.Sprintf("  %s;\n", f.String())
 	}
+	return s + "}"
 }
+
+func (r Record) data()    {}
+
+func (a Service) data()   {}
+
+// Variant represents a value that is from exactly one of the given cases, or tags.
+type Variant []Field
+
+func (v Variant) String() string {
+	s := "variant {\n"
+	for _, f := range v {
+		s += fmt.Sprintf("  %s;\n", f.String())
+	}
+	return s + "}"
+}
+
+func (v Variant) data()   {}
+
+// Vector represents vectors (sequences, lists, arrays).
+// e.g. 'vec bool', 'vec nat8', 'vec vec text', etc
+type Vector struct {
+	Data Data
+}
+
+func (v Vector) String() string {
+	return fmt.Sprintf("vec %s", v.Data.String())
+}
+
+func (v Vector) data()    {}

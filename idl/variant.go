@@ -78,6 +78,14 @@ func (v Variant) Decode(r *bytes.Reader) (interface{}, error) {
 	}, nil
 }
 
+func (v Variant) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
+	idx, ok := tdt.Indexes[v.String()]
+	if !ok {
+		return nil, fmt.Errorf("missing type index for: %s", v)
+	}
+	return leb128.EncodeSigned(big.NewInt(int64(idx)))
+}
+
 func (v Variant) EncodeValue(value interface{}) ([]byte, error) {
 	fs, ok := value.(FieldValue)
 	if !ok {
@@ -97,14 +105,6 @@ func (v Variant) EncodeValue(value interface{}) ([]byte, error) {
 		}
 	}
 	return nil, fmt.Errorf("unknown variant: %v", value)
-}
-
-func (v Variant) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
-	idx, ok := tdt.Indexes[v.String()]
-	if !ok {
-		return nil, fmt.Errorf("missing type index for: %s", v)
-	}
-	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
 func (v Variant) String() string {

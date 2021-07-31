@@ -11,17 +11,20 @@ type Definition interface {
 	fmt.Stringer
 }
 
-func (t Type) def()   {}
+// Import represents an import declarations from another file.
+type Import struct {
+	Text string
+}
+func (i Import) String() string {
+	return fmt.Sprintf("import %q", i.Text)
+}
+
 func (i Import) def() {}
 
 // Type represents a named type definition.
 type Type struct {
 	Id   string
 	Data Data
-}
-
-func (t Type) String() string {
-	return fmt.Sprintf("type %s = %s", t.Id, t.Data.String())
 }
 
 func convertType(n *ast.Node) Type {
@@ -35,11 +38,8 @@ func convertType(n *ast.Node) Type {
 	}
 }
 
-// Import represents an import declarations from another file.
-type Import struct {
-	Text string
+func (t Type) String() string {
+	return fmt.Sprintf("type %s = %s", t.Id, t.Data.String())
 }
 
-func (i Import) String() string {
-	return fmt.Sprintf("import %q", i.Text)
-}
+func (t Type) def()   {}
