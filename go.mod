@@ -3,7 +3,7 @@ module github.com/allusion-be/candid-go
 go 1.16
 
 require (
-	github.com/allusion-be/agent-go v0.0.0-20210714093045-210cf9ccfd0a // indirect
+	github.com/allusion-be/agent-go v0.0.0-20210714093045-210cf9ccfd0a
 	github.com/allusion-be/leb128 v0.2.2
 	github.com/di-wu/parser v0.3.0
 )
