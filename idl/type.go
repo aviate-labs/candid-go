@@ -21,6 +21,7 @@ var (
 	recType      int64 = -20 // 0x6c
 	varType      int64 = -21 // 0x6b
 	funcType     int64 = -22 // 0x6a
+	serviceType  int64 = -23 // 0x69
 )
 
 type PrimType interface {

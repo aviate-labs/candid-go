@@ -54,7 +54,6 @@ func (r Rec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 			return nil
 		}
 		vs = append(vs, concat(l, t)...)
-
 	}
 
 	tdt.Add(r, concat(id, l, vs))

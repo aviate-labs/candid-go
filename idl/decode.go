@@ -2,6 +2,8 @@ package idl
 
 import (
 	"bytes"
+	"fmt"
+	"reflect"
 
 	"github.com/allusion-be/leb128"
 )
@@ -165,6 +167,46 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 					argTypes: args,
 					retTypes: rets,
 					ann:      anns,
+				})
+			case serviceType:
+				l, err := leb128.DecodeUnsigned(r)
+				if err != nil {
+					return nil, nil, err
+				}
+				var methods []Method
+				for i := 0; i < int(l.Int64()); i++ {
+					lm, err := leb128.DecodeUnsigned(r)
+					if err != nil {
+						return nil, nil, err
+					}
+					name := make([]byte, lm.Int64())
+					n, err := r.Read(name)
+					if err != nil {
+						return nil, nil, err
+					}
+					if n != int(lm.Int64()) {
+						return nil, nil, fmt.Errorf("invalid method name: %d", bs)
+					}
+
+					tid, err = leb128.DecodeSigned(r)
+					if err != nil {
+						return nil, nil, err
+					}
+					v, err := getType(tid.Int64(), tds)
+					if err != nil {
+						return nil, nil, err
+					}
+					f, ok := v.(*Func)
+					if !ok {
+						fmt.Println(reflect.TypeOf(v))
+					}
+					methods = append(methods, Method{
+						Name: string(name),
+						Func: f,
+					})
+				}
+				tds = append(tds, &Service{
+					methods: methods,
 				})
 			}
 		}

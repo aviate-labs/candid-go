@@ -10,6 +10,11 @@ import (
 	"github.com/allusion-be/leb128"
 )
 
+type FieldValue struct {
+	Name  string
+	Value interface{}
+}
+
 type Variant struct {
 	fields []Field
 }

@@ -7,8 +7,6 @@ import (
 	"io"
 	"math"
 	"math/big"
-
-	"github.com/allusion-be/agent-go"
 )
 
 func concat(bs ...[]byte) []byte {
@@ -144,19 +142,4 @@ func zeros(n int) []byte {
 		z = append(z, 0)
 	}
 	return z
-}
-
-type Field struct {
-	Name string
-	Type Type
-}
-
-type FieldValue struct {
-	Name  string
-	Value interface{}
-}
-
-type PrincipalMethod struct {
-	Principal agent.Principal
-	Method    string
 }

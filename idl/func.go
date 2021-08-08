@@ -164,3 +164,8 @@ func (f Func) String() string {
 	}
 	return fmt.Sprintf("(%s) -> (%s)%s", strings.Join(args, ", "), strings.Join(rets, ", "), ann)
 }
+
+type PrincipalMethod struct {
+	Principal agent.Principal
+	Method    string
+}
