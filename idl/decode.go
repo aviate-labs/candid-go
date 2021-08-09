@@ -243,5 +243,8 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 		}
 	}
 
+	if r.Len() != 0 {
+		return nil, nil, fmt.Errorf("too long")
+	}
 	return ts, vs, nil
 }

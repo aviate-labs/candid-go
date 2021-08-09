@@ -10,7 +10,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	rawDid, _ := ioutil.ReadFile("testdata/prim.test.did")
+	rawDid, _ := ioutil.ReadFile("../../idl/testdata/prim.test.did")
 	p, _ := ast.New(rawDid)
 	if _, err := candidtest.TestData(p); err != nil {
 		t.Fatal(err)

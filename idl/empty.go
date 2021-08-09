@@ -2,6 +2,7 @@ package idl
 
 import (
 	"bytes"
+	"fmt"
 	"math/big"
 
 	"github.com/allusion-be/leb128"
@@ -12,7 +13,7 @@ type Empty struct {
 }
 
 func (Empty) Decode(*bytes.Reader) (interface{}, error) {
-	return nil, nil
+	return nil, fmt.Errorf("cannot decode empty type")
 }
 
 func (Empty) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {

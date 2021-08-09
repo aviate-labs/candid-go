@@ -1,4 +1,4 @@
-# CANDID-TEST (v0.1.0) github.com/di-wu/candid-go/internal/candid_test
+# CANDID-TEST (v0.1.0) github.com/di-wu/candid-go/internal/candidtest
 
 TestData     <-- (Comment / Test / EndLine)+
 

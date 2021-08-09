@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+	"unicode/utf8"
 
 	"github.com/allusion-be/leb128"
 )
@@ -26,6 +27,10 @@ func (t *Text) Decode(r *bytes.Reader) (interface{}, error) {
 	if i != int(n.Int64()) {
 		return nil, io.EOF
 	}
+	if !utf8.Valid(bs) {
+		return nil, fmt.Errorf("invalid utf8 text")
+	}
+
 	return string(bs), nil
 }
 

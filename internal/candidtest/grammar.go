@@ -1,5 +1,5 @@
 // Do not edit. This file is auto-generated.
-// Grammar: CANDID-TEST (v0.1.0) github.com/di-wu/candid-go/internal/candid_test
+// Grammar: CANDID-TEST (v0.1.0) github.com/di-wu/candid-go/internal/candidtest
 
 package candidtest
 
@@ -559,7 +559,7 @@ func Hex(p *parser.Parser) (*parser.Cursor, bool) {
 
 // Token Definitions
 const (
-	// CANDID-TEST (github.com/di-wu/candid-go/internal/candid_test)
+	// CANDID-TEST (github.com/di-wu/candid-go/internal/candidtest)
 
 	ESC = 0x005C // \
 )
@@ -568,7 +568,7 @@ const (
 const (
 	Unknown = iota
 
-	// CANDID-TEST (github.com/di-wu/candid-go/internal/candid_test)
+	// CANDID-TEST (github.com/di-wu/candid-go/internal/candidtest)
 
 	TestDataT    // 001
 	CommentTextT // 002
@@ -594,7 +594,7 @@ const (
 var NodeTypes = []string{
 	"UNKNOWN",
 
-	// CANDID-TEST (github.com/di-wu/candid-go/internal/candid_test)
+	// CANDID-TEST (github.com/di-wu/candid-go/internal/candidtest)
 
 	"TestData",
 	"CommentText",

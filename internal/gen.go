@@ -15,6 +15,7 @@ func main() {
 		path string
 		name string
 	}{
+		{path: "internal/blob", name: "blob"},
 		{path: "internal/candid"},
 		{path: "internal/candidtest", name: "candidtest"},
 	} {
