@@ -1,10 +1,6 @@
-github.com/allusion-be/agent-go v0.0.0-20210714093045-210cf9ccfd0a h1:fajaoIOpKeutb0f4D3R9vMk2W7gqrZDTJsSYZEem09A=
-github.com/allusion-be/agent-go v0.0.0-20210714093045-210cf9ccfd0a/go.mod h1:b9PvHMgS1LSQluvboDlSJshyWJOmGhGrYJ+wzyGy08M=
 github.com/allusion-be/leb128 v0.2.2 h1:LGBCsloLLrHVI5jlxHz5PRfPpNoxUyOy8iB2G/c1Y1k=
 github.com/allusion-be/leb128 v0.2.2/go.mod h1:9Ckcucoql3UWjG9OC3eCMEyIZScuQ2bCkTwp/t29LAc=
+github.com/allusion-be/principal-go v0.1.0 h1:B5TdkAJxNxL+oeIYjeLtZhvC45EgLqNwfnU54dKHvvU=
+github.com/allusion-be/principal-go v0.1.0/go.mod h1:LUpUoMOCiXa1xTVT1lHHntyDhsYIwNo6j6Q7Hekz3Hw=
 github.com/di-wu/parser v0.3.0 h1:NMOvy5ifswgt4gsdhySVcKOQtvjC43cHZIfViWctqQY=
 github.com/di-wu/parser v0.3.0/go.mod h1:SLp58pW6WamdmznrVRrw2NTyn4wAvT9rrEFynKX7nYo=
-github.com/fxamacker/cbor/v2 v2.3.0 h1:aM45YGMctNakddNNAezPxDUpv38j44Abh+hifNuqXik=
-github.com/fxamacker/cbor/v2 v2.3.0/go.mod h1:TA1xS00nchWmaBnEIxPSE5oHLuJBAVvqrtAnWBwBCVo=
-github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
-github.com/x448/float16 v0.8.4/go.mod h1:14CWIYCyZA/cWjXOioeEpHeN/83MdbZDRQHoFcYsOfg=

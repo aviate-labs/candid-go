@@ -1,12 +1,12 @@
 package idl_test
 
 import (
-	"github.com/allusion-be/agent-go"
 	"github.com/allusion-be/candid-go/idl"
+	"github.com/allusion-be/principal-go"
 )
 
 func ExampleFunc() {
-	p, _ := agent.DecodePrincipal("w7x7r-cok77-xa")
+	p, _ := principal.Decode("w7x7r-cok77-xa")
 	test_(
 		[]idl.Type{
 			idl.NewFunc(

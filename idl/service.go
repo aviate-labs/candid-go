@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/allusion-be/agent-go"
 	"github.com/allusion-be/leb128"
+	"github.com/allusion-be/principal-go"
 )
 
 type Service struct {
@@ -77,7 +77,7 @@ func (s Service) Decode(r *bytes.Reader) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	pid := make(agent.Principal, l.Int64())
+	pid := make(principal.Principal, l.Int64())
 	n, err := r.Read(pid)
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func (s Service) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 }
 
 func (s Service) EncodeValue(v interface{}) ([]byte, error) {
-	p, ok := v.(agent.Principal)
+	p, ok := v.(principal.Principal)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}

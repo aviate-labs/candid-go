@@ -6,8 +6,8 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/allusion-be/agent-go"
 	"github.com/allusion-be/leb128"
+	"github.com/allusion-be/principal-go"
 )
 
 func encodeTypes(ts []Type, tdt *TypeDefinitionTable) ([]byte, error) {
@@ -95,7 +95,7 @@ func (f Func) Decode(r *bytes.Reader) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	pid := make(agent.Principal, l.Int64())
+	pid := make(principal.Principal, l.Int64())
 	{
 		n, err := r.Read(pid)
 		if err != nil {
@@ -166,6 +166,6 @@ func (f Func) String() string {
 }
 
 type PrincipalMethod struct {
-	Principal agent.Principal
+	Principal principal.Principal
 	Method    string
 }
