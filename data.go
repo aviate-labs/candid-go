@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/allusion-be/candid-go/internal/candid"
+	"github.com/aviate-labs/candid-go/internal/candid"
 	"github.com/di-wu/parser/ast"
 )
 
@@ -24,15 +24,18 @@ func convertNat(n *ast.Node) *big.Int {
 
 // Blob can be used for binary data, that is, sequences of bytes.
 type Blob struct{}
+
 func (b Blob) String() string {
 	return "blob"
 }
-func (b Blob) data()      {}
+func (b Blob) data() {}
+
 // Data is the content of message arguments and results.
 type Data interface {
 	data()
 	fmt.Stringer
 }
+
 func convertData(n *ast.Node) Data {
 	switch n.Type {
 	case candid.BlobT:
@@ -77,12 +80,15 @@ func convertData(n *ast.Node) Data {
 		panic(n)
 	}
 }
+
 // DataId is an id reference to a data type.
 type DataId string
+
 func (i DataId) String() string {
 	return string(i)
 }
-func (i DataId) data()    {}
+func (i DataId) data() {}
+
 // Field
 // The order in which fields are specified is immaterial.
 type Field struct {
@@ -100,6 +106,7 @@ type Field struct {
 	NatData  *big.Int
 	NameData *string
 }
+
 func convertField(n *ast.Node) Field {
 	var field Field
 	if len(n.Children()) != 1 {
@@ -142,7 +149,7 @@ func (f Field) String() string {
 	return s
 }
 
-func (f Func) data()      {}
+func (f Func) data() {}
 
 // Optional is used to express that some value is optional, meaning that data might
 // be present as some value of type t, or might be absent as the value null.
@@ -154,7 +161,7 @@ func (o Optional) String() string {
 	return fmt.Sprintf("opt %s", o.Data.String())
 }
 
-func (o Optional) data()  {}
+func (o Optional) data() {}
 
 // Primitive describes the possible forms of primitive data.
 type Primitive string
@@ -185,9 +192,9 @@ func (r Record) String() string {
 	return s + "}"
 }
 
-func (r Record) data()    {}
+func (r Record) data() {}
 
-func (a Service) data()   {}
+func (a Service) data() {}
 
 // Variant represents a value that is from exactly one of the given cases, or tags.
 type Variant []Field
@@ -200,7 +207,7 @@ func (v Variant) String() string {
 	return s + "}"
 }
 
-func (v Variant) data()   {}
+func (v Variant) data() {}
 
 // Vector represents vectors (sequences, lists, arrays).
 // e.g. 'vec bool', 'vec nat8', 'vec vec text', etc
@@ -212,4 +219,4 @@ func (v Vector) String() string {
 	return fmt.Sprintf("vec %s", v.Data.String())
 }
 
-func (v Vector) data()    {}
+func (v Vector) data() {}

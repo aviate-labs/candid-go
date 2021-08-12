@@ -1,6 +1,6 @@
 package idl_test
 
-import "github.com/allusion-be/candid-go/idl"
+import "github.com/aviate-labs/candid-go/idl"
 
 func ExampleVariant() {
 	result := map[string]idl.Type{

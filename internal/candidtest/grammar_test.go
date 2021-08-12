@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/allusion-be/candid-go/internal/candidtest"
+	"github.com/aviate-labs/candid-go/internal/candidtest"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
 )

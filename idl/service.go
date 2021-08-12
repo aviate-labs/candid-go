@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/allusion-be/leb128"
-	"github.com/allusion-be/principal-go"
+	"github.com/aviate-labs/leb128"
+	"github.com/aviate-labs/principal-go"
 )
 
 type Service struct {

@@ -1,6 +1,6 @@
 package idl_test
 
-import "github.com/allusion-be/candid-go/idl"
+import "github.com/aviate-labs/candid-go/idl"
 
 func ExampleText() {
 	test([]idl.Type{new(idl.Text)}, []interface{}{""})

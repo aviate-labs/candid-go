@@ -1,8 +1,8 @@
 package idl_test
 
 import (
-	"github.com/allusion-be/candid-go/idl"
-	"github.com/allusion-be/principal-go"
+	"github.com/aviate-labs/candid-go/idl"
+	"github.com/aviate-labs/principal-go"
 )
 
 func ExampleFunc() {

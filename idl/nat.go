@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/allusion-be/leb128"
+	"github.com/aviate-labs/leb128"
 )
 
 type Nat struct {

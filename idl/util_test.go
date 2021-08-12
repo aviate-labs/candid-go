@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/allusion-be/candid-go/idl"
+	"github.com/aviate-labs/candid-go/idl"
 )
 
 func TestHash(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/allusion-be/candid-go/internal/candid"
+	"github.com/aviate-labs/candid-go/internal/candid"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
 )

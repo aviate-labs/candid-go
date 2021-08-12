@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/allusion-be/candid-go/idl"
-	"github.com/allusion-be/candid-go/internal/blob"
-	"github.com/allusion-be/candid-go/internal/candidtest"
+	"github.com/aviate-labs/candid-go/idl"
+	"github.com/aviate-labs/candid-go/internal/blob"
+	"github.com/aviate-labs/candid-go/internal/candidtest"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
 )

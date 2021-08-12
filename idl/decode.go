@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/allusion-be/leb128"
+	"github.com/aviate-labs/leb128"
 )
 
 func Decode(bs []byte) ([]Type, []interface{}, error) {
