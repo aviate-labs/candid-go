@@ -11,6 +11,11 @@ import (
 	"github.com/aviate-labs/principal-go"
 )
 
+type Method struct {
+	Name string
+	Func *Func
+}
+
 type Service struct {
 	methods []Method
 }
@@ -114,9 +119,4 @@ func (s Service) String() string {
 		methods = append(methods, fmt.Sprintf("%s:%s", m.Name, m.Func.String()))
 	}
 	return fmt.Sprintf("service {%s}", strings.Join(methods, "; "))
-}
-
-type Method struct {
-	Name string
-	Func *Func
 }
