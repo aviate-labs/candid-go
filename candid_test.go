@@ -2,10 +2,12 @@ package candid
 
 import (
 	"fmt"
+	"io/ioutil"
 )
 
-func ExampleParseMotoko() {
-	p, _ := ParseMotoko("testdata/counter.mo")
+func ExampleParseDID() {
+	raw, _ := ioutil.ReadFile("testdata/counter.did")
+	p, _ := ParseDID(raw)
 	fmt.Println(p)
 	// Output:
 	// service : {
