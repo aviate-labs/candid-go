@@ -13,12 +13,23 @@ func TestValues(t *testing.T) {
 	for _, vs := range []string{
 		"()",
 		"(    )",
+
 		"0",
 		"( 0 )",
 		"( 0 : nat8, 1_000 )",
 		"( 0 : int8 )",
 		"( 0 : float32 )",
 		"( 0.000_001 : float64 )",
+
+		"(true)",
+		"(false : bool)",
+
+		"null",
+		"(null)",
+
+		"\"\"",
+		"(\"\")",
+		"(\"Hello world.\" : text)",
 	} {
 		p, err := ast.New([]byte(vs))
 		if err != nil {
