@@ -50,6 +50,7 @@ func Value(p *ast.Parser) (*ast.Node, error) {
 			Text,
 			Record,
 			Variant,
+			Principal,
 		},
 	)
 }
@@ -67,6 +68,7 @@ func OptValue(p *ast.Parser) (*ast.Node, error) {
 			Text,
 			Record,
 			Variant,
+			Principal,
 		},
 	)
 }
@@ -186,6 +188,20 @@ func Null(p *ast.Parser) (*ast.Node, error) {
 			Type:        NullT,
 			TypeStrings: NodeTypes,
 			Value:       "null",
+		},
+	)
+}
+
+func Principal(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        PrincipalT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"principal",
+				Spp,
+				TextValue,
+			},
 		},
 	)
 }
@@ -450,6 +466,15 @@ func Sp(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
+func Spp(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			' ',
+			Sp,
+		},
+	)
+}
+
 func Ws(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		op.MinZero(
@@ -528,12 +553,13 @@ const (
 	NumTypeT     // 004
 	BoolValueT   // 005
 	NullT        // 006
-	TextT        // 007
-	TextValueT   // 008
-	RecordT      // 009
-	RecordFieldT // 010
-	VariantT     // 011
-	IdT          // 012
+	PrincipalT   // 007
+	TextT        // 008
+	TextValueT   // 009
+	RecordT      // 010
+	RecordFieldT // 011
+	VariantT     // 012
+	IdT          // 013
 )
 
 var NodeTypes = []string{
@@ -547,6 +573,7 @@ var NodeTypes = []string{
 	"NumType",
 	"BoolValue",
 	"Null",
+	"Principal",
 	"Text",
 	"TextValue",
 	"Record",

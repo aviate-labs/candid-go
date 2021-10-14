@@ -1,8 +1,8 @@
 # CANDID (v0.1.0) github.com/di-wu/candid-go/internal/candid/candidvalue
 
 Values   <-- '(' Sp (Value (Sp ',' Sp Value)*)? Sp ')' / Value
-Value     <- OptValue / Num / Bool / Null / Text / Record / Variant
-OptValue  <- 'opt' Sp Num / Bool / Null / Text / Record / Variant
+Value     <- OptValue / Num / Bool / Null / Text / Record / Variant / Principal
+OptValue  <- 'opt' Sp Num / Bool / Null / Text / Record / Variant / Principal
 
 Num      <-- NumValue (Sp ':' Sp NumType)?
 NumValue <-- '-'? digit ('_'? digit)* ('.' digit ('_'? digit)*)?
@@ -14,6 +14,8 @@ Bool       <- BoolValue (Sp ':' Sp 'bool')?
 BoolValue <-- ('true' / 'false')
 
 Null <-- 'null'
+
+Principal  <-- 'principal' Spp TextValue
 
 Text       <-- TextValue (Sp ':' Sp 'text')?
 TextValue  <-- '"' Char* '"'
@@ -46,8 +48,9 @@ VariantField  <- Id (Sp '=' Sp Value)? ';'?
 
 Id <-- (letter / '_') (letter / digit / '_')*
 
-Sp  <- ' '*
-Ws  <- (' ' / x09 / x0A / x0D / (x0D x0A))*
+Sp   <- ' '*
+Spp  <- ' ' Sp
+Ws   <- (' ' / x09 / x0A / x0D / (x0D x0A))*
 
 letter  <- [A-Z] / [a-z]
 digit   <- [0-9]

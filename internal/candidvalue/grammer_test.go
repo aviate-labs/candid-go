@@ -39,6 +39,8 @@ func TestValues(t *testing.T) {
 
 		"variant{ e }",
 		"variant{ e = 0; }",
+
+		"principal \"aaaaa-aaa\"",
 	} {
 		p, err := ast.New([]byte(vs))
 		if err != nil {
