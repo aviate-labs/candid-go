@@ -41,6 +41,9 @@ func TestValues(t *testing.T) {
 		"variant{ e = 0; }",
 
 		"principal \"aaaaa-aaa\"",
+
+		"vec{}",
+		"vec{ 0; 1; 2 }",
 	} {
 		p, err := ast.New([]byte(vs))
 		if err != nil {

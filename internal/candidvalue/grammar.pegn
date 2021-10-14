@@ -1,8 +1,8 @@
 # CANDID (v0.1.0) github.com/di-wu/candid-go/internal/candid/candidvalue
 
 Values   <-- '(' Sp (Value (Sp ',' Sp Value)*)? Sp ')' / Value
-Value     <- OptValue / Num / Bool / Null / Text / Record / Variant / Principal
-OptValue  <- 'opt' Sp Num / Bool / Null / Text / Record / Variant / Principal
+Value     <- OptValue / Num / Bool / Null / Text / Record / Variant / Principal / Vec
+OptValue  <- 'opt' Sp Num / Bool / Null / Text / Record / Variant / Principal / Vec
 
 Num      <-- NumValue (Sp ':' Sp NumType)?
 NumValue <-- '-'? digit ('_'? digit)* ('.' digit ('_'? digit)*)?
@@ -45,6 +45,9 @@ RecordField  <-- Id Sp '=' Sp Value
 
 Variant      <-- 'variant' Sp '{' Ws VariantField Ws '}'
 VariantField  <- Id (Sp '=' Sp Value)? ';'?
+
+Vec       <-- 'vec' Sp '{' Ws VecFields? Ws '}'
+VecFields  <- Value Sp (';' Ws Value Sp)* ';'?
 
 Id <-- (letter / '_') (letter / digit / '_')*
 

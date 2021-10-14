@@ -51,6 +51,7 @@ func Value(p *ast.Parser) (*ast.Node, error) {
 			Record,
 			Variant,
 			Principal,
+			Vec,
 		},
 	)
 }
@@ -69,6 +70,7 @@ func OptValue(p *ast.Parser) (*ast.Node, error) {
 			Record,
 			Variant,
 			Principal,
+			Vec,
 		},
 	)
 }
@@ -436,6 +438,46 @@ func VariantField(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
+func Vec(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        VecT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"vec",
+				Sp,
+				'{',
+				Ws,
+				op.Optional(
+					VecFields,
+				),
+				Ws,
+				'}',
+			},
+		},
+	)
+}
+
+func VecFields(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			Value,
+			Sp,
+			op.MinZero(
+				op.And{
+					';',
+					Ws,
+					Value,
+					Sp,
+				},
+			),
+			op.Optional(
+				';',
+			),
+		},
+	)
+}
+
 func Id(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
@@ -559,7 +601,8 @@ const (
 	RecordT      // 010
 	RecordFieldT // 011
 	VariantT     // 012
-	IdT          // 013
+	VecT         // 013
+	IdT          // 014
 )
 
 var NodeTypes = []string{
@@ -579,5 +622,6 @@ var NodeTypes = []string{
 	"Record",
 	"RecordField",
 	"Variant",
+	"Vec",
 	"Id",
 }
