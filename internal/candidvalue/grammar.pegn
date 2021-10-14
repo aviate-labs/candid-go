@@ -1,0 +1,14 @@
+# CANDID (v0.1.0) github.com/di-wu/candid-go/internal/candid/candidvalue
+
+Values <-- '(' Sp (Value (Sp ',' Sp Value)*)? Sp ')' / Value
+Value   <- Num
+
+Num      <-- NumValue (Sp ':' Sp NumType)?
+NumValue <-- '-'? digit ('_'? digit)* ('.' digit ('_'? digit)*)?
+NumType  <-- 'nat8' / 'nat16' / 'nat32' / 'nat64' / 'nat'
+           / 'int8' / 'int16' / 'int32' / 'int64' / 'int'
+           / 'float32' / 'float64'
+
+Sp <- ' '*
+
+digit <- [0-9]

@@ -18,6 +18,7 @@ func main() {
 		{path: "internal/blob", name: "blob"},
 		{path: "internal/candid"},
 		{path: "internal/candidtest", name: "candidtest"},
+		{path: "internal/candidvalue", name: "candidvalue"},
 	} {
 		rawGrammar, _ := ioutil.ReadFile(fmt.Sprintf("%s/grammar.pegn", grammar.path))
 		if err := pegn.GenerateFromFiles(fmt.Sprintf("%s/", grammar.path), pegn.Config{
