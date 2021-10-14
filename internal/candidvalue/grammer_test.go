@@ -30,6 +30,15 @@ func TestValues(t *testing.T) {
 		"\"\"",
 		"(\"\")",
 		"(\"Hello world.\" : text)",
+
+		"opt 0",
+
+		"record{}",
+		"record{ f0 = 0; f1 = opt 0 }",
+		"record{\n\tf0 = 0;\n\tf1 = opt 0;\n}",
+
+		"variant{ e }",
+		"variant{ e = 0; }",
 	} {
 		p, err := ast.New([]byte(vs))
 		if err != nil {

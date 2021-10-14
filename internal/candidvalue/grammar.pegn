@@ -1,7 +1,8 @@
 # CANDID (v0.1.0) github.com/di-wu/candid-go/internal/candid/candidvalue
 
-Values <-- '(' Sp (Value (Sp ',' Sp Value)*)? Sp ')' / Value
-Value   <- Num / Bool / Null / Text
+Values   <-- '(' Sp (Value (Sp ',' Sp Value)*)? Sp ')' / Value
+Value     <- OptValue / Num / Bool / Null / Text / Record / Variant
+OptValue  <- 'opt' Sp Num / Bool / Null / Text / Record / Variant
 
 Num      <-- NumValue (Sp ':' Sp NumType)?
 NumValue <-- '-'? digit ('_'? digit)* ('.' digit ('_'? digit)*)?
@@ -36,9 +37,20 @@ escape   <- 'n' / 'r' / 't'
           / x27 # '
 HexNum   <- hex   ('_'? hex)*
 
-Sp <- ' '*
+Record       <-- 'record' Sp '{' Ws RecordFields? Ws '}'
+RecordFields  <- RecordField Sp (';' Ws RecordField Sp)* ';'?
+RecordField  <-- Id Sp '=' Sp Value
 
-digit <- [0-9]
-hex    <- digit / [A-F] / [a-f]
+Variant      <-- 'variant' Sp '{' Ws VariantField Ws '}'
+VariantField  <- Id (Sp '=' Sp Value)? ';'?
 
-ESC <- x5C # \
+Id <-- (letter / '_') (letter / digit / '_')*
+
+Sp  <- ' '*
+Ws  <- (' ' / x09 / x0A / x0D / (x0D x0A))*
+
+letter  <- [A-Z] / [a-z]
+digit   <- [0-9]
+hex     <- digit / [A-F] / [a-f]
+
+ESC  <- x5C # \
