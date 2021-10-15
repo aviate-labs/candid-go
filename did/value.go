@@ -1,7 +1,6 @@
 package did
 
 import (
-	"fmt"
 	"math/big"
 	"strconv"
 	"strings"
@@ -13,6 +12,33 @@ import (
 
 func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 	switch n.Type {
+	case candidvalue.BoolValueT:
+		switch n.Value {
+		case "true":
+			return []idl.Type{new(idl.Bool)}, []interface{}{true}, nil
+		case "false":
+			return []idl.Type{new(idl.Bool)}, []interface{}{false}, nil
+		default:
+			panic(n)
+		}
+	case candidvalue.NullT:
+		return []idl.Type{new(idl.Null)}, []interface{}{nil}, nil
+	case candidvalue.NumT:
+		typ, arg, err := convertNum(n)
+		if err != nil {
+			return nil, nil, err
+		}
+		return []idl.Type{typ}, []interface{}{arg}, nil
+	case candidvalue.OptValueT:
+		types, args, err := ConvertValues(n.Children()[0])
+		if err != nil {
+			return nil, nil, err
+		}
+		return []idl.Type{idl.NewOpt(types[0])}, []interface{}{args[0]}, nil
+	case candidvalue.TextT:
+		n := n.Children()[0]
+		s := strings.TrimPrefix(strings.TrimSuffix(n.Value, "\""), "\"")
+		return []idl.Type{new(idl.Text)}, []interface{}{s}, nil
 	case candidvalue.ValuesT:
 		var (
 			types []idl.Type
@@ -27,18 +53,6 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 			args = append(args, arg...)
 		}
 		return types, args, nil
-	case candidvalue.NumT:
-		typ, arg, err := convertNum(n)
-		if err != nil {
-			return nil, nil, err
-		}
-		return []idl.Type{typ}, []interface{}{arg}, nil
-	case candidvalue.OptValueT:
-		types, args, err := ConvertValues(n.Children()[0])
-		if err != nil {
-			return nil, nil, err
-		}
-		return []idl.Type{idl.NewOpt(types[0])}, []interface{}{args[0]}, nil
 	default:
 		panic(n)
 	}
@@ -67,7 +81,6 @@ func convertNum(n *ast.Node) (idl.Type, interface{}, error) {
 		}
 		return new(idl.Int), big.NewInt(i), nil
 	case 2:
-		fmt.Println(n)
 		vArg := n[0].Value
 		vType := n[1].Value
 

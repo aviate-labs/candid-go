@@ -61,19 +61,19 @@ func OptValue(p *ast.Parser) (*ast.Node, error) {
 		ast.Capture{
 			Type:        OptValueT,
 			TypeStrings: NodeTypes,
-			Value: op.Or{
-				op.And{
-					"opt",
-					Spp,
+			Value: op.And{
+				"opt",
+				Spp,
+				op.Or{
 					Num,
+					Bool,
+					Null,
+					Text,
+					Record,
+					Variant,
+					Principal,
+					Vec,
 				},
-				Bool,
-				Null,
-				Text,
-				Record,
-				Variant,
-				Principal,
-				Vec,
 			},
 		},
 	)
