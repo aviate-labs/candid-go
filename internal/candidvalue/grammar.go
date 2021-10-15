@@ -58,19 +58,23 @@ func Value(p *ast.Parser) (*ast.Node, error) {
 
 func OptValue(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
-		op.Or{
-			op.And{
-				"opt",
-				Sp,
-				Num,
+		ast.Capture{
+			Type:        OptValueT,
+			TypeStrings: NodeTypes,
+			Value: op.Or{
+				op.And{
+					"opt",
+					Spp,
+					Num,
+				},
+				Bool,
+				Null,
+				Text,
+				Record,
+				Variant,
+				Principal,
+				Vec,
 			},
-			Bool,
-			Null,
-			Text,
-			Record,
-			Variant,
-			Principal,
-			Vec,
 		},
 	)
 }
@@ -590,19 +594,20 @@ const (
 	// CANDID (github.com/di-wu/candid-go/internal/candid/candidvalue)
 
 	ValuesT      // 001
-	NumT         // 002
-	NumValueT    // 003
-	NumTypeT     // 004
-	BoolValueT   // 005
-	NullT        // 006
-	PrincipalT   // 007
-	TextT        // 008
-	TextValueT   // 009
-	RecordT      // 010
-	RecordFieldT // 011
-	VariantT     // 012
-	VecT         // 013
-	IdT          // 014
+	OptValueT    // 002
+	NumT         // 003
+	NumValueT    // 004
+	NumTypeT     // 005
+	BoolValueT   // 006
+	NullT        // 007
+	PrincipalT   // 008
+	TextT        // 009
+	TextValueT   // 010
+	RecordT      // 011
+	RecordFieldT // 012
+	VariantT     // 013
+	VecT         // 014
+	IdT          // 015
 )
 
 var NodeTypes = []string{
@@ -611,6 +616,7 @@ var NodeTypes = []string{
 	// CANDID (github.com/di-wu/candid-go/internal/candid/candidvalue)
 
 	"Values",
+	"OptValue",
 	"Num",
 	"NumValue",
 	"NumType",
