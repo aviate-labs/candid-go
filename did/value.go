@@ -35,6 +35,23 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 			return nil, nil, err
 		}
 		return []idl.Type{idl.NewOpt(types[0])}, []interface{}{args[0]}, nil
+	case candidvalue.RecordT:
+		if len(n.Children()) == 0 {
+			return []idl.Type{idl.NewRec(nil)}, []interface{}{nil}, nil
+		}
+		types := make(map[string]idl.Type)
+		args := make(map[string]interface{})
+		for _, n := range n.Children() {
+			n := n.Children()
+			id := n[0].Value
+			typ, arg, err := ConvertValues(n[1])
+			if err != nil {
+				return nil, nil, err
+			}
+			types[id] = typ[0]
+			args[id] = arg[0]
+		}
+		return []idl.Type{idl.NewRec(types)}, []interface{}{args}, nil
 	case candidvalue.TextT:
 		n := n.Children()[0]
 		s := strings.TrimPrefix(strings.TrimSuffix(n.Value, "\""), "\"")
@@ -53,6 +70,41 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 			args = append(args, arg...)
 		}
 		return types, args, nil
+	case candidvalue.VariantT:
+		n := n.Children()
+		id := n[0].Value
+		switch len(n) {
+		case 1:
+			typ := idl.NewVariant(map[string]idl.Type{id: new(idl.Null)})
+			arg := idl.FieldValue{Name: id, Value: nil}
+			return []idl.Type{typ}, []interface{}{arg}, nil
+		case 2:
+			varType, varArg, err := ConvertValues(n[1])
+			if err != nil {
+				return nil, nil, err
+			}
+			typ := idl.NewVariant(map[string]idl.Type{id: varType[0]})
+			arg := idl.FieldValue{Name: id, Value: varArg[0]}
+			return []idl.Type{typ}, []interface{}{arg}, nil
+		default:
+			panic(n)
+		}
+	case candidvalue.VecT:
+		n := n.Children()
+		if len(n) == 0 {
+			return []idl.Type{idl.NewVec(new(idl.Null))}, []interface{}{[]interface{}{}}, nil
+		}
+		var types idl.Type
+		var args []interface{}
+		for _, n := range n {
+			typ, arg, err := ConvertValues(n)
+			if err != nil {
+				return nil, nil, err
+			}
+			types = typ[0]
+			args = append(args, arg[0])
+		}
+		return []idl.Type{idl.NewVec(types)}, []interface{}{args}, nil
 	default:
 		panic(n)
 	}
