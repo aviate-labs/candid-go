@@ -58,6 +58,15 @@ func TestEncodeValue(t *testing.T) {
 
 		{"\"\"", "4449444c00017100"},
 		{"\"quint\"", "4449444c000171057175696e74"},
+
+		{"record {}", "4449444c016c000100"},
+		{"record {foo = \"baz\"; bar = 42}", "4449444c016c02d3e3aa027c868eb7027101002a0362617a"},
+
+		{"variant { ok }", "4449444c016b019cc2017f010000"},
+		{"variant { err = \"oops...\" }", "4449444c016b01e58eb40271010000076f6f70732e2e2e"},
+
+		{"vec {}", "4449444c016d7f010000"},
+		{"vec { 0; }", "4449444c016d7c01000100"},
 	} {
 		e, err := candid.EncodeValue(test.values)
 		if err != nil {
