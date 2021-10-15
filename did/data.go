@@ -1,4 +1,4 @@
-package candid
+package did
 
 import (
 	"fmt"

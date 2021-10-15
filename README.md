@@ -9,4 +9,4 @@ This is still entirely experimental.
 ### Contains:
 
 - Parser for the Candid IDL signatures.
-- ~Binary formatting.~
+- Binary formatting.

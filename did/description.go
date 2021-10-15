@@ -1,4 +1,4 @@
-package candid
+package did
 
 import (
 	"strings"
@@ -16,7 +16,7 @@ type Description struct {
 	Services []Service
 }
 
-func convertDescription(n *ast.Node) Description {
+func ConvertDescription(n *ast.Node) Description {
 	var desc Description
 	for _, n := range n.Children() {
 		switch n.Type {

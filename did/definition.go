@@ -1,7 +1,8 @@
-package candid
+package did
 
 import (
 	"fmt"
+
 	"github.com/di-wu/parser/ast"
 )
 
@@ -15,6 +16,7 @@ type Definition interface {
 type Import struct {
 	Text string
 }
+
 func (i Import) String() string {
 	return fmt.Sprintf("import %q", i.Text)
 }
@@ -42,4 +44,4 @@ func (t Type) String() string {
 	return fmt.Sprintf("type %s = %s", t.Id, t.Data.String())
 }
 
-func (t Type) def()   {}
+func (t Type) def() {}

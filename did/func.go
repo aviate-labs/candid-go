@@ -1,9 +1,10 @@
-package candid
+package did
 
 import (
 	"fmt"
-	"github.com/di-wu/parser/ast"
 	"strings"
+
+	"github.com/di-wu/parser/ast"
 )
 
 // Argument describes the argument types of a Field.

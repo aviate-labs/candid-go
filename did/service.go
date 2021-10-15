@@ -1,4 +1,4 @@
-package candid
+package did
 
 import (
 	"fmt"
@@ -60,7 +60,6 @@ func convertService(n *ast.Node) Service {
 				continue
 			}
 			actor.MethodId = &id
-			break
 		case candid.TupTypeT:
 			// TODO: what does this even do?
 		case candid.ActorTypeT:
