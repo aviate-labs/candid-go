@@ -2,7 +2,7 @@
 
 Values   <-- '(' Sp (Value (Sp ',' Sp Value)*)? Sp ')' / Value
 Value     <- OptValue / Num / Bool / Null / Text / Record / Variant / Principal / Vec
-OptValue  <- 'opt' Sp Num / Bool / Null / Text / Record / Variant / Principal / Vec
+OptValue <-- 'opt' Spp Num / Bool / Null / Text / Record / Variant / Principal / Vec
 
 Num      <-- NumValue (Sp ':' Sp NumType)?
 NumValue <-- '-'? digit ('_'? digit)* ('.' digit ('_'? digit)*)?
