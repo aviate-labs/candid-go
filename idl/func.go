@@ -27,24 +27,24 @@ func encodeTypes(ts []Type, tdt *TypeDefinitionTable) ([]byte, error) {
 }
 
 type Func struct {
-	argTypes []Type
-	retTypes []Type
-	ann      []string
+	ArgTypes    []Type
+	RetTypes    []Type
+	Annotations []string
 }
 
 func NewFunc(argumentTypes []Type, returnTypes []Type, annotations []string) *Func {
 	return &Func{
-		argTypes: argumentTypes,
-		retTypes: returnTypes,
-		ann:      annotations,
+		ArgTypes:    argumentTypes,
+		RetTypes:    returnTypes,
+		Annotations: annotations,
 	}
 }
 
 func (f Func) AddTypeDefinition(tdt *TypeDefinitionTable) error {
-	for _, t := range f.argTypes {
+	for _, t := range f.ArgTypes {
 		t.AddTypeDefinition(tdt)
 	}
-	for _, t := range f.retTypes {
+	for _, t := range f.RetTypes {
 		t.AddTypeDefinition(tdt)
 	}
 
@@ -52,20 +52,20 @@ func (f Func) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	if err != nil {
 		return err
 	}
-	vsa, err := encodeTypes(f.argTypes, tdt)
+	vsa, err := encodeTypes(f.ArgTypes, tdt)
 	if err != nil {
 		return err
 	}
-	vsr, err := encodeTypes(f.retTypes, tdt)
+	vsr, err := encodeTypes(f.RetTypes, tdt)
 	if err != nil {
 		return err
 	}
-	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(f.ann))))
+	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(f.Annotations))))
 	if err != nil {
 		return err
 	}
 	var vs []byte
-	for _, t := range f.ann {
+	for _, t := range f.Annotations {
 		switch t {
 		case "query":
 			vs = []byte{0x01}
@@ -151,16 +151,16 @@ func (f Func) EncodeValue(v interface{}) ([]byte, error) {
 
 func (f Func) String() string {
 	var args []string
-	for _, t := range f.argTypes {
+	for _, t := range f.ArgTypes {
 		args = append(args, t.String())
 	}
 	var rets []string
-	for _, t := range f.retTypes {
+	for _, t := range f.RetTypes {
 		rets = append(rets, t.String())
 	}
 	var ann string
-	if len(f.ann) != 0 {
-		ann = fmt.Sprintf(" %s", strings.Join(f.ann, " "))
+	if len(f.Annotations) != 0 {
+		ann = fmt.Sprintf(" %s", strings.Join(f.Annotations, " "))
 	}
 	return fmt.Sprintf("(%s) -> (%s)%s", strings.Join(args, ", "), strings.Join(rets, ", "), ann)
 }

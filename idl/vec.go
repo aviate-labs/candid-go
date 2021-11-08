@@ -9,17 +9,17 @@ import (
 )
 
 type Vec struct {
-	typ Type
+	Type Type
 }
 
 func NewVec(t Type) *Vec {
 	return &Vec{
-		typ: t,
+		Type: t,
 	}
 }
 
 func (v Vec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
-	if err := v.typ.AddTypeDefinition(tdt); err != nil {
+	if err := v.Type.AddTypeDefinition(tdt); err != nil {
 		return err
 	}
 
@@ -27,7 +27,7 @@ func (v Vec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	if err != nil {
 		return err
 	}
-	v_, err := v.typ.EncodeType(tdt)
+	v_, err := v.Type.EncodeType(tdt)
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func (v Vec) Decode(r *bytes.Reader) (interface{}, error) {
 	}
 	var vs []interface{}
 	for i := 0; i < int(l.Int64()); i++ {
-		v_, err := v.typ.Decode(r)
+		v_, err := v.Type.Decode(r)
 		if err != nil {
 			return nil, err
 		}
@@ -70,7 +70,7 @@ func (v Vec) EncodeValue(value interface{}) ([]byte, error) {
 	}
 	var vs []byte
 	for _, value := range vs_ {
-		v_, err := v.typ.EncodeValue(value)
+		v_, err := v.Type.EncodeValue(value)
 		if err != nil {
 			return nil, err
 		}
@@ -80,5 +80,5 @@ func (v Vec) EncodeValue(value interface{}) ([]byte, error) {
 }
 
 func (v Vec) String() string {
-	return fmt.Sprintf("vec %s", v.typ)
+	return fmt.Sprintf("vec %s", v.Type)
 }

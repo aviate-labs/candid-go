@@ -9,49 +9,49 @@ import (
 )
 
 type Int struct {
-	base uint8
+	Base uint8
 	primType
 }
 
 func Int16() *Int {
 	return &Int{
-		base: 16,
+		Base: 16,
 	}
 }
 
 func Int32() *Int {
 	return &Int{
-		base: 32,
+		Base: 32,
 	}
 }
 
 func Int64() *Int {
 	return &Int{
-		base: 64,
+		Base: 64,
 	}
 }
 
 func Int8() *Int {
 	return &Int{
-		base: 8,
+		Base: 8,
 	}
 }
 
 func (n *Int) Decode(r *bytes.Reader) (interface{}, error) {
-	if n.base == 0 {
+	if n.Base == 0 {
 		return leb128.DecodeSigned(r)
 	}
-	return readInt(r, int(n.base/8))
+	return readInt(r, int(n.Base/8))
 }
 
 func (n Int) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
-	if n.base == 0 {
+	if n.Base == 0 {
 		return leb128.EncodeSigned(big.NewInt(intType))
 	}
 	intXType := new(big.Int).Set(big.NewInt(intXType))
 	intXType = intXType.Add(
 		intXType,
-		big.NewInt(3-int64(log2(n.base))),
+		big.NewInt(3-int64(log2(n.Base))),
 	)
 	return leb128.EncodeSigned(intXType)
 }
@@ -61,11 +61,11 @@ func (n Int) EncodeValue(v interface{}) ([]byte, error) {
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
-	if n.base == 0 {
+	if n.Base == 0 {
 		return leb128.EncodeSigned(v_)
 	}
 	{
-		exp := big.NewInt(int64(n.base) - 1)
+		exp := big.NewInt(int64(n.Base) - 1)
 		lim := big.NewInt(2)
 		lim = lim.Exp(lim, exp, nil)
 		min := new(big.Int).Set(lim)
@@ -76,12 +76,12 @@ func (n Int) EncodeValue(v interface{}) ([]byte, error) {
 			return nil, fmt.Errorf("invalid value: %s", v_)
 		}
 	}
-	return writeInt(v_, int(n.base/8)), nil
+	return writeInt(v_, int(n.Base/8)), nil
 }
 
 func (n Int) String() string {
-	if n.base == 0 {
+	if n.Base == 0 {
 		return "int"
 	}
-	return fmt.Sprintf("int%d", n.base)
+	return fmt.Sprintf("int%d", n.Base)
 }

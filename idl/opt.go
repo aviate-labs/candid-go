@@ -9,17 +9,17 @@ import (
 )
 
 type Opt struct {
-	typ Type
+	Type Type
 }
 
 func NewOpt(t Type) *Opt {
 	return &Opt{
-		typ: t,
+		Type: t,
 	}
 }
 
 func (o Opt) AddTypeDefinition(tdt *TypeDefinitionTable) error {
-	if err := o.typ.AddTypeDefinition(tdt); err != nil {
+	if err := o.Type.AddTypeDefinition(tdt); err != nil {
 		return err
 	}
 
@@ -27,7 +27,7 @@ func (o Opt) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	if err != nil {
 		return err
 	}
-	v, err := o.typ.EncodeType(tdt)
+	v, err := o.Type.EncodeType(tdt)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func (o Opt) Decode(r *bytes.Reader) (interface{}, error) {
 	case 0x00:
 		return nil, nil
 	case 0x01:
-		return o.typ.Decode(r)
+		return o.Type.Decode(r)
 	default:
 		return nil, fmt.Errorf("invalid option value")
 	}
@@ -62,7 +62,7 @@ func (o Opt) EncodeValue(v interface{}) ([]byte, error) {
 	if v == nil {
 		return []byte{0x00}, nil
 	}
-	v_, err := o.typ.EncodeValue(v)
+	v_, err := o.Type.EncodeValue(v)
 	if err != nil {
 		return nil, err
 	}
@@ -70,5 +70,5 @@ func (o Opt) EncodeValue(v interface{}) ([]byte, error) {
 }
 
 func (o Opt) String() string {
-	return fmt.Sprintf("opt %s", o.typ)
+	return fmt.Sprintf("opt %s", o.Type)
 }

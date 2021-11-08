@@ -11,25 +11,25 @@ import (
 )
 
 type Rec struct {
-	fields []Field
+	Fields []Field
 }
 
 func NewRec(fields map[string]Type) *Rec {
 	var rec Rec
 	for k, v := range fields {
-		rec.fields = append(rec.fields, Field{
+		rec.Fields = append(rec.Fields, Field{
 			Name: k,
 			Type: v,
 		})
 	}
-	sort.Slice(rec.fields, func(i, j int) bool {
-		return Hash(rec.fields[i].Name).Cmp(Hash(rec.fields[j].Name)) < 0
+	sort.Slice(rec.Fields, func(i, j int) bool {
+		return Hash(rec.Fields[i].Name).Cmp(Hash(rec.Fields[j].Name)) < 0
 	})
 	return &rec
 }
 
 func (r Rec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
-	for _, f := range r.fields {
+	for _, f := range r.Fields {
 		if err := f.Type.AddTypeDefinition(tdt); err != nil {
 			return err
 		}
@@ -39,12 +39,12 @@ func (r Rec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	if err != nil {
 		return err
 	}
-	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(r.fields))))
+	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(r.Fields))))
 	if err != nil {
 		return err
 	}
 	var vs []byte
-	for _, f := range r.fields {
+	for _, f := range r.Fields {
 		l, err := leb128.EncodeUnsigned(Hash(f.Name))
 		if err != nil {
 			return nil
@@ -62,7 +62,7 @@ func (r Rec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 
 func (r Rec) Decode(r_ *bytes.Reader) (interface{}, error) {
 	rec := make(map[string]interface{})
-	for _, f := range r.fields {
+	for _, f := range r.Fields {
 		v, err := f.Type.Decode(r_)
 		if err != nil {
 			return nil, err
@@ -92,11 +92,11 @@ func (r Rec) EncodeValue(v interface{}) ([]byte, error) {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
 	var vs_ []interface{}
-	for _, f := range r.fields {
+	for _, f := range r.Fields {
 		vs_ = append(vs_, fs[f.Name])
 	}
 	var vs []byte
-	for i, f := range r.fields {
+	for i, f := range r.Fields {
 		v_, err := f.Type.EncodeValue(vs_[i])
 		if err != nil {
 			return nil, err
@@ -108,7 +108,7 @@ func (r Rec) EncodeValue(v interface{}) ([]byte, error) {
 
 func (r Rec) String() string {
 	var s []string
-	for _, f := range r.fields {
+	for _, f := range r.Fields {
 		s = append(s, fmt.Sprintf("%s:%s", f.Name, f.Type.String()))
 	}
 	return fmt.Sprintf("record {%s}", strings.Join(s, "; "))

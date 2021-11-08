@@ -1,6 +1,10 @@
 package candid
 
 import (
+	"fmt"
+	"math/big"
+	"strings"
+
 	"github.com/aviate-labs/candid-go/did"
 	"github.com/aviate-labs/candid-go/idl"
 	"github.com/aviate-labs/candid-go/internal/candid"
@@ -42,4 +46,96 @@ func EncodeValue(value string) ([]byte, error) {
 		return nil, err
 	}
 	return idl.Encode(types, args)
+}
+
+func DecodeValue(value []byte) (string, error) {
+	types, args, err := idl.Decode(value)
+	if err != nil {
+		return "", err
+	}
+	if len(types) != 1 || len(args) != 1 {
+		return "", fmt.Errorf("can not decode: %x", value)
+	}
+	s, err := valueToString(types[0], args[0])
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("(%s)", s), nil
+}
+
+func valueToString(typ idl.Type, value interface{}) (string, error) {
+	switch t := typ.(type) {
+	case *idl.Opt:
+		if value == nil {
+			return "opt null", nil
+		}
+		s, err := valueToString(t.Type, value)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf("opt %s", s), nil
+	case *idl.Nat:
+		if t.Base == 0 {
+			return fmt.Sprintf("%s : nat", value), nil
+		}
+		return fmt.Sprintf("%s : nat%d", value, t.Base), nil
+	case *idl.Int:
+		if t.Base == 0 {
+			return fmt.Sprintf("%s", value), nil
+		}
+		return fmt.Sprintf("%s : int%d", value, t.Base), nil
+	case *idl.Float:
+		f, _ := value.(*big.Float).Float64()
+		return fmt.Sprintf("%.f : float%d", f, t.Base), nil
+	case *idl.Bool:
+		return fmt.Sprintf("%t", value), nil
+	case *idl.Null:
+		return "null", nil
+	case *idl.Text:
+		return fmt.Sprintf("%q", value), nil
+	case *idl.Rec:
+		var ss []string
+		for _, f := range t.Fields {
+			v := value.(map[string]interface{})
+			s, err := valueToString(f.Type, v[f.Name])
+			if err != nil {
+				return "", nil
+			}
+			ss = append(ss, fmt.Sprintf("%s = %s", f.Name, s))
+		}
+		if len(ss) == 0 {
+			return "record {}", nil
+		}
+		return fmt.Sprintf("record { %s }", strings.Join(ss, "; ")), nil
+	case *idl.Variant:
+		f := t.Fields[0]
+		v := value.(*idl.FieldValue).Value
+		var s string
+		switch t := f.Type.(type) {
+		case *idl.Null:
+			s = f.Name
+		default:
+			sv, err := valueToString(t, v)
+			if err != nil {
+				return "", err
+			}
+			s = fmt.Sprintf("%s = %s", f.Name, sv)
+		}
+		return fmt.Sprintf("variant { %s }", s), nil
+	case *idl.Vec:
+		var ss []string
+		for _, a := range value.([]interface{}) {
+			s, err := valueToString(t.Type, a)
+			if err != nil {
+				return "", err
+			}
+			ss = append(ss, s)
+		}
+		if len(ss) == 0 {
+			return "vec {}", nil
+		}
+		return fmt.Sprintf("vec { %s }", strings.Join(ss, "; ")), nil
+	default:
+		panic(fmt.Sprintf("%s, %v", typ, value))
+	}
 }

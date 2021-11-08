@@ -92,7 +92,7 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 						Type: v,
 					})
 				}
-				tds = append(tds, &Rec{fields: fields})
+				tds = append(tds, &Rec{Fields: fields})
 			case varType:
 				l, err := leb128.DecodeUnsigned(r)
 				if err != nil {
@@ -117,7 +117,7 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 						Type: v,
 					})
 				}
-				tds = append(tds, &Variant{fields: fields})
+				tds = append(tds, &Variant{Fields: fields})
 			case funcType:
 				la, err := leb128.DecodeUnsigned(r)
 				if err != nil {
@@ -164,9 +164,9 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 					anns = append(anns, string(ann))
 				}
 				tds = append(tds, &Func{
-					argTypes: args,
-					retTypes: rets,
-					ann:      anns,
+					ArgTypes:    args,
+					RetTypes:    rets,
+					Annotations: anns,
 				})
 			case serviceType:
 				l, err := leb128.DecodeUnsigned(r)

@@ -16,25 +16,25 @@ type FieldValue struct {
 }
 
 type Variant struct {
-	fields []Field
+	Fields []Field
 }
 
 func NewVariant(fields map[string]Type) *Variant {
 	var variant Variant
 	for k, v := range fields {
-		variant.fields = append(variant.fields, Field{
+		variant.Fields = append(variant.Fields, Field{
 			Name: k,
 			Type: v,
 		})
 	}
-	sort.Slice(variant.fields, func(i, j int) bool {
-		return Hash(variant.fields[i].Name).Cmp(Hash(variant.fields[j].Name)) < 0
+	sort.Slice(variant.Fields, func(i, j int) bool {
+		return Hash(variant.Fields[i].Name).Cmp(Hash(variant.Fields[j].Name)) < 0
 	})
 	return &variant
 }
 
 func (v Variant) AddTypeDefinition(tdt *TypeDefinitionTable) error {
-	for _, f := range v.fields {
+	for _, f := range v.Fields {
 		if err := f.Type.AddTypeDefinition(tdt); err != nil {
 			return err
 		}
@@ -44,12 +44,12 @@ func (v Variant) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	if err != nil {
 		return err
 	}
-	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(v.fields))))
+	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(v.Fields))))
 	if err != nil {
 		return err
 	}
 	var vs []byte
-	for _, f := range v.fields {
+	for _, f := range v.Fields {
 		id, err := leb128.EncodeUnsigned(Hash(f.Name))
 		if err != nil {
 			return nil
@@ -70,14 +70,14 @@ func (v Variant) Decode(r *bytes.Reader) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	if id.Cmp(big.NewInt(int64(len(v.fields)))) >= 0 {
+	if id.Cmp(big.NewInt(int64(len(v.Fields)))) >= 0 {
 		return nil, fmt.Errorf("invalid variant index: %v", id)
 	}
-	v_, err := v.fields[int(id.Int64())].Type.Decode(r)
+	v_, err := v.Fields[int(id.Int64())].Type.Decode(r)
 	if err != nil {
 		return nil, err
 	}
-	return FieldValue{
+	return &FieldValue{
 		Name:  id.String(),
 		Value: v_,
 	}, nil
@@ -96,7 +96,7 @@ func (v Variant) EncodeValue(value interface{}) ([]byte, error) {
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
-	for i, f := range v.fields {
+	for i, f := range v.Fields {
 		if f.Name == fs.Name {
 			id, err := leb128.EncodeUnsigned(big.NewInt(int64(i)))
 			if err != nil {
@@ -114,7 +114,7 @@ func (v Variant) EncodeValue(value interface{}) ([]byte, error) {
 
 func (v Variant) String() string {
 	var s []string
-	for _, f := range v.fields {
+	for _, f := range v.Fields {
 		s = append(s, fmt.Sprintf("%s:%s", f.Name, f.Type.String()))
 	}
 	return fmt.Sprintf("variant {%s}", strings.Join(s, "; "))
