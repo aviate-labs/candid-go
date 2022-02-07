@@ -13,20 +13,34 @@ import (
 	"github.com/di-wu/parser/ast"
 )
 
-// ParseDID parses the given raw .did files and returns the Program that is defined in it.
-func ParseDID(raw []byte) (did.Description, error) {
-	p, err := ast.New(raw)
+func DecodeValue(value []byte) (string, error) {
+	types, values, err := idl.Decode(value)
 	if err != nil {
-		return did.Description{}, err
+		return "", err
 	}
-	n, err := candid.Prog(p)
+	if len(types) != 1 || len(values) != 1 {
+		return "", fmt.Errorf("can not decode: %x", value)
+	}
+	s, err := valueToString(types[0], values[0])
 	if err != nil {
-		return did.Description{}, err
+		return "", err
 	}
-	if _, err := p.Expect(parser.EOD); err != nil {
-		return did.Description{}, err
+	return fmt.Sprintf("(%s)", s), nil
+}
+
+func DecodeValues(types []idl.Type, values []interface{}) (string, error) {
+	var ss []string
+	if len(types) != len(values) {
+		return "", fmt.Errorf("unequal length")
 	}
-	return did.ConvertDescription(n), nil
+	for i := range types {
+		s, err := valueToString(types[i], values[i])
+		if err != nil {
+			return "", err
+		}
+		ss = append(ss, s)
+	}
+	return fmt.Sprintf("(%s)", strings.Join(ss, "; ")), nil
 }
 
 func EncodeValue(value string) ([]byte, error) {
@@ -48,19 +62,20 @@ func EncodeValue(value string) ([]byte, error) {
 	return idl.Encode(types, args)
 }
 
-func DecodeValue(value []byte) (string, error) {
-	types, args, err := idl.Decode(value)
+// ParseDID parses the given raw .did files and returns the Program that is defined in it.
+func ParseDID(raw []byte) (did.Description, error) {
+	p, err := ast.New(raw)
 	if err != nil {
-		return "", err
+		return did.Description{}, err
 	}
-	if len(types) != 1 || len(args) != 1 {
-		return "", fmt.Errorf("can not decode: %x", value)
-	}
-	s, err := valueToString(types[0], args[0])
+	n, err := candid.Prog(p)
 	if err != nil {
-		return "", err
+		return did.Description{}, err
 	}
-	return fmt.Sprintf("(%s)", s), nil
+	if _, err := p.Expect(parser.EOD); err != nil {
+		return did.Description{}, err
+	}
+	return did.ConvertDescription(n), nil
 }
 
 func valueToString(typ idl.Type, value interface{}) (string, error) {
