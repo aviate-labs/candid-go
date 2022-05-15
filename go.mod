@@ -1,6 +1,6 @@
 module github.com/aviate-labs/candid-go
 
-go 1.16
+go 1.18
 
 require (
 	github.com/aviate-labs/leb128 v0.3.0
