@@ -1,0 +1,41 @@
+package idl2_test
+
+import (
+	"bytes"
+	"encoding/hex"
+	"fmt"
+	"math/big"
+
+	"github.com/aviate-labs/principal-go"
+)
+
+func bigIntFromString(v string) *big.Int {
+	bi, _ := new(big.Int).SetString(v, 10)
+	return bi
+}
+
+func hexToBytesReader(v string) *bytes.Reader {
+	bs, _ := hex.DecodeString(v)
+	return bytes.NewReader(bs)
+}
+
+func principalFromString(v string) principal.Principal {
+	p, _ := principal.Decode(v)
+	return p
+}
+
+func printDecode(val any, err error) {
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(val)
+	}
+}
+
+func printEncode(typ []byte, val []byte, err error) {
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("%x%x\n", typ, val)
+	}
+}

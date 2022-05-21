@@ -9,18 +9,6 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-func newEncodeState() *encodeState {
-	return &encodeState{
-		tdt: &idl.TypeDefinitionTable{
-			Indexes: make(map[string]int),
-		},
-	}
-}
-
-type encodeState struct {
-	tdt *idl.TypeDefinitionTable
-}
-
 func Marshal(args []interface{}) ([]byte, error) {
 	e := newEncodeState()
 	for _, v := range args {
@@ -62,6 +50,14 @@ func addTypes(v reflect.Value, e *encodeState) error {
 	return nil
 }
 
+func concat(bs ...[]byte) []byte {
+	var c []byte
+	for _, b := range bs {
+		c = append(c, b...)
+	}
+	return c
+}
+
 func encode(v reflect.Value) ([]byte, []byte, error) {
 	if v.Kind() == reflect.Interface {
 		if v.IsNil() {
@@ -85,10 +81,14 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 	}
 }
 
-func concat(bs ...[]byte) []byte {
-	var c []byte
-	for _, b := range bs {
-		c = append(c, b...)
+type encodeState struct {
+	tdt *idl.TypeDefinitionTable
+}
+
+func newEncodeState() *encodeState {
+	return &encodeState{
+		tdt: &idl.TypeDefinitionTable{
+			Indexes: make(map[string]int),
+		},
 	}
-	return c
 }
