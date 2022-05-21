@@ -6,13 +6,28 @@ import (
 	"reflect"
 
 	"github.com/aviate-labs/candid-go/idl"
+	"github.com/aviate-labs/candid-go/idl2"
+	"github.com/aviate-labs/candid-go/typ"
 	"github.com/aviate-labs/leb128"
 )
 
 func Marshal(args []interface{}) ([]byte, error) {
 	e := newEncodeState()
+	tdt, err := types(args, e)
+	if err != nil {
+		return nil, err
+	}
+	data, err := values(args, e)
+	if err != nil {
+		return nil, err
+	}
+	return concat([]byte{'D', 'I', 'D', 'L'}, tdt, data), nil
+}
+
+func types(args []interface{}, e *encodeState) ([]byte, error) {
 	for _, v := range args {
-		addTypes(reflect.ValueOf(v), e)
+		v := reflect.ValueOf(v)
+		_ = v // TODO
 	}
 
 	tdtl, err := leb128.EncodeSigned(big.NewInt(int64(len(e.tdt.Indexes))))
@@ -23,7 +38,10 @@ func Marshal(args []interface{}) ([]byte, error) {
 	for _, t := range e.tdt.Types {
 		tdte = append(tdte, t...)
 	}
+	return append(tdtl, tdte...), nil
+}
 
+func values(args []interface{}, e *encodeState) ([]byte, error) {
 	tsl, err := leb128.EncodeSigned(big.NewInt(int64(len(args))))
 	if err != nil {
 		return nil, err
@@ -40,14 +58,7 @@ func Marshal(args []interface{}) ([]byte, error) {
 		ts = append(ts, t...)
 		vs = append(vs, v...)
 	}
-	return concat(
-		[]byte{'D', 'I', 'D', 'L'},
-		tdtl, tdte, tsl, ts, vs,
-	), nil
-}
-
-func addTypes(v reflect.Value, e *encodeState) error {
-	return nil
+	return concat(tsl, ts, vs), nil
 }
 
 func concat(bs ...[]byte) []byte {
@@ -61,21 +72,27 @@ func concat(bs ...[]byte) []byte {
 func encode(v reflect.Value) ([]byte, []byte, error) {
 	if v.Kind() == reflect.Interface {
 		if v.IsNil() {
-			return nil, nil, fmt.Errorf("is nil")
+			return idl2.EncodeNull()
 		}
 		v = v.Elem()
 	}
 	switch v.Kind() {
+	case reflect.Ptr:
+		return encode(v.Elem())
 	case reflect.Bool:
-		typ, err := leb128.EncodeSigned(big.NewInt(-2))
-		if err != nil {
-			return nil, nil, err
+		return idl2.EncodeBool(v.Bool())
+	case reflect.Uint, reflect.Int:
+		return nil, nil, fmt.Errorf("use big.Int instead of uint/int")
+	case reflect.Struct:
+		switch v.Type().String() {
+		case "typ.Int":
+			bi := v.Interface().(typ.Int)
+			return idl2.EncodeInt(bi)
+		case "typ.Nat":
+			bi := v.Interface().(typ.Nat)
+			return idl2.EncodeNat(bi)
 		}
-		if b := v.Bool(); b {
-			return typ, []byte{0x01}, nil
-		} else {
-			return typ, []byte{0x00}, nil
-		}
+		return nil, nil, fmt.Errorf("invalid struct type: %s", v.Type())
 	default:
 		return nil, nil, fmt.Errorf("invalid primary value: %s", v.Kind())
 	}

@@ -1,9 +1,8 @@
 package idl2_test
 
 import (
-	"math/big"
-
 	"github.com/aviate-labs/candid-go/idl2"
+	"github.com/aviate-labs/candid-go/typ"
 )
 
 func ExampleDecodeBool() {
@@ -186,11 +185,11 @@ func ExampleEncodeFloat64() {
 }
 
 func ExampleEncodeInt() {
-	printEncode(idl2.EncodeInt(big.NewInt(0)))
-	printEncode(idl2.EncodeInt(big.NewInt(42)))
-	printEncode(idl2.EncodeInt(big.NewInt(1234567890)))
-	printEncode(idl2.EncodeInt(big.NewInt(-1234567890)))
-	printEncode(idl2.EncodeInt(bigIntFromString("60000000000000000")))
+	printEncode(idl2.EncodeInt(typ.NewInt(0)))
+	printEncode(idl2.EncodeInt(typ.NewInt(42)))
+	printEncode(idl2.EncodeInt(typ.NewInt(1234567890)))
+	printEncode(idl2.EncodeInt(typ.NewInt(-1234567890)))
+	printEncode(idl2.EncodeInt(typ.NewIntFromString("60000000000000000")))
 	// Output:
 	// 7c00
 	// 7c2a
@@ -230,13 +229,11 @@ func ExampleEncodeInt8() {
 }
 
 func ExampleEncodeNat() {
-	printEncode(idl2.EncodeNat(big.NewInt(-1)))
-	printEncode(idl2.EncodeNat(big.NewInt(0)))
-	printEncode(idl2.EncodeNat(big.NewInt(42)))
-	printEncode(idl2.EncodeNat(big.NewInt(1234567890)))
-	printEncode(idl2.EncodeNat(bigIntFromString("60000000000000000")))
+	printEncode(idl2.EncodeNat(typ.NewNat[uint](0)))
+	printEncode(idl2.EncodeNat(typ.NewNat[uint](42)))
+	printEncode(idl2.EncodeNat(typ.NewNat[uint](1234567890)))
+	printEncode(idl2.EncodeNat(typ.NewNatFromString("60000000000000000")))
 	// Output:
-	// can not leb128 encode negative values
 	// 7d00
 	// 7d2a
 	// 7dd285d8cc04

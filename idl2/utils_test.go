@@ -4,15 +4,9 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"math/big"
 
 	"github.com/aviate-labs/principal-go"
 )
-
-func bigIntFromString(v string) *big.Int {
-	bi, _ := new(big.Int).SetString(v, 10)
-	return bi
-}
 
 func hexToBytesReader(v string) *bytes.Reader {
 	bs, _ := hex.DecodeString(v)

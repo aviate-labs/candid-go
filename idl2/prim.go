@@ -8,6 +8,7 @@ import (
 	"math/big"
 	"unicode/utf8"
 
+	"github.com/aviate-labs/candid-go/typ"
 	"github.com/aviate-labs/leb128"
 	"github.com/aviate-labs/principal-go"
 )
@@ -182,8 +183,8 @@ func EncodeFloat64(value float64) ([]byte, []byte, error) {
 	return Float64.bytes(), v, nil
 }
 
-func EncodeInt(value *big.Int) ([]byte, []byte, error) {
-	v, err := leb128.EncodeSigned(value)
+func EncodeInt(value typ.Int) ([]byte, []byte, error) {
+	v, err := leb128.EncodeSigned(value.BigInt())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -206,8 +207,8 @@ func EncodeInt8(value int8) ([]byte, []byte, error) {
 	return Int8.bytes(), writeInt(big.NewInt(int64(value)), 1), nil
 }
 
-func EncodeNat(value *big.Int) ([]byte, []byte, error) {
-	v, err := leb128.EncodeUnsigned(value)
+func EncodeNat(value typ.Nat) ([]byte, []byte, error) {
+	v, err := leb128.EncodeUnsigned(value.BigInt())
 	if err != nil {
 		return nil, nil, err
 	}
