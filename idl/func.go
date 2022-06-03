@@ -95,7 +95,7 @@ func (f Func) Decode(r *bytes.Reader) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	pid := make(principal.Principal, l.Int64())
+	pid := make([]byte, l.Int64())
 	{
 		n, err := r.Read(pid)
 		if err != nil {
@@ -120,7 +120,7 @@ func (f Func) Decode(r *bytes.Reader) (interface{}, error) {
 		}
 	}
 	return &PrincipalMethod{
-		Principal: pid,
+		Principal: &principal.Principal{Raw: pid},
 		Method:    string(m),
 	}, nil
 }
@@ -138,7 +138,7 @@ func (f Func) EncodeValue(v interface{}) ([]byte, error) {
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
-	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(pm.Principal))))
+	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(pm.Principal.Raw))))
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (f Func) EncodeValue(v interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return concat([]byte{0x01, 0x01}, l, pm.Principal, lm, []byte(pm.Method)), nil
+	return concat([]byte{0x01, 0x01}, l, pm.Principal.Raw, lm, []byte(pm.Method)), nil
 }
 
 func (f Func) String() string {
@@ -166,6 +166,6 @@ func (f Func) String() string {
 }
 
 type PrincipalMethod struct {
-	Principal principal.Principal
+	Principal *principal.Principal
 	Method    string
 }

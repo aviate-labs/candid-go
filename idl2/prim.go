@@ -122,7 +122,7 @@ func DecodeNat8(r *bytes.Reader) (uint8, error) {
 	return r.ReadByte()
 }
 
-func DecodePrincipal(r *bytes.Reader) (principal.Principal, error) {
+func DecodePrincipal(r *bytes.Reader) (*principal.Principal, error) {
 	b, err := r.ReadByte()
 	if err != nil {
 		return nil, err
@@ -135,13 +135,13 @@ func DecodePrincipal(r *bytes.Reader) (principal.Principal, error) {
 		return nil, err
 	}
 	if l.Uint64() == 0 {
-		return principal.Principal{}, nil
+		return &principal.Principal{[]byte{}}, nil
 	}
 	v := make([]byte, l.Uint64())
 	if _, err := r.Read(v); err != nil {
 		return nil, err
 	}
-	return principal.Principal(v), nil
+	return &principal.Principal{v}, nil
 }
 
 func DecodeText(r *bytes.Reader) (string, error) {
@@ -241,12 +241,12 @@ func EncodeNull() ([]byte, []byte, error) {
 	return Null.bytes(), []byte(nil), nil
 }
 
-func EncodePrincipal(value principal.Principal) ([]byte, []byte, error) {
-	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(value))))
+func EncodePrincipal(value *principal.Principal) ([]byte, []byte, error) {
+	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(value.Raw))))
 	if err != nil {
 		return nil, nil, err
 	}
-	return Principal.bytes(), concat([]byte{0x01}, l, value), nil
+	return Principal.bytes(), concat([]byte{0x01}, l, value.Raw), nil
 }
 
 func EncodeReserved() ([]byte, []byte, error) {

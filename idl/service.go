@@ -82,7 +82,7 @@ func (s Service) Decode(r *bytes.Reader) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	pid := make(principal.Principal, l.Int64())
+	pid := make([]byte, l.Int64())
 	n, err := r.Read(pid)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func (s Service) Decode(r *bytes.Reader) (interface{}, error) {
 	if n != int(l.Int64()) {
 		return nil, fmt.Errorf("invalid principal id: %d", pid)
 	}
-	return pid, nil
+	return &principal.Principal{pid}, nil
 }
 
 func (s Service) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
@@ -102,15 +102,15 @@ func (s Service) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 }
 
 func (s Service) EncodeValue(v interface{}) ([]byte, error) {
-	p, ok := v.(principal.Principal)
+	p, ok := v.(*principal.Principal)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
-	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(p))))
+	l, err := leb128.EncodeUnsigned(big.NewInt(int64(len(p.Raw))))
 	if err != nil {
 		return nil, err
 	}
-	return concat([]byte{0x01}, l, []byte(p)), nil
+	return concat([]byte{0x01}, l, []byte(p.Raw)), nil
 }
 
 func (s Service) String() string {
