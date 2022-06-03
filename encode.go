@@ -81,8 +81,32 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 		return encode(v.Elem())
 	case reflect.Bool:
 		return idl2.EncodeBool(v.Bool())
-	case reflect.Uint, reflect.Int:
-		return nil, nil, fmt.Errorf("use big.Int instead of uint/int")
+	case reflect.Uint:
+		return nil, nil, fmt.Errorf("use typ.Nat instead of uint")
+	case reflect.Int:
+		return nil, nil, fmt.Errorf("use typ.Int instead of int")
+	case reflect.Uint8:
+		return idl2.EncodeNat8(uint8(v.Uint()))
+	case reflect.Uint16:
+		return idl2.EncodeNat16(uint16(v.Uint()))
+	case reflect.Uint32:
+		return idl2.EncodeNat32(uint32(v.Uint()))
+	case reflect.Uint64:
+		return idl2.EncodeNat64(uint64(v.Uint()))
+	case reflect.Int8:
+		return idl2.EncodeInt8(int8(v.Uint()))
+	case reflect.Int16:
+		return idl2.EncodeInt16(int16(v.Uint()))
+	case reflect.Int32:
+		return idl2.EncodeInt32(int32(v.Uint()))
+	case reflect.Int64:
+		return idl2.EncodeInt64(int64(v.Uint()))
+	case reflect.Float32:
+		return idl2.EncodeFloat32(float32(v.Float()))
+	case reflect.Float64:
+		return idl2.EncodeFloat64(v.Float())
+	case reflect.String:
+		return idl2.EncodeText(v.String())
 	case reflect.Struct:
 		switch v.Type().String() {
 		case "typ.Int":
