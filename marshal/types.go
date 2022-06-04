@@ -1,4 +1,4 @@
-package idl2
+package marshal
 
 type PrimType uint8
 

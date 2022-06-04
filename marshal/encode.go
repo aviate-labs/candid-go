@@ -1,4 +1,4 @@
-package candid
+package marshal
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"github.com/aviate-labs/candid-go/idl"
-	"github.com/aviate-labs/candid-go/idl2"
 	"github.com/aviate-labs/candid-go/typ"
 	"github.com/aviate-labs/leb128"
 	"github.com/aviate-labs/principal-go"
@@ -23,6 +22,64 @@ func Marshal(args []interface{}) ([]byte, error) {
 		return nil, err
 	}
 	return concat([]byte{'D', 'I', 'D', 'L'}, tdt, data), nil
+}
+
+func encode(v reflect.Value) ([]byte, []byte, error) {
+	if v.Kind() == reflect.Interface {
+		if v.IsNil() {
+			return EncodeNull()
+		}
+		v = v.Elem()
+	}
+	switch v.Kind() {
+	case reflect.Ptr:
+		return encode(v.Elem())
+	case reflect.Bool:
+		return EncodeBool(v.Bool())
+	case reflect.Uint:
+		return nil, nil, fmt.Errorf("use typ.Nat instead of uint")
+	case reflect.Int:
+		return nil, nil, fmt.Errorf("use typ.Int instead of int")
+	case reflect.Uint8:
+		return EncodeNat8(uint8(v.Uint()))
+	case reflect.Uint16:
+		return EncodeNat16(uint16(v.Uint()))
+	case reflect.Uint32:
+		return EncodeNat32(uint32(v.Uint()))
+	case reflect.Uint64:
+		return EncodeNat64(uint64(v.Uint()))
+	case reflect.Int8:
+		return EncodeInt8(int8(v.Uint()))
+	case reflect.Int16:
+		return EncodeInt16(int16(v.Uint()))
+	case reflect.Int32:
+		return EncodeInt32(int32(v.Uint()))
+	case reflect.Int64:
+		return EncodeInt64(int64(v.Uint()))
+	case reflect.Float32:
+		return EncodeFloat32(float32(v.Float()))
+	case reflect.Float64:
+		return EncodeFloat64(v.Float())
+	case reflect.String:
+		return EncodeText(v.String())
+	case reflect.Struct:
+		switch v.Type().String() {
+		case "typ.Int":
+			bi := v.Interface().(typ.Int)
+			return EncodeInt(bi)
+		case "typ.Nat":
+			bi := v.Interface().(typ.Nat)
+			return EncodeNat(bi)
+		case "typ.Reserved":
+			return EncodeReserved()
+		case "principal.Principal":
+			p := v.Interface().(principal.Principal)
+			return EncodePrincipal(&p)
+		}
+		return nil, nil, fmt.Errorf("invalid struct type: %s", v.Type())
+	default:
+		return nil, nil, fmt.Errorf("invalid primary value: %s", v.Kind())
+	}
 }
 
 func types(args []interface{}, e *encodeState) ([]byte, error) {
@@ -60,72 +117,6 @@ func values(args []interface{}, e *encodeState) ([]byte, error) {
 		vs = append(vs, v...)
 	}
 	return concat(tsl, ts, vs), nil
-}
-
-func concat(bs ...[]byte) []byte {
-	var c []byte
-	for _, b := range bs {
-		c = append(c, b...)
-	}
-	return c
-}
-
-func encode(v reflect.Value) ([]byte, []byte, error) {
-	if v.Kind() == reflect.Interface {
-		if v.IsNil() {
-			return idl2.EncodeNull()
-		}
-		v = v.Elem()
-	}
-	switch v.Kind() {
-	case reflect.Ptr:
-		return encode(v.Elem())
-	case reflect.Bool:
-		return idl2.EncodeBool(v.Bool())
-	case reflect.Uint:
-		return nil, nil, fmt.Errorf("use typ.Nat instead of uint")
-	case reflect.Int:
-		return nil, nil, fmt.Errorf("use typ.Int instead of int")
-	case reflect.Uint8:
-		return idl2.EncodeNat8(uint8(v.Uint()))
-	case reflect.Uint16:
-		return idl2.EncodeNat16(uint16(v.Uint()))
-	case reflect.Uint32:
-		return idl2.EncodeNat32(uint32(v.Uint()))
-	case reflect.Uint64:
-		return idl2.EncodeNat64(uint64(v.Uint()))
-	case reflect.Int8:
-		return idl2.EncodeInt8(int8(v.Uint()))
-	case reflect.Int16:
-		return idl2.EncodeInt16(int16(v.Uint()))
-	case reflect.Int32:
-		return idl2.EncodeInt32(int32(v.Uint()))
-	case reflect.Int64:
-		return idl2.EncodeInt64(int64(v.Uint()))
-	case reflect.Float32:
-		return idl2.EncodeFloat32(float32(v.Float()))
-	case reflect.Float64:
-		return idl2.EncodeFloat64(v.Float())
-	case reflect.String:
-		return idl2.EncodeText(v.String())
-	case reflect.Struct:
-		switch v.Type().String() {
-		case "typ.Int":
-			bi := v.Interface().(typ.Int)
-			return idl2.EncodeInt(bi)
-		case "typ.Nat":
-			bi := v.Interface().(typ.Nat)
-			return idl2.EncodeNat(bi)
-		case "typ.Reserved":
-			return idl2.EncodeReserved()
-		case "principal.Principal":
-			p := v.Interface().(principal.Principal)
-			return idl2.EncodePrincipal(&p)
-		}
-		return nil, nil, fmt.Errorf("invalid struct type: %s", v.Type())
-	default:
-		return nil, nil, fmt.Errorf("invalid primary value: %s", v.Kind())
-	}
 }
 
 type encodeState struct {

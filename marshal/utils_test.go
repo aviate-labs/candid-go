@@ -1,4 +1,4 @@
-package idl2_test
+package marshal_test
 
 import (
 	"bytes"

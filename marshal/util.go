@@ -1,4 +1,4 @@
-package idl2
+package marshal
 
 import (
 	"bytes"
