@@ -6,22 +6,23 @@ import (
 )
 
 var (
-	nullType     int64 = -1  // 0x7f
-	boolType     int64 = -2  // 0x7e
-	natType      int64 = -3  // 0x7d
-	intType      int64 = -4  // 0x7c
-	natXType     int64 = -5  // 0x7b-0x78
-	intXType     int64 = -9  // 0x77-0x73
-	floatXType   int64 = -13 // 0x72
-	textType     int64 = -15 // 0x71
-	reservedType int64 = -16 // 0x70
-	emptyType    int64 = -17 // 0x6f
-	optType      int64 = -18 // 0x6e
-	vecType      int64 = -19 // 0x6d
-	recType      int64 = -20 // 0x6c
-	varType      int64 = -21 // 0x6b
-	funcType     int64 = -22 // 0x6a
-	serviceType  int64 = -23 // 0x69
+	nullType      int64 = -1  // 0x7f
+	boolType      int64 = -2  // 0x7e
+	natType       int64 = -3  // 0x7d
+	intType       int64 = -4  // 0x7c
+	natXType      int64 = -5  // 0x7b-0x78
+	intXType      int64 = -9  // 0x77-0x73
+	floatXType    int64 = -13 // 0x72
+	textType      int64 = -15 // 0x71
+	reservedType  int64 = -16 // 0x70
+	emptyType     int64 = -17 // 0x6f
+	optType       int64 = -18 // 0x6e
+	vecType       int64 = -19 // 0x6d
+	recType       int64 = -20 // 0x6c
+	varType       int64 = -21 // 0x6b
+	funcType      int64 = -22 // 0x6a
+	serviceType   int64 = -23 // 0x69
+	principalType int64 = -24 // 0x68
 )
 
 type PrimType interface {
@@ -87,6 +88,8 @@ func getType(t int64, tds []Type) (Type, error) {
 		return new(Reserved), nil
 	case emptyType:
 		return new(Empty), nil
+	case principalType:
+		return new(Principal), nil
 	default:
 		if t < -24 {
 			return nil, &FormatError{
