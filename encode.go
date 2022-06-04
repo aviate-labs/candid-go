@@ -9,6 +9,7 @@ import (
 	"github.com/aviate-labs/candid-go/idl2"
 	"github.com/aviate-labs/candid-go/typ"
 	"github.com/aviate-labs/leb128"
+	"github.com/aviate-labs/principal-go"
 )
 
 func Marshal(args []interface{}) ([]byte, error) {
@@ -115,6 +116,11 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 		case "typ.Nat":
 			bi := v.Interface().(typ.Nat)
 			return idl2.EncodeNat(bi)
+		case "typ.Reserved":
+			return idl2.EncodeReserved()
+		case "principal.Principal":
+			p := v.Interface().(principal.Principal)
+			return idl2.EncodePrincipal(&p)
 		}
 		return nil, nil, fmt.Errorf("invalid struct type: %s", v.Type())
 	default:

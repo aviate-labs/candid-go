@@ -7,6 +7,7 @@ import (
 	"github.com/aviate-labs/candid-go"
 	"github.com/aviate-labs/candid-go/idl"
 	"github.com/aviate-labs/candid-go/typ"
+	"github.com/aviate-labs/principal-go"
 )
 
 func ExampleMarshalBool() {
@@ -27,4 +28,17 @@ func ExampleMarshalNat() {
 	// [68 73 68 76 0 1 125 5] <nil>
 	// [68 73 68 76 0 1 125 5] <nil>
 	// [68 73 68 76 0 1 125 5] <nil>
+}
+
+func ExampleMarshalPrincipal() {
+	p, _ := principal.Decode("aaaaa-aa")
+	fmt.Println(candid.Marshal([]interface{}{p}))
+	// Output:
+	// [68 73 68 76 0 1 104 1 0] <nil>
+}
+
+func ExampleMarshalReserved() {
+	fmt.Println(candid.Marshal([]interface{}{new(typ.Reserved)}))
+	// Output:
+	// [68 73 68 76 0 1 112] <nil>
 }

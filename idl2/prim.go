@@ -135,13 +135,13 @@ func DecodePrincipal(r *bytes.Reader) (*principal.Principal, error) {
 		return nil, err
 	}
 	if l.Uint64() == 0 {
-		return &principal.Principal{[]byte{}}, nil
+		return &principal.Principal{Raw: []byte{}}, nil
 	}
 	v := make([]byte, l.Uint64())
 	if _, err := r.Read(v); err != nil {
 		return nil, err
 	}
-	return &principal.Principal{v}, nil
+	return &principal.Principal{Raw: v}, nil
 }
 
 func DecodeText(r *bytes.Reader) (string, error) {
