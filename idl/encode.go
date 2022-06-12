@@ -3,6 +3,7 @@ package idl
 import (
 	"fmt"
 	"math/big"
+	"reflect"
 
 	"github.com/aviate-labs/leb128"
 )
@@ -64,4 +65,19 @@ func Encode(argumentTypes []Type, arguments []interface{}) ([]byte, error) {
 		// values of argument list: M(<datatype>*)
 		vs,
 	), nil
+}
+
+func encode(v reflect.Value, enc func(reflect.Kind, reflect.Value) ([]byte, error)) ([]byte, error) {
+	if v.Kind() == reflect.Interface {
+		if v.IsNil() {
+			return nil, fmt.Errorf("invalid argument: nil")
+		}
+		v = v.Elem()
+	}
+	switch kind := v.Kind(); kind {
+	case reflect.Ptr:
+		return encode(v.Elem(), enc)
+	default:
+		return enc(kind, v)
+	}
 }

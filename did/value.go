@@ -122,7 +122,7 @@ func convertNum(n *ast.Node) (idl.Type, interface{}, error) {
 			if err != nil {
 				return nil, nil, err
 			}
-			return idl.Float64(), big.NewFloat(f), nil
+			return idl.Float64(), f, nil
 		}
 
 		// int
@@ -139,16 +139,19 @@ func convertNum(n *ast.Node) (idl.Type, interface{}, error) {
 		// floats
 		if vType == "float32" || vType == "float64" {
 			v := strings.ReplaceAll(vArg, "_", "")
-			f, err := strconv.ParseFloat(v, 64)
-			if err != nil {
-				return nil, nil, err
-			}
-			bf := big.NewFloat(f)
 			switch n := n[1]; n.Value {
 			case "float32":
-				return idl.Float32(), bf, nil
+				f, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return nil, nil, err
+				}
+				return idl.Float32(), float32(f), nil
 			default:
-				return idl.Float64(), bf, nil
+				f, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return nil, nil, err
+				}
+				return idl.Float64(), f, nil
 			}
 		}
 

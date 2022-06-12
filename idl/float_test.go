@@ -1,16 +1,14 @@
 package idl_test
 
 import (
-	"math/big"
-
 	"github.com/aviate-labs/candid-go/idl"
 )
 
 func ExampleFloat32() {
-	test([]idl.Type{idl.Float32()}, []interface{}{big.NewFloat(-0.5)})
-	test([]idl.Type{idl.Float32()}, []interface{}{big.NewFloat(0)})
-	test([]idl.Type{idl.Float32()}, []interface{}{big.NewFloat(0.5)})
-	test([]idl.Type{idl.Float32()}, []interface{}{big.NewFloat(3)})
+	test([]idl.Type{idl.Float32()}, []interface{}{float32(-0.5)})
+	test([]idl.Type{idl.Float32()}, []interface{}{float32(0)})
+	test([]idl.Type{idl.Float32()}, []interface{}{float32(0.5)})
+	test([]idl.Type{idl.Float32()}, []interface{}{float32(3)})
 	// Output:
 	// 4449444c000173000000bf
 	// 4449444c00017300000000
@@ -19,10 +17,10 @@ func ExampleFloat32() {
 }
 
 func ExampleFloat64() {
-	test([]idl.Type{idl.Float64()}, []interface{}{big.NewFloat(-0.5)})
-	test([]idl.Type{idl.Float64()}, []interface{}{big.NewFloat(0)})
-	test([]idl.Type{idl.Float64()}, []interface{}{big.NewFloat(0.5)})
-	test([]idl.Type{idl.Float64()}, []interface{}{big.NewFloat(3)})
+	test([]idl.Type{idl.Float64()}, []interface{}{-0.5})
+	test([]idl.Type{idl.Float64()}, []interface{}{float32(0)})
+	test([]idl.Type{idl.Float64()}, []interface{}{0.5})
+	test([]idl.Type{idl.Float64()}, []interface{}{float64(3)})
 	// Output:
 	// 4449444c000172000000000000e0bf
 	// 4449444c0001720000000000000000

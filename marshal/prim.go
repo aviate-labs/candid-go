@@ -33,12 +33,9 @@ func DecodeFloat32(r *bytes.Reader) (float32, error) {
 	if _, err := r.Read(v); err != nil {
 		return 0, err
 	}
-	f, _ := big.NewFloat(
-		float64(math.Float32frombits(
-			binary.LittleEndian.Uint32(v),
-		)),
-	).Float32()
-	return f, nil
+	return math.Float32frombits(
+		binary.LittleEndian.Uint32(v),
+	), nil
 }
 
 func DecodeFloat64(r *bytes.Reader) (float64, error) {
@@ -46,12 +43,9 @@ func DecodeFloat64(r *bytes.Reader) (float64, error) {
 	if _, err := r.Read(v); err != nil {
 		return 0, err
 	}
-	f, _ := big.NewFloat(
-		float64(math.Float64frombits(
-			binary.LittleEndian.Uint64(v),
-		)),
-	).Float64()
-	return f, nil
+	return math.Float64frombits(
+		binary.LittleEndian.Uint64(v),
+	), nil
 }
 
 func DecodeInt(r *bytes.Reader) (*big.Int, error) {

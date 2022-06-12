@@ -3,7 +3,6 @@ package idl_test
 import (
 	"fmt"
 	"math/big"
-	"reflect"
 	"testing"
 
 	"github.com/aviate-labs/candid-go/idl"
@@ -31,11 +30,15 @@ func test(types []idl.Type, args []interface{}) {
 		fmt.Println("dec:", err)
 		return
 	}
-	if !reflect.DeepEqual(ts, types) {
-		fmt.Println("types:", types, ts)
+	for i, v := range ts {
+		if v.String() != types[i].String() {
+			fmt.Println("types:", v, types[i])
+		}
 	}
-	if !reflect.DeepEqual(vs, args) {
-		fmt.Println("args:", args, vs)
+	for i, v := range vs {
+		if fmt.Sprintf("%v", v) != fmt.Sprintf("%v", args[i]) {
+			fmt.Println("args:", v, args[i])
+		}
 	}
 }
 

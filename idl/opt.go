@@ -8,17 +8,17 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type Opt struct {
-	Type Type
+type Opt[typ Type] struct {
+	Type typ
 }
 
-func NewOpt(t Type) *Opt {
-	return &Opt{
+func NewOpt[typ Type](t typ) *Opt[typ] {
+	return &Opt[typ]{
 		Type: t,
 	}
 }
 
-func (o Opt) AddTypeDefinition(tdt *TypeDefinitionTable) error {
+func (o Opt[t]) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	if err := o.Type.AddTypeDefinition(tdt); err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (o Opt) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (o Opt) Decode(r *bytes.Reader) (interface{}, error) {
+func (o Opt[t]) Decode(r *bytes.Reader) (interface{}, error) {
 	l, err := r.ReadByte()
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (o Opt) Decode(r *bytes.Reader) (interface{}, error) {
 	}
 }
 
-func (o Opt) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
+func (o Opt[t]) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	idx, ok := tdt.Indexes[o.String()]
 	if !ok {
 		return nil, fmt.Errorf("missing type index for: %s", o)
@@ -58,7 +58,7 @@ func (o Opt) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (o Opt) EncodeValue(v interface{}) ([]byte, error) {
+func (o Opt[t]) EncodeValue(v interface{}) ([]byte, error) {
 	if v == nil {
 		return []byte{0x00}, nil
 	}
@@ -69,6 +69,6 @@ func (o Opt) EncodeValue(v interface{}) ([]byte, error) {
 	return concat([]byte{0x01}, v_), nil
 }
 
-func (o Opt) String() string {
+func (o Opt[t]) String() string {
 	return fmt.Sprintf("opt %s", o.Type)
 }

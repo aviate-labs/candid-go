@@ -2,7 +2,6 @@ package candid
 
 import (
 	"fmt"
-	"math/big"
 	"strings"
 
 	"github.com/aviate-labs/candid-go/did"
@@ -80,7 +79,7 @@ func ParseDID(raw []byte) (did.Description, error) {
 
 func valueToString(typ idl.Type, value interface{}) (string, error) {
 	switch t := typ.(type) {
-	case *idl.Opt:
+	case *idl.Opt[idl.Type]:
 		if value == nil {
 			return "opt null", nil
 		}
@@ -100,8 +99,8 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 		}
 		return fmt.Sprintf("%s : int%d", value, t.Base), nil
 	case *idl.Float:
-		f, _ := value.(*big.Float).Float64()
-		return fmt.Sprintf("%.f : float%d", f, t.Base), nil
+		f, _ := value.(float64)
+		return fmt.Sprintf("%.f : %s", f, t), nil
 	case *idl.Bool:
 		return fmt.Sprintf("%t", value), nil
 	case *idl.Null:

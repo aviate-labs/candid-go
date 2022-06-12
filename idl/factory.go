@@ -20,7 +20,7 @@ type IDL struct {
 	Text     *Text
 	Reserved *Reserved
 	Empty    *Empty
-	Opt      *Opt
+	Opt      func(typ Type) *Opt[Type]
 	Tuple    func(ts ...Type) *Tuple
 	Vec      func(t Type) *Vec
 	Record   func(fields map[string]Type) *Rec
@@ -46,6 +46,9 @@ func NewInterface(factory IDLFactory) *Service {
 		Text:     new(Text),
 		Reserved: new(Reserved),
 		Empty:    new(Empty),
+		Opt: func(typ Type) *Opt[Type] {
+			return &Opt[Type]{Type: typ}
+		},
 		Tuple: func(ts ...Type) *Tuple {
 			tuple := Tuple(ts)
 			return &tuple
