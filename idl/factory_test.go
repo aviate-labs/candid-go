@@ -6,14 +6,6 @@ import (
 	"github.com/aviate-labs/candid-go/idl"
 )
 
-func ExampleTokens() {
-	fmt.Println(idl.NewRec(map[string]idl.Type{
-		"e8s": idl.Nat64(),
-	}))
-	// Output:
-	// record {e8s:nat64}
-}
-
 func ExampleLedger() {
 	fmt.Println(idl.NewInterface(func(typ idl.IDL) *idl.Service {
 		accountIdentitier := typ.Vec(typ.Nat8)
@@ -42,4 +34,12 @@ func ExampleOptNat() {
 	}))
 	// Output:
 	// service {now:() -> (opt nat) query}
+}
+
+func ExampleTokens() {
+	fmt.Println(idl.NewRec(map[string]idl.Type{
+		"e8s": idl.Nat64(),
+	}))
+	// Output:
+	// record {e8s:nat64}
 }

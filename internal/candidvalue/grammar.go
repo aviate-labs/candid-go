@@ -9,72 +9,192 @@ import (
 	"github.com/di-wu/parser/op"
 )
 
-func Values(p *ast.Parser) (*ast.Node, error) {
+// Node Types
+const (
+	Unknown = iota
+
+	// CANDID (github.com/di-wu/candid-go/internal/candid/candidvalue)
+
+	ValuesT      // 001
+	OptValueT    // 002
+	NumT         // 003
+	NumValueT    // 004
+	NumTypeT     // 005
+	BoolValueT   // 006
+	NullT        // 007
+	PrincipalT   // 008
+	TextT        // 009
+	TextValueT   // 010
+	RecordT      // 011
+	RecordFieldT // 012
+	VariantT     // 013
+	VecT         // 014
+	IdT          // 015
+)
+
+// Token Definitions
+const (
+	// CANDID (github.com/di-wu/candid-go/internal/candid/candidvalue)
+
+	ESC = 0x005C // \
+)
+
+var NodeTypes = []string{
+	"UNKNOWN",
+
+	// CANDID (github.com/di-wu/candid-go/internal/candid/candidvalue)
+
+	"Values",
+	"OptValue",
+	"Num",
+	"NumValue",
+	"NumType",
+	"BoolValue",
+	"Null",
+	"Principal",
+	"Text",
+	"TextValue",
+	"Record",
+	"RecordField",
+	"Variant",
+	"Vec",
+	"Id",
+}
+
+func Ascii(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(op.Or{
+		parser.CheckRuneRange(0x0020, 0x0021),
+		parser.CheckRuneRange(0x0023, 0x005B),
+		parser.CheckRuneRange(0x005D, 0x007E),
+	})
+}
+
+func Bool(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			BoolValue,
+			op.Optional(
+				op.And{
+					Sp,
+					':',
+					Sp,
+					"bool",
+				},
+			),
+		},
+	)
+}
+
+func BoolValue(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type:        ValuesT,
+			Type:        BoolValueT,
 			TypeStrings: NodeTypes,
 			Value: op.Or{
-				op.And{
-					'(',
-					Sp,
-					op.Optional(
-						op.And{
-							Value,
-							op.MinZero(
-								op.And{
-									Sp,
-									',',
-									Sp,
-									Value,
-								},
-							),
-						},
-					),
-					Sp,
-					')',
-				},
-				Value,
-			},
+	"true",
+	"false",
+},
 		},
 	)
 }
 
-func Value(p *ast.Parser) (*ast.Node, error) {
+func Char(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		op.Or{
-			OptValue,
-			Num,
-			Bool,
-			Null,
-			Text,
-			Record,
-			Variant,
-			Principal,
-			Vec,
+			Utf,
+			op.And{
+				ESC,
+				op.Repeat(2,
+					Hex,
+				),
+			},
+			op.And{
+				ESC,
+				Escape,
+			},
+			op.And{
+				"\\u{",
+				HexNum,
+				'}',
+			},
 		},
 	)
 }
 
-func OptValue(p *ast.Parser) (*ast.Node, error) {
+func Digit(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(parser.CheckRuneRange('0', '9'))
+}
+
+func Escape(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(op.Or{
+		'n',
+		'r',
+		't',
+		ESC,
+		0x0022,
+		0x0027,
+	})
+}
+
+func Hex(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(op.Or{
+		Digit,
+		parser.CheckRuneRange('A', 'F'),
+		parser.CheckRuneRange('a', 'f'),
+	})
+}
+
+func HexNum(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			Hex,
+			op.MinZero(
+				op.And{
+					op.Optional(
+						'_',
+					),
+					Hex,
+				},
+			),
+		},
+	)
+}
+
+func Id(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type:        OptValueT,
+			Type:        IdT,
 			TypeStrings: NodeTypes,
 			Value: op.And{
-				"opt",
-				Spp,
 				op.Or{
-					Num,
-					Bool,
-					Null,
-					Text,
-					Record,
-					Variant,
-					Principal,
-					Vec,
+					Letter,
+					'_',
 				},
+				op.MinZero(
+					op.Or{
+						Letter,
+						Digit,
+						'_',
+					},
+				),
 			},
+		},
+	)
+}
+
+func Letter(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(op.Or{
+		parser.CheckRuneRange('A', 'Z'),
+		parser.CheckRuneRange('a', 'z'),
+	})
+}
+
+func Null(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        NullT,
+			TypeStrings: NodeTypes,
+			Value:       "null",
 		},
 	)
 }
@@ -94,6 +214,29 @@ func Num(p *ast.Parser) (*ast.Node, error) {
 						NumType,
 					},
 				),
+			},
+		},
+	)
+}
+
+func NumType(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        NumTypeT,
+			TypeStrings: NodeTypes,
+			Value: op.Or{
+				"nat8",
+				"nat16",
+				"nat32",
+				"nat64",
+				"nat",
+				"int8",
+				"int16",
+				"int32",
+				"int64",
+				"int",
+				"float32",
+				"float64",
 			},
 		},
 	)
@@ -136,64 +279,25 @@ func NumValue(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
-func NumType(p *ast.Parser) (*ast.Node, error) {
+func OptValue(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type:        NumTypeT,
+			Type:        OptValueT,
 			TypeStrings: NodeTypes,
-			Value: op.Or{
-				"nat8",
-				"nat16",
-				"nat32",
-				"nat64",
-				"nat",
-				"int8",
-				"int16",
-				"int32",
-				"int64",
-				"int",
-				"float32",
-				"float64",
-			},
-		},
-	)
-}
-
-func Bool(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.And{
-			BoolValue,
-			op.Optional(
-				op.And{
-					Sp,
-					':',
-					Sp,
-					"bool",
+			Value: op.And{
+				"opt",
+				Spp,
+				op.Or{
+					Num,
+					Bool,
+					Null,
+					Text,
+					Record,
+					Variant,
+					Principal,
+					Vec,
 				},
-			),
-		},
-	)
-}
-
-func BoolValue(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        BoolValueT,
-			TypeStrings: NodeTypes,
-			Value: op.Or{
-	"true",
-	"false",
-},
-		},
-	)
-}
-
-func Null(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        NullT,
-			TypeStrings: NodeTypes,
-			Value:       "null",
+			},
 		},
 	)
 }
@@ -208,6 +312,79 @@ func Principal(p *ast.Parser) (*ast.Node, error) {
 				Spp,
 				TextValue,
 			},
+		},
+	)
+}
+
+func Record(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        RecordT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"record",
+				Sp,
+				'{',
+				Ws,
+				op.Optional(
+					RecordFields,
+				),
+				Ws,
+				'}',
+			},
+		},
+	)
+}
+
+func RecordField(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        RecordFieldT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				Id,
+				Sp,
+				'=',
+				Sp,
+				Value,
+			},
+		},
+	)
+}
+
+func RecordFields(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			RecordField,
+			Sp,
+			op.MinZero(
+				op.And{
+					';',
+					Ws,
+					RecordField,
+					Sp,
+				},
+			),
+			op.Optional(
+				';',
+			),
+		},
+	)
+}
+
+func Sp(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.MinZero(
+			' ',
+		),
+	)
+}
+
+func Spp(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			' ',
+			Sp,
 		},
 	)
 }
@@ -243,29 +420,6 @@ func TextValue(p *ast.Parser) (*ast.Node, error) {
 					Char,
 				),
 				'"',
-			},
-		},
-	)
-}
-
-func Char(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.Or{
-			Utf,
-			op.And{
-				ESC,
-				op.Repeat(2,
-					Hex,
-				),
-			},
-			op.And{
-				ESC,
-				Escape,
-			},
-			op.And{
-				"\\u{",
-				HexNum,
-				'}',
 			},
 		},
 	)
@@ -333,72 +487,51 @@ func UtfEnc(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
-func HexNum(p *ast.Parser) (*ast.Node, error) {
+func Utfcont(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(parser.CheckRuneRange(0x0080, 0x00BF))
+}
+
+func Value(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
-		op.And{
-			Hex,
-			op.MinZero(
-				op.And{
-					op.Optional(
-						'_',
-					),
-					Hex,
-				},
-			),
+		op.Or{
+			OptValue,
+			Num,
+			Bool,
+			Null,
+			Text,
+			Record,
+			Variant,
+			Principal,
+			Vec,
 		},
 	)
 }
 
-func Record(p *ast.Parser) (*ast.Node, error) {
+func Values(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type:        RecordT,
+			Type:        ValuesT,
 			TypeStrings: NodeTypes,
-			Value: op.And{
-				"record",
-				Sp,
-				'{',
-				Ws,
-				op.Optional(
-					RecordFields,
-				),
-				Ws,
-				'}',
-			},
-		},
-	)
-}
-
-func RecordFields(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.And{
-			RecordField,
-			Sp,
-			op.MinZero(
+			Value: op.Or{
 				op.And{
-					';',
-					Ws,
-					RecordField,
+					'(',
 					Sp,
+					op.Optional(
+						op.And{
+							Value,
+							op.MinZero(
+								op.And{
+									Sp,
+									',',
+									Sp,
+									Value,
+								},
+							),
+						},
+					),
+					Sp,
+					')',
 				},
-			),
-			op.Optional(
-				';',
-			),
-		},
-	)
-}
-
-func RecordField(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        RecordFieldT,
-			TypeStrings: NodeTypes,
-			Value: op.And{
-				Id,
-				Sp,
-				'=',
-				Sp,
 				Value,
 			},
 		},
@@ -482,45 +615,6 @@ func VecFields(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
-func Id(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        IdT,
-			TypeStrings: NodeTypes,
-			Value: op.And{
-				op.Or{
-					Letter,
-					'_',
-				},
-				op.MinZero(
-					op.Or{
-						Letter,
-						Digit,
-						'_',
-					},
-				),
-			},
-		},
-	)
-}
-
-func Sp(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.MinZero(
-			' ',
-		),
-	)
-}
-
-func Spp(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.And{
-			' ',
-			Sp,
-		},
-	)
-}
-
 func Ws(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		op.MinZero(
@@ -536,98 +630,4 @@ func Ws(p *ast.Parser) (*ast.Node, error) {
 			},
 		),
 	)
-}
-
-func Utfcont(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(parser.CheckRuneRange(0x0080, 0x00BF))
-}
-
-func Ascii(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(op.Or{
-		parser.CheckRuneRange(0x0020, 0x0021),
-		parser.CheckRuneRange(0x0023, 0x005B),
-		parser.CheckRuneRange(0x005D, 0x007E),
-	})
-}
-
-func Escape(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(op.Or{
-		'n',
-		'r',
-		't',
-		ESC,
-		0x0022,
-		0x0027,
-	})
-}
-
-func Letter(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(op.Or{
-		parser.CheckRuneRange('A', 'Z'),
-		parser.CheckRuneRange('a', 'z'),
-	})
-}
-
-func Digit(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(parser.CheckRuneRange('0', '9'))
-}
-
-func Hex(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(op.Or{
-		Digit,
-		parser.CheckRuneRange('A', 'F'),
-		parser.CheckRuneRange('a', 'f'),
-	})
-}
-
-// Token Definitions
-const (
-	// CANDID (github.com/di-wu/candid-go/internal/candid/candidvalue)
-
-	ESC = 0x005C // \
-)
-
-// Node Types
-const (
-	Unknown = iota
-
-	// CANDID (github.com/di-wu/candid-go/internal/candid/candidvalue)
-
-	ValuesT      // 001
-	OptValueT    // 002
-	NumT         // 003
-	NumValueT    // 004
-	NumTypeT     // 005
-	BoolValueT   // 006
-	NullT        // 007
-	PrincipalT   // 008
-	TextT        // 009
-	TextValueT   // 010
-	RecordT      // 011
-	RecordFieldT // 012
-	VariantT     // 013
-	VecT         // 014
-	IdT          // 015
-)
-
-var NodeTypes = []string{
-	"UNKNOWN",
-
-	// CANDID (github.com/di-wu/candid-go/internal/candid/candidvalue)
-
-	"Values",
-	"OptValue",
-	"Num",
-	"NumValue",
-	"NumType",
-	"BoolValue",
-	"Null",
-	"Principal",
-	"Text",
-	"TextValue",
-	"Record",
-	"RecordField",
-	"Variant",
-	"Vec",
-	"Id",
 }

@@ -6,6 +6,10 @@ type Int struct {
 	i *big.Int
 }
 
+func NewBigInt(bi *big.Int) Int {
+	return Int{bi}
+}
+
 func NewInt[number Integer](i number) Int {
 	return Int{i: big.NewInt(int64(i))}
 }
@@ -26,12 +30,16 @@ func (i Int) String() string {
 	return i.i.String()
 }
 
-type Natural interface {
-	uint | uint64 | uint32 | uint16 | uint8
+type Integer interface {
+	int | int64 | int32 | int16 | int8
 }
 
 type Nat struct {
 	n *big.Int
+}
+
+func NewBigNat(bi *big.Int) Nat {
+	return Nat{bi}
 }
 
 func NewNat[number Natural](n number) Nat {
@@ -57,6 +65,6 @@ func (n Nat) String() string {
 	return n.n.String()
 }
 
-type Integer interface {
-	int | int64 | int32 | int16 | int8
+type Natural interface {
+	uint | uint64 | uint32 | uint16 | uint8
 }

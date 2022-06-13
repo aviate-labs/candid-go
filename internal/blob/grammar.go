@@ -9,6 +9,42 @@ import (
 	"github.com/di-wu/parser/op"
 )
 
+// Node Types
+const (
+	Unknown = iota
+
+	// CANDID-BLOB (github.com/di-wu/candid-go/internal/blob)
+
+	BlobT  // 001
+	AlphaT // 002
+	HexT   // 003
+)
+
+var NodeTypes = []string{
+	"UNKNOWN",
+
+	// CANDID-BLOB (github.com/di-wu/candid-go/internal/blob)
+
+	"Blob",
+	"Alpha",
+	"Hex",
+}
+
+func Alpha(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        AlphaT,
+			TypeStrings: NodeTypes,
+			Value: op.MinOne(
+				op.Or{
+					parser.CheckRuneRange('A', 'Z'),
+					parser.CheckRuneRange('a', 'z'),
+				},
+			),
+		},
+	)
+}
+
 func Blob(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
@@ -21,21 +57,6 @@ func Blob(p *ast.Parser) (*ast.Node, error) {
 						'\\',
 						Hex,
 					},
-				},
-			),
-		},
-	)
-}
-
-func Alpha(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        AlphaT,
-			TypeStrings: NodeTypes,
-			Value: op.MinOne(
-				op.Or{
-					parser.CheckRuneRange('A', 'Z'),
-					parser.CheckRuneRange('a', 'z'),
 				},
 			),
 		},
@@ -56,25 +77,4 @@ func Hex(p *ast.Parser) (*ast.Node, error) {
 			),
 		},
 	)
-}
-
-// Node Types
-const (
-	Unknown = iota
-
-	// CANDID-BLOB (github.com/di-wu/candid-go/internal/blob)
-
-	BlobT  // 001
-	AlphaT // 002
-	HexT   // 003
-)
-
-var NodeTypes = []string{
-	"UNKNOWN",
-
-	// CANDID-BLOB (github.com/di-wu/candid-go/internal/blob)
-
-	"Blob",
-	"Alpha",
-	"Hex",
 }

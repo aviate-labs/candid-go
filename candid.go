@@ -89,15 +89,12 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 		}
 		return fmt.Sprintf("opt %s", s), nil
 	case *idl.Nat:
-		if t.Base == 0 {
-			return fmt.Sprintf("%s : nat", value), nil
-		}
-		return fmt.Sprintf("%s : nat%d", value, t.Base), nil
+		return fmt.Sprintf("%v : %s", value, t.String()), nil
 	case *idl.Int:
-		if t.Base == 0 {
-			return fmt.Sprintf("%s", value), nil
+		if t.Base() == 0 {
+			return fmt.Sprintf("%v", value), nil
 		}
-		return fmt.Sprintf("%s : int%d", value, t.Base), nil
+		return fmt.Sprintf("%v : %s", value, t.String()), nil
 	case *idl.Float:
 		f, _ := value.(float64)
 		return fmt.Sprintf("%.f : %s", f, t), nil

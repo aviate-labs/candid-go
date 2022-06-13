@@ -161,28 +161,29 @@ func convertNum(n *ast.Node) (idl.Type, interface{}, error) {
 		if err != nil {
 			return nil, nil, err
 		}
-		bi := big.NewInt(i)
 		switch vType {
 		case "nat":
+			bi := big.NewInt(i)
 			return new(idl.Nat), bi, nil
 		case "nat8":
-			return idl.Nat8(), bi, nil
+			return idl.Nat8(), uint8(i), nil
 		case "nat16":
-			return idl.Nat16(), bi, nil
+			return idl.Nat16(), uint16(i), nil
 		case "nat32":
-			return idl.Nat32(), bi, nil
+			return idl.Nat32(), uint32(i), nil
 		case "nat64":
-			return idl.Nat64(), bi, nil
+			return idl.Nat64(), uint64(i), nil
 		case "int":
+			bi := big.NewInt(i)
 			return new(idl.Int), bi, nil
 		case "int8":
-			return idl.Int8(), bi, nil
+			return idl.Int8(), int8(i), nil
 		case "int16":
-			return idl.Int16(), bi, nil
+			return idl.Int16(), int16(i), nil
 		case "int32":
-			return idl.Int32(), bi, nil
+			return idl.Int32(), int32(i), nil
 		case "int64":
-			return idl.Int64(), bi, nil
+			return idl.Int64(), i, nil
 		default:
 			panic(n)
 		}

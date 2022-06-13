@@ -9,18 +9,135 @@ import (
 	"github.com/di-wu/parser/op"
 )
 
-func TestData(p *ast.Parser) (*ast.Node, error) {
+// Node Types
+const (
+	Unknown = iota
+
+	// CANDID-TEST (github.com/di-wu/candid-go/internal/candidtest)
+
+	TestDataT    // 001
+	CommentTextT // 002
+	TestT        // 003
+	TestGoodT    // 004
+	TestBadT     // 005
+	TestTestT    // 006
+	NullT        // 007
+	BoolT        // 008
+	NatT         // 009
+	IntT         // 010
+	FloatT       // 011
+	BaseT        // 012
+	TextT        // 013
+	ReservedT    // 014
+	EmptyT       // 015
+	OptT         // 016
+	TextInputT   // 017
+	BlobInputT   // 018
+	DescriptionT // 019
+)
+
+// Token Definitions
+const (
+	// CANDID-TEST (github.com/di-wu/candid-go/internal/candidtest)
+
+	ESC = 0x005C // \
+)
+
+var NodeTypes = []string{
+	"UNKNOWN",
+
+	// CANDID-TEST (github.com/di-wu/candid-go/internal/candidtest)
+
+	"TestData",
+	"CommentText",
+	"Test",
+	"TestGood",
+	"TestBad",
+	"TestTest",
+	"Null",
+	"Bool",
+	"Nat",
+	"Int",
+	"Float",
+	"Base",
+	"Text",
+	"Reserved",
+	"Empty",
+	"Opt",
+	"TextInput",
+	"BlobInput",
+	"Description",
+}
+
+func Ascii(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(op.Or{
+		parser.CheckRuneRange(0x0020, 0x0021),
+		parser.CheckRuneRange(0x0023, 0x005B),
+		parser.CheckRuneRange(0x005D, 0x007E),
+	})
+}
+
+func Base(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type:        TestDataT,
+			Type:        BaseT,
 			TypeStrings: NodeTypes,
 			Value: op.MinOne(
-				op.Or{
-					Comment,
-					Test,
-					EndLine,
-				},
+				Digit,
 			),
+		},
+	)
+}
+
+func BlobInput(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        BlobInputT,
+			TypeStrings: NodeTypes,
+			Value:       String,
+		},
+	)
+}
+
+func BlobInputTmpl(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			"blob \"",
+			BlobInput,
+			'"',
+		},
+	)
+}
+
+func Bool(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        BoolT,
+			TypeStrings: NodeTypes,
+			Value:       "bool",
+		},
+	)
+}
+
+func Char(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.Or{
+			Utf,
+			op.And{
+				ESC,
+				op.Repeat(2,
+					Hex,
+				),
+			},
+			op.And{
+				ESC,
+				Escape,
+			},
+			op.And{
+				"\\u{",
+				HexNum,
+				'}',
+			},
 		},
 	)
 }
@@ -65,6 +182,126 @@ func CommentText(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
+func Description(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        DescriptionT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				'"',
+				String,
+				'"',
+			},
+		},
+	)
+}
+
+func Digit(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(parser.CheckRuneRange('0', '9'))
+}
+
+func Empty(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        EmptyT,
+			TypeStrings: NodeTypes,
+			Value:       "empty",
+		},
+	)
+}
+
+func EndLine(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.Or{
+			0x000A,
+			0x000D,
+			op.And{
+				0x000D,
+				0x000A,
+			},
+		},
+	)
+}
+
+func Escape(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(op.Or{
+		'n',
+		'r',
+		't',
+		ESC,
+		0x0022,
+		0x0027,
+	})
+}
+
+func Float(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        FloatT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"float",
+				Base,
+			},
+		},
+	)
+}
+
+func Hex(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(op.Or{
+		Digit,
+		parser.CheckRuneRange('A', 'F'),
+		parser.CheckRuneRange('a', 'f'),
+	})
+}
+
+func HexNum(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			Hex,
+			op.MinZero(
+				op.And{
+					op.Optional(
+						'_',
+					),
+					Hex,
+				},
+			),
+		},
+	)
+}
+
+func Input(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.Or{
+			BlobInputTmpl,
+			TextInputTmpl,
+		},
+	)
+}
+
+func Int(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        IntT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"int",
+				op.Optional(
+					Base,
+				),
+			},
+		},
+	)
+}
+
+func Letter(p *parser.Parser) (*parser.Cursor, bool) {
+	return p.Check(op.Or{
+		parser.CheckRuneRange('A', 'Z'),
+		parser.CheckRuneRange('a', 'z'),
+	})
+}
+
 func MultiComment(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		op.MinZero(
@@ -81,28 +318,59 @@ func MultiComment(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
-func Ws(p *ast.Parser) (*ast.Node, error) {
+func Nat(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
-		op.MinZero(
-			op.Or{
-				' ',
-				0x0009,
-				EndLine,
+		ast.Capture{
+			Type:        NatT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"nat",
+				op.Optional(
+					Base,
+				),
 			},
-		),
+		},
 	)
 }
 
-func EndLine(p *ast.Parser) (*ast.Node, error) {
+func Null(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
-		op.Or{
-			0x000A,
-			0x000D,
-			op.And{
-				0x000D,
-				0x000A,
+		ast.Capture{
+			Type:        NullT,
+			TypeStrings: NodeTypes,
+			Value:       "null",
+		},
+	)
+}
+
+func Opt(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        OptT,
+			TypeStrings: NodeTypes,
+			Value: op.And{
+				"opt ",
+				Values,
 			},
 		},
+	)
+}
+
+func Reserved(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        ReservedT,
+			TypeStrings: NodeTypes,
+			Value:       "reserved",
+		},
+	)
+}
+
+func String(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.MinZero(
+			Char,
+		),
 	)
 }
 
@@ -132,20 +400,10 @@ func Test(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
-func TestGoodTmpl(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.And{
-			':',
-			Ws,
-			TestGood,
-		},
-	)
-}
-
-func TestGood(p *ast.Parser) (*ast.Node, error) {
+func TestBad(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type:        TestGoodT,
+			Type:        TestBadT,
 			TypeStrings: NodeTypes,
 			Value:       ValuesBr,
 		},
@@ -162,12 +420,38 @@ func TestBadTmpl(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
-func TestBad(p *ast.Parser) (*ast.Node, error) {
+func TestData(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
-			Type:        TestBadT,
+			Type:        TestDataT,
+			TypeStrings: NodeTypes,
+			Value: op.MinOne(
+				op.Or{
+					Comment,
+					Test,
+					EndLine,
+				},
+			),
+		},
+	)
+}
+
+func TestGood(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		ast.Capture{
+			Type:        TestGoodT,
 			TypeStrings: NodeTypes,
 			Value:       ValuesBr,
+		},
+	)
+}
+
+func TestGoodTmpl(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.And{
+			':',
+			Ws,
+			TestGood,
 		},
 	)
 }
@@ -190,174 +474,12 @@ func TestTest(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
-func ValuesBr(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.Or{
-			"()",
-			op.And{
-				'(',
-				Values,
-				op.MinZero(
-					op.And{
-						", ",
-						Values,
-					},
-				),
-				')',
-			},
-		},
-	)
-}
-
-func Values(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.Or{
-			Null,
-			Bool,
-			Nat,
-			Int,
-			Float,
-			Text,
-			Reserved,
-			Empty,
-			Opt,
-		},
-	)
-}
-
-func Null(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        NullT,
-			TypeStrings: NodeTypes,
-			Value:       "null",
-		},
-	)
-}
-
-func Bool(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        BoolT,
-			TypeStrings: NodeTypes,
-			Value:       "bool",
-		},
-	)
-}
-
-func Nat(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        NatT,
-			TypeStrings: NodeTypes,
-			Value: op.And{
-				"nat",
-				op.Optional(
-					Base,
-				),
-			},
-		},
-	)
-}
-
-func Int(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        IntT,
-			TypeStrings: NodeTypes,
-			Value: op.And{
-				"int",
-				op.Optional(
-					Base,
-				),
-			},
-		},
-	)
-}
-
-func Float(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        FloatT,
-			TypeStrings: NodeTypes,
-			Value: op.And{
-				"float",
-				Base,
-			},
-		},
-	)
-}
-
-func Base(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        BaseT,
-			TypeStrings: NodeTypes,
-			Value: op.MinOne(
-				Digit,
-			),
-		},
-	)
-}
-
 func Text(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		ast.Capture{
 			Type:        TextT,
 			TypeStrings: NodeTypes,
 			Value:       "text",
-		},
-	)
-}
-
-func Reserved(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        ReservedT,
-			TypeStrings: NodeTypes,
-			Value:       "reserved",
-		},
-	)
-}
-
-func Empty(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        EmptyT,
-			TypeStrings: NodeTypes,
-			Value:       "empty",
-		},
-	)
-}
-
-func Opt(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        OptT,
-			TypeStrings: NodeTypes,
-			Value: op.And{
-				"opt ",
-				Values,
-			},
-		},
-	)
-}
-
-func Input(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.Or{
-			BlobInputTmpl,
-			TextInputTmpl,
-		},
-	)
-}
-
-func TextInputTmpl(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.And{
-			'"',
-			TextInput,
-			'"',
 		},
 	)
 }
@@ -372,83 +494,12 @@ func TextInput(p *ast.Parser) (*ast.Node, error) {
 	)
 }
 
-func BlobInputTmpl(p *ast.Parser) (*ast.Node, error) {
+func TextInputTmpl(p *ast.Parser) (*ast.Node, error) {
 	return p.Expect(
 		op.And{
-			"blob \"",
-			BlobInput,
 			'"',
-		},
-	)
-}
-
-func BlobInput(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        BlobInputT,
-			TypeStrings: NodeTypes,
-			Value:       String,
-		},
-	)
-}
-
-func Description(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		ast.Capture{
-			Type:        DescriptionT,
-			TypeStrings: NodeTypes,
-			Value: op.And{
-				'"',
-				String,
-				'"',
-			},
-		},
-	)
-}
-
-func String(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.MinZero(
-			Char,
-		),
-	)
-}
-
-func Char(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.Or{
-			Utf,
-			op.And{
-				ESC,
-				op.Repeat(2,
-					Hex,
-				),
-			},
-			op.And{
-				ESC,
-				Escape,
-			},
-			op.And{
-				"\\u{",
-				HexNum,
-				'}',
-			},
-		},
-	)
-}
-
-func HexNum(p *ast.Parser) (*ast.Node, error) {
-	return p.Expect(
-		op.And{
-			Hex,
-			op.MinZero(
-				op.And{
-					op.Optional(
-						'_',
-					),
-					Hex,
-				},
-			),
+			TextInput,
+			'"',
 		},
 	)
 }
@@ -519,100 +570,49 @@ func Utfcont(p *parser.Parser) (*parser.Cursor, bool) {
 	return p.Check(parser.CheckRuneRange(0x0080, 0x00BF))
 }
 
-func Ascii(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(op.Or{
-		parser.CheckRuneRange(0x0020, 0x0021),
-		parser.CheckRuneRange(0x0023, 0x005B),
-		parser.CheckRuneRange(0x005D, 0x007E),
-	})
+func Values(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.Or{
+			Null,
+			Bool,
+			Nat,
+			Int,
+			Float,
+			Text,
+			Reserved,
+			Empty,
+			Opt,
+		},
+	)
 }
 
-func Escape(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(op.Or{
-		'n',
-		'r',
-		't',
-		ESC,
-		0x0022,
-		0x0027,
-	})
+func ValuesBr(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.Or{
+			"()",
+			op.And{
+				'(',
+				Values,
+				op.MinZero(
+					op.And{
+						", ",
+						Values,
+					},
+				),
+				')',
+			},
+		},
+	)
 }
 
-func Letter(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(op.Or{
-		parser.CheckRuneRange('A', 'Z'),
-		parser.CheckRuneRange('a', 'z'),
-	})
-}
-
-func Digit(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(parser.CheckRuneRange('0', '9'))
-}
-
-func Hex(p *parser.Parser) (*parser.Cursor, bool) {
-	return p.Check(op.Or{
-		Digit,
-		parser.CheckRuneRange('A', 'F'),
-		parser.CheckRuneRange('a', 'f'),
-	})
-}
-
-// Token Definitions
-const (
-	// CANDID-TEST (github.com/di-wu/candid-go/internal/candidtest)
-
-	ESC = 0x005C // \
-)
-
-// Node Types
-const (
-	Unknown = iota
-
-	// CANDID-TEST (github.com/di-wu/candid-go/internal/candidtest)
-
-	TestDataT    // 001
-	CommentTextT // 002
-	TestT        // 003
-	TestGoodT    // 004
-	TestBadT     // 005
-	TestTestT    // 006
-	NullT        // 007
-	BoolT        // 008
-	NatT         // 009
-	IntT         // 010
-	FloatT       // 011
-	BaseT        // 012
-	TextT        // 013
-	ReservedT    // 014
-	EmptyT       // 015
-	OptT         // 016
-	TextInputT   // 017
-	BlobInputT   // 018
-	DescriptionT // 019
-)
-
-var NodeTypes = []string{
-	"UNKNOWN",
-
-	// CANDID-TEST (github.com/di-wu/candid-go/internal/candidtest)
-
-	"TestData",
-	"CommentText",
-	"Test",
-	"TestGood",
-	"TestBad",
-	"TestTest",
-	"Null",
-	"Bool",
-	"Nat",
-	"Int",
-	"Float",
-	"Base",
-	"Text",
-	"Reserved",
-	"Empty",
-	"Opt",
-	"TextInput",
-	"BlobInput",
-	"Description",
+func Ws(p *ast.Parser) (*ast.Node, error) {
+	return p.Expect(
+		op.MinZero(
+			op.Or{
+				' ',
+				0x0009,
+				EndLine,
+			},
+		),
+	)
 }

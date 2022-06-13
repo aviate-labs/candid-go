@@ -24,10 +24,10 @@ func ExampleNat() {
 }
 
 func ExampleNat16() {
-	test([]idl.Type{idl.Nat16()}, []interface{}{big.NewInt(0)})
-	test([]idl.Type{idl.Nat16()}, []interface{}{big.NewInt(42)})
-	test([]idl.Type{idl.Nat16()}, []interface{}{big.NewInt(65535)})
-	test([]idl.Type{idl.Nat16()}, []interface{}{big.NewInt(65536)})
+	test([]idl.Type{idl.Nat16()}, []interface{}{uint16(0)})
+	test([]idl.Type{idl.Nat16()}, []interface{}{uint16(42)})
+	test([]idl.Type{idl.Nat16()}, []interface{}{uint16(65535)})
+	test([]idl.Type{idl.Nat16()}, []interface{}{uint32(65536)})
 	// Output:
 	// 4449444c00017a0000
 	// 4449444c00017a2a00
@@ -36,10 +36,10 @@ func ExampleNat16() {
 }
 
 func ExampleNat32() {
-	test([]idl.Type{idl.Nat32()}, []interface{}{big.NewInt(0)})
-	test([]idl.Type{idl.Nat32()}, []interface{}{big.NewInt(42)})
-	test([]idl.Type{idl.Nat32()}, []interface{}{big.NewInt(4294967295)})
-	test([]idl.Type{idl.Nat32()}, []interface{}{big.NewInt(4294967296)})
+	test([]idl.Type{idl.Nat32()}, []interface{}{uint32(0)})
+	test([]idl.Type{idl.Nat32()}, []interface{}{uint32(42)})
+	test([]idl.Type{idl.Nat32()}, []interface{}{uint32(4294967295)})
+	test([]idl.Type{idl.Nat32()}, []interface{}{uint64(4294967296)})
 	// Output:
 	// 4449444c00017900000000
 	// 4449444c0001792a000000
@@ -48,9 +48,9 @@ func ExampleNat32() {
 }
 
 func ExampleNat64() {
-	test([]idl.Type{idl.Nat64()}, []interface{}{big.NewInt(0)})
-	test([]idl.Type{idl.Nat64()}, []interface{}{big.NewInt(42)})
-	test([]idl.Type{idl.Nat64()}, []interface{}{big.NewInt(1234567890)})
+	test([]idl.Type{idl.Nat64()}, []interface{}{uint64(0)})
+	test([]idl.Type{idl.Nat64()}, []interface{}{uint64(42)})
+	test([]idl.Type{idl.Nat64()}, []interface{}{uint64(1234567890)})
 	// Output:
 	// 4449444c0001780000000000000000
 	// 4449444c0001782a00000000000000
@@ -58,10 +58,10 @@ func ExampleNat64() {
 }
 
 func ExampleNat8() {
-	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(0)})
-	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(42)})
-	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(255)})
-	test([]idl.Type{idl.Nat8()}, []interface{}{big.NewInt(256)})
+	test([]idl.Type{idl.Nat8()}, []interface{}{uint8(0)})
+	test([]idl.Type{idl.Nat8()}, []interface{}{uint8(42)})
+	test([]idl.Type{idl.Nat8()}, []interface{}{uint8(255)})
+	test([]idl.Type{idl.Nat8()}, []interface{}{uint16(256)})
 	// Output:
 	// 4449444c00017b00
 	// 4449444c00017b2a

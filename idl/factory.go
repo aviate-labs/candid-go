@@ -1,7 +1,5 @@
 package idl
 
-type IDLFactory = func(types IDL) *Service
-
 type IDL struct {
 	Null     *Null
 	Bool     *Bool
@@ -28,6 +26,8 @@ type IDL struct {
 	Func     func(args []Type, ret []Type, annotations []string) *Func
 	Service  func(functions map[string]*Func) *Service
 }
+
+type IDLFactory = func(types IDL) *Service
 
 func NewInterface(factory IDLFactory) *Service {
 	return factory(IDL{

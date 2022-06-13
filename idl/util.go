@@ -1,7 +1,6 @@
 package idl
 
 import (
-	"bytes"
 	"math"
 	"math/big"
 )
@@ -32,35 +31,13 @@ func pad1(n int, bs []byte) []byte {
 	return bs
 }
 
-func readInt(r *bytes.Reader, n int) (*big.Int, error) {
-	bi, err := readUInt(r, n)
-	if err != nil {
-		return nil, err
-	}
+func readInt(bi *big.Int, n int) (*big.Int, error) {
 	m := big.NewInt(2)
 	m = m.Exp(m, big.NewInt(int64((n-1)*8+7)), nil)
 	if bi.Cmp(m) >= 0 {
 		v := new(big.Int).Set(m)
 		v = v.Mul(v, big.NewInt(-2))
 		bi = bi.Add(bi, v)
-	}
-	return bi, nil
-}
-
-func readUInt(r *bytes.Reader, n int) (*big.Int, error) {
-	var (
-		bi  = new(big.Int)
-		xFF = big.NewInt(256)
-		m   = big.NewInt(1)
-	)
-	for i := 0; i < n; i++ {
-		b, err := r.ReadByte()
-		if err != nil {
-			return nil, err
-		}
-		v := new(big.Int).SetBytes([]byte{b})
-		bi = bi.Add(bi, v.Mul(v, m))
-		m = m.Mul(m, xFF)
 	}
 	return bi, nil
 }
