@@ -11,7 +11,7 @@ import (
 	"github.com/aviate-labs/principal-go"
 )
 
-func Marshal(args []interface{}) ([]byte, error) {
+func Marshal(args []any) ([]byte, error) {
 	e := newEncodeState()
 	tdt, err := types(args, e)
 	if err != nil {
@@ -64,12 +64,16 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 		return EncodeText(v.String())
 	case reflect.Struct:
 		switch v.Type().String() {
+		case "typ.Empty":
+			return EncodeEmpty()
 		case "typ.Int":
 			bi := v.Interface().(typ.Int)
 			return EncodeInt(bi)
 		case "typ.Nat":
 			bi := v.Interface().(typ.Nat)
 			return EncodeNat(bi)
+		case "typ.Null":
+			return EncodeNull()
 		case "typ.Reserved":
 			return EncodeReserved()
 		case "principal.Principal":
@@ -82,7 +86,7 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 	}
 }
 
-func types(args []interface{}, e *encodeState) ([]byte, error) {
+func types(args []any, e *encodeState) ([]byte, error) {
 	for _, v := range args {
 		v := reflect.ValueOf(v)
 		_ = v // TODO
@@ -99,7 +103,7 @@ func types(args []interface{}, e *encodeState) ([]byte, error) {
 	return append(tdtl, tdte...), nil
 }
 
-func values(args []interface{}, e *encodeState) ([]byte, error) {
+func values(args []any, e *encodeState) ([]byte, error) {
 	tsl, err := leb128.EncodeSigned(big.NewInt(int64(len(args))))
 	if err != nil {
 		return nil, err

@@ -11,35 +11,49 @@ import (
 	"github.com/aviate-labs/principal-go"
 )
 
-func ExampleMarshalBool() {
-	fmt.Println(idl.Encode([]idl.Type{new(idl.Bool)}, []interface{}{true}))
+func ExampleMarshal_bool() {
+	fmt.Println(idl.Encode([]idl.Type{new(idl.Bool)}, []any{true}))
 	fmt.Println(candid.EncodeValue("(true)"))
-	fmt.Println(marshal.Marshal([]interface{}{true}))
+	fmt.Println(marshal.Marshal([]any{true}))
 	// Output:
 	// [68 73 68 76 0 1 126 1] <nil>
 	// [68 73 68 76 0 1 126 1] <nil>
 	// [68 73 68 76 0 1 126 1] <nil>
 }
 
-func ExampleMarshalNat() {
-	fmt.Println(idl.Encode([]idl.Type{new(idl.Nat)}, []interface{}{big.NewInt(5)}))
+func ExampleMarshal_nat() {
+	fmt.Println(idl.Encode([]idl.Type{new(idl.Nat)}, []any{big.NewInt(5)}))
 	fmt.Println(candid.EncodeValue("(5 : nat)"))
-	fmt.Println(marshal.Marshal([]interface{}{typ.NewNat[uint](5)}))
+	fmt.Println(marshal.Marshal([]any{typ.NewNat[uint](5)}))
 	// Output:
 	// [68 73 68 76 0 1 125 5] <nil>
 	// [68 73 68 76 0 1 125 5] <nil>
 	// [68 73 68 76 0 1 125 5] <nil>
 }
 
-func ExampleMarshalPrincipal() {
+func ExampleMarshal_principal() {
 	p, _ := principal.Decode("aaaaa-aa")
-	fmt.Println(marshal.Marshal([]interface{}{p}))
+	fmt.Println(marshal.Marshal([]any{p}))
+	fmt.Println(marshal.Marshal([]any{*p}))
 	// Output:
+	// [68 73 68 76 0 1 104 1 0] <nil>
 	// [68 73 68 76 0 1 104 1 0] <nil>
 }
 
-func ExampleMarshalReserved() {
-	fmt.Println(marshal.Marshal([]interface{}{new(typ.Reserved)}))
+func ExampleMarshal_reserved() {
+	fmt.Println(marshal.Marshal([]any{new(typ.Reserved)}))
 	// Output:
 	// [68 73 68 76 0 1 112] <nil>
+}
+
+func ExampleMarshal_null() {
+	fmt.Println(marshal.Marshal([]any{new(typ.Null)}))
+	// Output:
+	// [68 73 68 76 0 1 127] <nil>
+}
+
+func ExampleMarshal_empty() {
+	fmt.Println(marshal.Marshal([]any{new(typ.Empty)}))
+	// Output:
+	// [68 73 68 76 0 1 111] <nil>
 }
