@@ -102,7 +102,7 @@ func (s Service) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 }
 
 func (s Service) EncodeValue(v interface{}) ([]byte, error) {
-	p, ok := v.(*principal.Principal)
+	p, ok := v.(principal.Principal)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}

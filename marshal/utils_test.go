@@ -13,7 +13,7 @@ func hexToBytesReader(v string) *bytes.Reader {
 	return bytes.NewReader(bs)
 }
 
-func principalFromString(v string) *principal.Principal {
+func principalFromString(v string) principal.Principal {
 	p, _ := principal.Decode(v)
 	return p
 }

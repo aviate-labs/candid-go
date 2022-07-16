@@ -120,7 +120,7 @@ func (f Func) Decode(r *bytes.Reader) (interface{}, error) {
 		}
 	}
 	return &PrincipalMethod{
-		Principal: &principal.Principal{Raw: pid},
+		Principal: principal.Principal{Raw: pid},
 		Method:    string(m),
 	}, nil
 }
@@ -166,6 +166,6 @@ func (f Func) String() string {
 }
 
 type PrincipalMethod struct {
-	Principal *principal.Principal
+	Principal principal.Principal
 	Method    string
 }

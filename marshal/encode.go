@@ -78,7 +78,7 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 			return EncodeReserved()
 		case "principal.Principal":
 			p := v.Interface().(principal.Principal)
-			return EncodePrincipal(&p)
+			return EncodePrincipal(p)
 		}
 		return nil, nil, fmt.Errorf("invalid struct type: %s", v.Type())
 	default:

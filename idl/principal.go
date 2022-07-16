@@ -40,7 +40,7 @@ func (Principal) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 }
 
 func (Principal) EncodeValue(v interface{}) ([]byte, error) {
-	v_, ok := v.(*principal.Principal)
+	v_, ok := v.(principal.Principal)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
