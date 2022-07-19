@@ -8,6 +8,7 @@ import (
 	"github.com/aviate-labs/candid-go/idl"
 	"github.com/aviate-labs/candid-go/internal/candid"
 	"github.com/aviate-labs/candid-go/internal/candidvalue"
+	"github.com/aviate-labs/principal-go"
 	"github.com/di-wu/parser"
 	"github.com/di-wu/parser/ast"
 )
@@ -79,15 +80,10 @@ func ParseDID(raw []byte) (did.Description, error) {
 
 func valueToString(typ idl.Type, value interface{}) (string, error) {
 	switch t := typ.(type) {
-	case *idl.Opt[idl.Type]:
-		if value == nil {
-			return "opt null", nil
-		}
-		s, err := valueToString(t.Type, value)
-		if err != nil {
-			return "", err
-		}
-		return fmt.Sprintf("opt %s", s), nil
+	case *idl.Null:
+		return "null", nil
+	case *idl.Bool:
+		return fmt.Sprintf("%t", value), nil
 	case *idl.Nat:
 		return fmt.Sprintf("%v : %s", value, t.String()), nil
 	case *idl.Int:
@@ -98,12 +94,34 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 	case *idl.Float:
 		f, _ := value.(float64)
 		return fmt.Sprintf("%.f : %s", f, t), nil
-	case *idl.Bool:
-		return fmt.Sprintf("%t", value), nil
-	case *idl.Null:
-		return "null", nil
 	case *idl.Text:
 		return fmt.Sprintf("%q", value), nil
+	case *idl.Reserved:
+		return "reserved", nil
+	case *idl.Empty:
+		return "empty", nil
+	case *idl.Opt[idl.Type]:
+		if value == nil {
+			return "opt null", nil
+		}
+		s, err := valueToString(t.Type, value)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf("opt %s", s), nil
+	case *idl.Vec:
+		var ss []string
+		for _, a := range value.([]interface{}) {
+			s, err := valueToString(t.Type, a)
+			if err != nil {
+				return "", err
+			}
+			ss = append(ss, s)
+		}
+		if len(ss) == 0 {
+			return "vec {}", nil
+		}
+		return fmt.Sprintf("vec { %s }", strings.Join(ss, "; ")), nil
 	case *idl.Rec:
 		var ss []string
 		for _, f := range t.Fields {
@@ -133,19 +151,9 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 			s = fmt.Sprintf("%s = %s", f.Name, sv)
 		}
 		return fmt.Sprintf("variant { %s }", s), nil
-	case *idl.Vec:
-		var ss []string
-		for _, a := range value.([]interface{}) {
-			s, err := valueToString(t.Type, a)
-			if err != nil {
-				return "", err
-			}
-			ss = append(ss, s)
-		}
-		if len(ss) == 0 {
-			return "vec {}", nil
-		}
-		return fmt.Sprintf("vec { %s }", strings.Join(ss, "; ")), nil
+	case *idl.Principal:
+		p, _ := value.(principal.Principal)
+		return fmt.Sprintf("principal %q", p), nil
 	default:
 		panic(fmt.Sprintf("%s, %v", typ, value))
 	}

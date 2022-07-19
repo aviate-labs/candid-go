@@ -84,7 +84,7 @@ func (n *Nat) Decode(r *bytes.Reader) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-		return typ.NewBigInt(bi), nil
+		return typ.NewBigNat(bi), nil
 	case 8:
 		v := make([]byte, 8)
 		n, err := r.Read(v)

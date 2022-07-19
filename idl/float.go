@@ -28,6 +28,10 @@ func Float64() *Float {
 	}
 }
 
+func (f Float) Base() uint {
+	return uint(f.size)
+}
+
 func (f *Float) Decode(r *bytes.Reader) (interface{}, error) {
 	switch f.size {
 	case 4:

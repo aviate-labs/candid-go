@@ -67,6 +67,8 @@ func TestDecodeValue(t *testing.T) {
 
 		{"(vec {})", "4449444c016d7f010000"},
 		{"(vec { 0 })", "4449444c016d7c01000100"},
+
+		{"(opt principal \"aaaaa-aa\")", "4449444c016e680100010100"},
 	} {
 		e, err := hex.DecodeString(test.encoded)
 		if err != nil {

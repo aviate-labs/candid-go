@@ -1,30 +1,31 @@
 package idl
 
 type IDL struct {
-	Null     *Null
-	Bool     *Bool
-	Nat      *Nat
-	Int      *Int
-	Nat8     *Nat
-	Nat16    *Nat
-	Nat32    *Nat
-	Nat64    *Nat
-	Int8     *Int
-	Int16    *Int
-	Int32    *Int
-	Int64    *Int
-	Float32  *Float
-	Float64  *Float
-	Text     *Text
-	Reserved *Reserved
-	Empty    *Empty
-	Opt      func(typ Type) *Opt[Type]
-	Tuple    func(ts ...Type) *Tuple
-	Vec      func(t Type) *Vec
-	Record   func(fields map[string]Type) *Rec
-	Variant  func(fields map[string]Type) *Variant
-	Func     func(args []Type, ret []Type, annotations []string) *Func
-	Service  func(functions map[string]*Func) *Service
+	Null      *Null
+	Bool      *Bool
+	Nat       *Nat
+	Int       *Int
+	Nat8      *Nat
+	Nat16     *Nat
+	Nat32     *Nat
+	Nat64     *Nat
+	Int8      *Int
+	Int16     *Int
+	Int32     *Int
+	Int64     *Int
+	Float32   *Float
+	Float64   *Float
+	Text      *Text
+	Reserved  *Reserved
+	Empty     *Empty
+	Opt       func(typ Type) *Opt[Type]
+	Tuple     func(ts ...Type) *Tuple
+	Vec       func(t Type) *Vec
+	Record    func(fields map[string]Type) *Rec
+	Variant   func(fields map[string]Type) *Variant
+	Func      func(args []Type, ret []Type, annotations []string) *Func
+	Service   func(functions map[string]*Func) *Service
+	Principal *Principal
 }
 
 type IDLFactory = func(types IDL) *Service
@@ -68,5 +69,6 @@ func NewInterface(factory IDLFactory) *Service {
 		Service: func(methods map[string]*Func) *Service {
 			return NewService(methods)
 		},
+		Principal: new(Principal),
 	})
 }
