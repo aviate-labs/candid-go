@@ -8,11 +8,11 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type Bool struct {
+type BoolType struct {
 	primType
 }
 
-func (b Bool) Decode(r *bytes.Reader) (interface{}, error) {
+func (b BoolType) Decode(r *bytes.Reader) (interface{}, error) {
 	v, err := r.ReadByte()
 	if err != nil {
 		return nil, err
@@ -27,11 +27,11 @@ func (b Bool) Decode(r *bytes.Reader) (interface{}, error) {
 	}
 }
 
-func (Bool) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
+func (BoolType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(boolType))
 }
 
-func (b Bool) EncodeValue(v interface{}) ([]byte, error) {
+func (BoolType) EncodeValue(v interface{}) ([]byte, error) {
 	v_, ok := v.(bool)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
@@ -42,6 +42,6 @@ func (b Bool) EncodeValue(v interface{}) ([]byte, error) {
 	return []byte{0x00}, nil
 }
 
-func (Bool) String() string {
+func (BoolType) String() string {
 	return "bool"
 }

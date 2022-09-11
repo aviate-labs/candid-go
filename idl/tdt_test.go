@@ -3,7 +3,7 @@ package idl_test
 import (
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/aviate-labs/candid-go/idl"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestTypeDefinitionTable(t *testing.T) {
-	rawDid, err := ioutil.ReadFile("testdata/prim.test.did")
+	rawDid, err := os.ReadFile("testdata/prim.test.did")
 	if err != nil {
 		t.Fatal(err)
 	}

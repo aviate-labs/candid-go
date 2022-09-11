@@ -6,11 +6,11 @@ import (
 	"github.com/aviate-labs/candid-go/idl"
 )
 
-func ExampleRec() {
-	test([]idl.Type{idl.NewRec(nil)}, []interface{}{nil})
-	test_([]idl.Type{idl.NewRec(map[string]idl.Type{
-		"foo": new(idl.Text),
-		"bar": new(idl.Int),
+func ExampleRecordType() {
+	test([]idl.Type{idl.NewRecordType(nil)}, []interface{}{nil})
+	test_([]idl.Type{idl.NewRecordType(map[string]idl.Type{
+		"foo": new(idl.TextType),
+		"bar": new(idl.IntType),
 	})}, []interface{}{
 		map[string]interface{}{
 			"foo": "💩",

@@ -1,6 +1,6 @@
 package idl
 
-type Field struct {
+type FieldType struct {
 	Name string
 	Type Type
 }

@@ -80,27 +80,27 @@ func ParseDID(raw []byte) (did.Description, error) {
 
 func valueToString(typ idl.Type, value interface{}) (string, error) {
 	switch t := typ.(type) {
-	case *idl.Null:
+	case *idl.NullType:
 		return "null", nil
-	case *idl.Bool:
+	case *idl.BoolType:
 		return fmt.Sprintf("%t", value), nil
-	case *idl.Nat:
+	case *idl.NatType:
 		return fmt.Sprintf("%v : %s", value, t.String()), nil
-	case *idl.Int:
+	case *idl.IntType:
 		if t.Base() == 0 {
 			return fmt.Sprintf("%v", value), nil
 		}
 		return fmt.Sprintf("%v : %s", value, t.String()), nil
-	case *idl.Float:
+	case *idl.FloatType:
 		f, _ := value.(float64)
 		return fmt.Sprintf("%.f : %s", f, t), nil
-	case *idl.Text:
+	case *idl.TextType:
 		return fmt.Sprintf("%q", value), nil
 	case *idl.Reserved:
 		return "reserved", nil
-	case *idl.Empty:
+	case *idl.EmptyType:
 		return "empty", nil
-	case *idl.Opt[idl.Type]:
+	case *idl.OptionalType[idl.Type]:
 		if value == nil {
 			return "opt null", nil
 		}
@@ -109,7 +109,7 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 			return "", err
 		}
 		return fmt.Sprintf("opt %s", s), nil
-	case *idl.Vec:
+	case *idl.VectorType:
 		var ss []string
 		for _, a := range value.([]interface{}) {
 			s, err := valueToString(t.Type, a)
@@ -122,7 +122,7 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 			return "vec {}", nil
 		}
 		return fmt.Sprintf("vec { %s }", strings.Join(ss, "; ")), nil
-	case *idl.Rec:
+	case *idl.RecordType:
 		var ss []string
 		for _, f := range t.Fields {
 			v := value.(map[string]interface{})
@@ -136,12 +136,12 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 			return "record {}", nil
 		}
 		return fmt.Sprintf("record { %s }", strings.Join(ss, "; ")), nil
-	case *idl.Variant:
+	case *idl.VariantType:
 		f := t.Fields[0]
 		v := value.(*idl.FieldValue).Value
 		var s string
 		switch t := f.Type.(type) {
-		case *idl.Null:
+		case *idl.NullType:
 			s = f.Name
 		default:
 			sv, err := valueToString(t, v)

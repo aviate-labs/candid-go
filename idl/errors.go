@@ -3,7 +3,7 @@ package idl
 import "fmt"
 
 type DecodeError struct {
-	Types       Tuple
+	Types       TupleType
 	Description string
 }
 

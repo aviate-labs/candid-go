@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-type Tuple []Type
+type TupleType []Type
 
-func (ts Tuple) String() string {
+func (ts TupleType) String() string {
 	var s []string
 	for _, t := range ts {
 		s = append(s, t.String())

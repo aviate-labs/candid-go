@@ -6,8 +6,8 @@ import (
 	"github.com/aviate-labs/candid-go/idl"
 )
 
-func ExampleVec() {
-	test([]idl.Type{idl.NewVec(new(idl.Int))}, []interface{}{
+func ExampleVectorType() {
+	test([]idl.Type{idl.NewVectorType(new(idl.IntType))}, []interface{}{
 		[]interface{}{big.NewInt(0), big.NewInt(1), big.NewInt(2), big.NewInt(3)},
 	})
 	// Output:

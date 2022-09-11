@@ -26,26 +26,30 @@ func encodeTypes(ts []Type, tdt *TypeDefinitionTable) ([]byte, error) {
 	return concat(l, vs), nil
 }
 
-type Func struct {
+type FunctionType struct {
 	ArgTypes    []Type
 	RetTypes    []Type
 	Annotations []string
 }
 
-func NewFunc(argumentTypes []Type, returnTypes []Type, annotations []string) *Func {
-	return &Func{
+func NewFunctionType(argumentTypes []Type, returnTypes []Type, annotations []string) *FunctionType {
+	return &FunctionType{
 		ArgTypes:    argumentTypes,
 		RetTypes:    returnTypes,
 		Annotations: annotations,
 	}
 }
 
-func (f Func) AddTypeDefinition(tdt *TypeDefinitionTable) error {
+func (f FunctionType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	for _, t := range f.ArgTypes {
-		t.AddTypeDefinition(tdt)
+		if err := t.AddTypeDefinition(tdt); err != nil {
+			return err
+		}
 	}
 	for _, t := range f.RetTypes {
-		t.AddTypeDefinition(tdt)
+		if err := t.AddTypeDefinition(tdt); err != nil {
+			return err
+		}
 	}
 
 	id, err := leb128.EncodeSigned(big.NewInt(funcType))
@@ -80,7 +84,7 @@ func (f Func) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (f Func) Decode(r *bytes.Reader) (interface{}, error) {
+func (f FunctionType) Decode(r *bytes.Reader) (interface{}, error) {
 	{
 		bs := make([]byte, 2)
 		n, err := r.Read(bs)
@@ -125,7 +129,7 @@ func (f Func) Decode(r *bytes.Reader) (interface{}, error) {
 	}, nil
 }
 
-func (f Func) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
+func (f FunctionType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	idx, ok := tdt.Indexes[f.String()]
 	if !ok {
 		return nil, fmt.Errorf("missing type index for: %s", f)
@@ -133,7 +137,7 @@ func (f Func) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (f Func) EncodeValue(v interface{}) ([]byte, error) {
+func (f FunctionType) EncodeValue(v interface{}) ([]byte, error) {
 	pm, ok := v.(PrincipalMethod)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
@@ -149,7 +153,7 @@ func (f Func) EncodeValue(v interface{}) ([]byte, error) {
 	return concat([]byte{0x01, 0x01}, l, pm.Principal.Raw, lm, []byte(pm.Method)), nil
 }
 
-func (f Func) String() string {
+func (f FunctionType) String() string {
 	var args []string
 	for _, t := range f.ArgTypes {
 		args = append(args, t.String())

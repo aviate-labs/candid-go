@@ -13,14 +13,14 @@ import (
 
 type Method struct {
 	Name string
-	Func *Func
+	Func *FunctionType
 }
 
 type Service struct {
 	methods []Method
 }
 
-func NewService(methods map[string]*Func) *Service {
+func NewServiceType(methods map[string]*FunctionType) *Service {
 	var service Service
 	for k, v := range methods {
 		service.methods = append(service.methods, Method{
@@ -90,7 +90,7 @@ func (s Service) Decode(r *bytes.Reader) (interface{}, error) {
 	if n != int(l.Int64()) {
 		return nil, fmt.Errorf("invalid principal id: %d", pid)
 	}
-	return &principal.Principal{pid}, nil
+	return &principal.Principal{Raw: pid}, nil
 }
 
 func (s Service) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {

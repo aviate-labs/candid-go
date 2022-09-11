@@ -8,11 +8,11 @@ import (
 func ExampleService() {
 	p, _ := principal.Decode("w7x7r-cok77-xa")
 	test(
-		[]idl.Type{idl.NewService(
-			map[string]*idl.Func{
-				"foo": idl.NewFunc(
-					[]idl.Type{new(idl.Text)},
-					[]idl.Type{new(idl.Nat)},
+		[]idl.Type{idl.NewServiceType(
+			map[string]*idl.FunctionType{
+				"foo": idl.NewFunctionType(
+					[]idl.Type{new(idl.TextType)},
+					[]idl.Type{new(idl.NatType)},
 					nil,
 				),
 			},

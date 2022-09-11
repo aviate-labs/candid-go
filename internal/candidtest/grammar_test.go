@@ -1,7 +1,7 @@
 package candidtest_test
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/aviate-labs/candid-go/internal/candidtest"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	rawDid, _ := ioutil.ReadFile("../../idl/testdata/prim.test.did")
+	rawDid, _ := os.ReadFile("../../idl/testdata/prim.test.did")
 	p, _ := ast.New(rawDid)
 	if _, err := candidtest.TestData(p); err != nil {
 		t.Fatal(err)

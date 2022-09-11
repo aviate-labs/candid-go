@@ -3,8 +3,8 @@ package candid_test
 import (
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"math/big"
+	"os"
 	"testing"
 
 	"github.com/aviate-labs/candid-go"
@@ -19,7 +19,7 @@ func ExampleEncodeValue() {
 }
 
 func ExampleParseDID() {
-	raw, _ := ioutil.ReadFile("testdata/counter.did")
+	raw, _ := os.ReadFile("testdata/counter.did")
 	p, _ := candid.ParseDID(raw)
 	fmt.Println(p)
 	// Output:
@@ -92,7 +92,7 @@ func TestDecodeValues(t *testing.T) {
 	}{
 		{
 			value:  "(0 : nat)",
-			types:  []idl.Type{new((idl.Nat))},
+			types:  []idl.Type{new((idl.NatType))},
 			values: []interface{}{new(big.Int)},
 		},
 	} {

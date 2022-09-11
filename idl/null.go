@@ -8,25 +8,25 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type Null struct {
+type NullType struct {
 	primType
 }
 
-func (n *Null) Decode(_ *bytes.Reader) (interface{}, error) {
+func (NullType) Decode(_ *bytes.Reader) (interface{}, error) {
 	return nil, nil
 }
 
-func (Null) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
+func (NullType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(nullType))
 }
 
-func (Null) EncodeValue(v interface{}) ([]byte, error) {
+func (NullType) EncodeValue(v interface{}) ([]byte, error) {
 	if v != nil {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
 	return []byte{}, nil
 }
 
-func (n Null) String() string {
+func (NullType) String() string {
 	return "null"
 }

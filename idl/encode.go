@@ -18,7 +18,9 @@ func Encode(argumentTypes []Type, arguments []interface{}) ([]byte, error) {
 		Indexes: make(map[string]int),
 	}
 	for _, t := range argumentTypes {
-		t.AddTypeDefinition(tdt)
+		if err := t.AddTypeDefinition(tdt); err != nil {
+			return nil, err
+		}
 	}
 
 	tdtl, err := leb128.EncodeSigned(big.NewInt(int64(len(tdt.Indexes))))

@@ -44,40 +44,40 @@ func encodeNat8(v interface{}) (uint8, error) {
 	return 0, fmt.Errorf("invalid value: %v", v)
 }
 
-type Nat struct {
+type NatType struct {
 	size uint8
 	primType
 }
 
-func Nat16() *Nat {
-	return &Nat{
+func Nat16Type() *NatType {
+	return &NatType{
 		size: 2,
 	}
 }
 
-func Nat32() *Nat {
-	return &Nat{
+func Nat32Type() *NatType {
+	return &NatType{
 		size: 4,
 	}
 }
 
-func Nat64() *Nat {
-	return &Nat{
+func Nat64Type() *NatType {
+	return &NatType{
 		size: 8,
 	}
 }
 
-func Nat8() *Nat {
-	return &Nat{
+func Nat8Type() *NatType {
+	return &NatType{
 		size: 1,
 	}
 }
 
-func (n Nat) Base() uint {
+func (n NatType) Base() uint {
 	return uint(n.size)
 }
 
-func (n *Nat) Decode(r *bytes.Reader) (interface{}, error) {
+func (n NatType) Decode(r *bytes.Reader) (interface{}, error) {
 	switch n.size {
 	case 0:
 		bi, err := leb128.DecodeUnsigned(r)
@@ -122,7 +122,7 @@ func (n *Nat) Decode(r *bytes.Reader) (interface{}, error) {
 	}
 }
 
-func (n Nat) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
+func (n NatType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	if n.size == 0 {
 		return leb128.EncodeSigned(big.NewInt(natType))
 	}
@@ -134,7 +134,7 @@ func (n Nat) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(natXType)
 }
 
-func (n Nat) EncodeValue(v interface{}) ([]byte, error) {
+func (n NatType) EncodeValue(v interface{}) ([]byte, error) {
 	switch n.size {
 	case 0:
 		v, ok := v.(*big.Int)
@@ -177,7 +177,7 @@ func (n Nat) EncodeValue(v interface{}) ([]byte, error) {
 	}
 }
 
-func (n Nat) String() string {
+func (n NatType) String() string {
 	if n.size == 0 {
 		return "nat"
 	}

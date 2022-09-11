@@ -12,17 +12,17 @@ import (
 
 type FieldValue struct {
 	Name  string
-	Value interface{}
+	Value any
 }
 
-type Variant struct {
-	Fields []Field
+type VariantType struct {
+	Fields []FieldType
 }
 
-func NewVariant(fields map[string]Type) *Variant {
-	var variant Variant
+func NewVariantType(fields map[string]Type) *VariantType {
+	var variant VariantType
 	for k, v := range fields {
-		variant.Fields = append(variant.Fields, Field{
+		variant.Fields = append(variant.Fields, FieldType{
 			Name: k,
 			Type: v,
 		})
@@ -33,7 +33,7 @@ func NewVariant(fields map[string]Type) *Variant {
 	return &variant
 }
 
-func (v Variant) AddTypeDefinition(tdt *TypeDefinitionTable) error {
+func (v VariantType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	for _, f := range v.Fields {
 		if err := f.Type.AddTypeDefinition(tdt); err != nil {
 			return err
@@ -65,7 +65,7 @@ func (v Variant) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (v Variant) Decode(r *bytes.Reader) (interface{}, error) {
+func (v VariantType) Decode(r *bytes.Reader) (interface{}, error) {
 	id, err := leb128.DecodeUnsigned(r)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func (v Variant) Decode(r *bytes.Reader) (interface{}, error) {
 	}, nil
 }
 
-func (v Variant) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
+func (v VariantType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	idx, ok := tdt.Indexes[v.String()]
 	if !ok {
 		return nil, fmt.Errorf("missing type index for: %s", v)
@@ -91,7 +91,7 @@ func (v Variant) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (v Variant) EncodeValue(value interface{}) ([]byte, error) {
+func (v VariantType) EncodeValue(value interface{}) ([]byte, error) {
 	fs, ok := value.(FieldValue)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
@@ -112,7 +112,7 @@ func (v Variant) EncodeValue(value interface{}) ([]byte, error) {
 	return nil, fmt.Errorf("unknown variant: %v", value)
 }
 
-func (v Variant) String() string {
+func (v VariantType) String() string {
 	var s []string
 	for _, f := range v.Fields {
 		s = append(s, fmt.Sprintf("%s:%s", f.Name, f.Type.String()))

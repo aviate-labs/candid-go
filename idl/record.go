@@ -10,14 +10,14 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type Rec struct {
-	Fields []Field
+type RecordType struct {
+	Fields []FieldType
 }
 
-func NewRec(fields map[string]Type) *Rec {
-	var rec Rec
+func NewRecordType(fields map[string]Type) *RecordType {
+	var rec RecordType
 	for k, v := range fields {
-		rec.Fields = append(rec.Fields, Field{
+		rec.Fields = append(rec.Fields, FieldType{
 			Name: k,
 			Type: v,
 		})
@@ -28,7 +28,7 @@ func NewRec(fields map[string]Type) *Rec {
 	return &rec
 }
 
-func (r Rec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
+func (r RecordType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	for _, f := range r.Fields {
 		if err := f.Type.AddTypeDefinition(tdt); err != nil {
 			return err
@@ -60,7 +60,7 @@ func (r Rec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (r Rec) Decode(r_ *bytes.Reader) (interface{}, error) {
+func (r RecordType) Decode(r_ *bytes.Reader) (interface{}, error) {
 	rec := make(map[string]interface{})
 	for _, f := range r.Fields {
 		v, err := f.Type.Decode(r_)
@@ -75,7 +75,7 @@ func (r Rec) Decode(r_ *bytes.Reader) (interface{}, error) {
 	return rec, nil
 }
 
-func (r Rec) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
+func (r RecordType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	idx, ok := tdt.Indexes[r.String()]
 	if !ok {
 		return nil, fmt.Errorf("missing type index for: %s", r)
@@ -83,7 +83,7 @@ func (r Rec) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (r Rec) EncodeValue(v interface{}) ([]byte, error) {
+func (r RecordType) EncodeValue(v interface{}) ([]byte, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -106,7 +106,7 @@ func (r Rec) EncodeValue(v interface{}) ([]byte, error) {
 	return vs, nil
 }
 
-func (r Rec) String() string {
+func (r RecordType) String() string {
 	var s []string
 	for _, f := range r.Fields {
 		s = append(s, fmt.Sprintf("%s:%s", f.Name, f.Type.String()))

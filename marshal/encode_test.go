@@ -12,7 +12,7 @@ import (
 )
 
 func ExampleMarshal_bool() {
-	fmt.Println(idl.Encode([]idl.Type{new(idl.Bool)}, []any{true}))
+	fmt.Println(idl.Encode([]idl.Type{new(idl.BoolType)}, []any{true}))
 	fmt.Println(candid.EncodeValue("(true)"))
 	fmt.Println(marshal.Marshal([]any{true}))
 	// Output:
@@ -22,7 +22,7 @@ func ExampleMarshal_bool() {
 }
 
 func ExampleMarshal_nat() {
-	fmt.Println(idl.Encode([]idl.Type{new(idl.Nat)}, []any{big.NewInt(5)}))
+	fmt.Println(idl.Encode([]idl.Type{new(idl.NatType)}, []any{big.NewInt(5)}))
 	fmt.Println(candid.EncodeValue("(5 : nat)"))
 	fmt.Println(marshal.Marshal([]any{typ.NewNat[uint](5)}))
 	// Output:

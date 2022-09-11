@@ -36,20 +36,18 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 		return errors.New("value is invalid")
 	}
 
-	t := v.Type()
-	if t.Kind() == reflect.Ptr {
+	if v.Type().Kind() == reflect.Ptr {
 		v = v.Elem()
-		t = v.Type()
 	}
 
 	switch t := typ.(type) {
-	case *idl.Bool:
+	case *idl.BoolType:
 		switch v.Kind() {
 		case reflect.Bool: // OK
 		default:
 			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
 		}
-	case *idl.Nat:
+	case *idl.NatType:
 		switch v.Kind() {
 		case reflect.Uint8:
 			if t.Base() != 1 {
@@ -76,7 +74,7 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 		default:
 			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
 		}
-	case *idl.Int:
+	case *idl.IntType:
 		switch v.Kind() {
 		case reflect.Int8:
 			if t.Base() != 1 {
@@ -103,7 +101,7 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 		default:
 			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
 		}
-	case *idl.Float:
+	case *idl.FloatType:
 		switch v.Kind() {
 		case reflect.Float32:
 			if t.Base() != 4 {
@@ -116,9 +114,27 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 		default:
 			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
 		}
-	case *idl.Text:
+	case *idl.TextType:
 		switch v.Kind() {
 		case reflect.String: // OK
+		default:
+			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
+		}
+	case *idl.VectorType:
+		switch v.Kind() {
+		case reflect.Slice:
+		default:
+			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
+		}
+	case *idl.RecordType:
+		switch v.Kind() {
+		case reflect.Map:
+		default:
+			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
+		}
+	case *idl.VariantType:
+		switch v.Kind() {
+		case reflect.Map:
 		default:
 			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
 		}
@@ -132,7 +148,20 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 			}
 		}
 	default:
-		panic(fmt.Sprintf("%s, %v", typ, dv))
+		switch reflect.TypeOf(typ).String() {
+		case "*idl.OptionalType[github.com/aviate-labs/candid-go/idl.Type]":
+			if dv == nil {
+				return nil
+			}
+			opt := typ.(*idl.OptionalType[idl.Type])
+			var err error
+			if dv, err = optionalOf(opt.Type, dv, value); err != nil {
+				return err
+			}
+
+		default:
+			panic(fmt.Sprintf("%s, %v", typ, dv))
+		}
 	}
 
 	// Default behavior: there is no need to check/convert dv.

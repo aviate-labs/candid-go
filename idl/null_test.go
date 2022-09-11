@@ -5,7 +5,7 @@ import (
 )
 
 func ExampleNull() {
-	test([]idl.Type{new(idl.Null)}, []interface{}{nil})
+	test([]idl.Type{new(idl.NullType)}, []interface{}{nil})
 	// Output:
 	// 4449444c00017f
 }

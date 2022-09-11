@@ -1,30 +1,30 @@
 package idl
 
 type IDL struct {
-	Null      *Null
-	Bool      *Bool
-	Nat       *Nat
-	Int       *Int
-	Nat8      *Nat
-	Nat16     *Nat
-	Nat32     *Nat
-	Nat64     *Nat
-	Int8      *Int
-	Int16     *Int
-	Int32     *Int
-	Int64     *Int
-	Float32   *Float
-	Float64   *Float
-	Text      *Text
+	Null      *NullType
+	Bool      *BoolType
+	Nat       *NatType
+	Int       *IntType
+	Nat8      *NatType
+	Nat16     *NatType
+	Nat32     *NatType
+	Nat64     *NatType
+	Int8      *IntType
+	Int16     *IntType
+	Int32     *IntType
+	Int64     *IntType
+	Float32   *FloatType
+	Float64   *FloatType
+	Text      *TextType
 	Reserved  *Reserved
-	Empty     *Empty
-	Opt       func(typ Type) *Opt[Type]
-	Tuple     func(ts ...Type) *Tuple
-	Vec       func(t Type) *Vec
-	Record    func(fields map[string]Type) *Rec
-	Variant   func(fields map[string]Type) *Variant
-	Func      func(args []Type, ret []Type, annotations []string) *Func
-	Service   func(functions map[string]*Func) *Service
+	Empty     *EmptyType
+	Opt       func(typ Type) *OptionalType[Type]
+	Tuple     func(ts ...Type) *TupleType
+	Vec       func(t Type) *VectorType
+	Record    func(fields map[string]Type) *RecordType
+	Variant   func(fields map[string]Type) *VariantType
+	Func      func(args []Type, ret []Type, annotations []string) *FunctionType
+	Service   func(functions map[string]*FunctionType) *Service
 	Principal *Principal
 }
 
@@ -32,42 +32,44 @@ type IDLFactory = func(types IDL) *Service
 
 func NewInterface(factory IDLFactory) *Service {
 	return factory(IDL{
-		Bool:     new(Bool),
-		Null:     new(Null),
-		Nat:      new(Nat),
-		Int:      new(Int),
-		Nat8:     Nat8(),
-		Nat16:    Nat16(),
-		Nat32:    Nat32(),
-		Nat64:    Nat64(),
-		Int8:     Int8(),
-		Int16:    Int16(),
-		Int32:    Int32(),
-		Int64:    Int64(),
-		Text:     new(Text),
+		Bool:     new(BoolType),
+		Null:     new(NullType),
+		Nat:      new(NatType),
+		Int:      new(IntType),
+		Nat8:     Nat8Type(),
+		Nat16:    Nat16Type(),
+		Nat32:    Nat32Type(),
+		Nat64:    Nat64Type(),
+		Int8:     Int8Type(),
+		Int16:    Int16Type(),
+		Int32:    Int32Type(),
+		Int64:    Int64Type(),
+		Text:     new(TextType),
+		Float32:  Float32Type(),
+		Float64:  Float64Type(),
 		Reserved: new(Reserved),
-		Empty:    new(Empty),
-		Opt: func(typ Type) *Opt[Type] {
-			return &Opt[Type]{Type: typ}
+		Empty:    new(EmptyType),
+		Opt: func(typ Type) *OptionalType[Type] {
+			return &OptionalType[Type]{Type: typ}
 		},
-		Tuple: func(ts ...Type) *Tuple {
-			tuple := Tuple(ts)
+		Tuple: func(ts ...Type) *TupleType {
+			tuple := TupleType(ts)
 			return &tuple
 		},
-		Vec: func(t Type) *Vec {
-			return NewVec(t)
+		Vec: func(t Type) *VectorType {
+			return NewVectorType(t)
 		},
-		Record: func(fields map[string]Type) *Rec {
-			return NewRec(fields)
+		Record: func(fields map[string]Type) *RecordType {
+			return NewRecordType(fields)
 		},
-		Variant: func(fields map[string]Type) *Variant {
-			return NewVariant(fields)
+		Variant: func(fields map[string]Type) *VariantType {
+			return NewVariantType(fields)
 		},
-		Func: func(argumentTypes, returnTypes []Type, annotations []string) *Func {
-			return NewFunc(argumentTypes, returnTypes, annotations)
+		Func: func(argumentTypes, returnTypes []Type, annotations []string) *FunctionType {
+			return NewFunctionType(argumentTypes, returnTypes, annotations)
 		},
-		Service: func(methods map[string]*Func) *Service {
-			return NewService(methods)
+		Service: func(methods map[string]*FunctionType) *Service {
+			return NewServiceType(methods)
 		},
 		Principal: new(Principal),
 	})

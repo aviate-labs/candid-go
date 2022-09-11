@@ -44,40 +44,40 @@ func encodeInt8(v interface{}) (int8, error) {
 	return 0, fmt.Errorf("invalid value: %v", v)
 }
 
-type Int struct {
+type IntType struct {
 	size uint8
 	primType
 }
 
-func Int16() *Int {
-	return &Int{
+func Int16Type() *IntType {
+	return &IntType{
 		size: 2,
 	}
 }
 
-func Int32() *Int {
-	return &Int{
+func Int32Type() *IntType {
+	return &IntType{
 		size: 4,
 	}
 }
 
-func Int64() *Int {
-	return &Int{
+func Int64Type() *IntType {
+	return &IntType{
 		size: 8,
 	}
 }
 
-func Int8() *Int {
-	return &Int{
+func Int8Type() *IntType {
+	return &IntType{
 		size: 1,
 	}
 }
 
-func (n Int) Base() uint {
+func (n IntType) Base() uint {
 	return uint(n.size)
 }
 
-func (n *Int) Decode(r *bytes.Reader) (interface{}, error) {
+func (n *IntType) Decode(r *bytes.Reader) (interface{}, error) {
 	switch n.size {
 	case 0:
 		bi, err := leb128.DecodeSigned(r)
@@ -142,7 +142,7 @@ func (n *Int) Decode(r *bytes.Reader) (interface{}, error) {
 	}
 }
 
-func (n Int) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
+func (n IntType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	if n.size == 0 {
 		return leb128.EncodeSigned(big.NewInt(intType))
 	}
@@ -154,7 +154,7 @@ func (n Int) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(intXType)
 }
 
-func (n Int) EncodeValue(v interface{}) ([]byte, error) {
+func (n IntType) EncodeValue(v interface{}) ([]byte, error) {
 	switch n.size {
 	case 0:
 		v, ok := v.(*big.Int)
@@ -191,7 +191,7 @@ func (n Int) EncodeValue(v interface{}) ([]byte, error) {
 	}
 }
 
-func (n Int) String() string {
+func (n IntType) String() string {
 	if n.size == 0 {
 		return "int"
 	}

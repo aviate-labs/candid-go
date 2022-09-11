@@ -1,6 +1,8 @@
 package marshal_test
 
 import (
+	"encoding/hex"
+	"fmt"
 	"testing"
 
 	"github.com/aviate-labs/candid-go/marshal"
@@ -77,6 +79,41 @@ func TestUnmarshal_string_invalid(t *testing.T) {
 	}
 	var name string
 	if err := marshal.Unmarshal(data, []any{&name}); err == nil {
-		t.Fatal()
+		t.Fatal(err)
 	}
+}
+
+func ExampleUnmarshal_record() {
+	record := make(map[string]any)
+	data, _ := hex.DecodeString("4449444c016c02d3e3aa027c868eb7027101002a04f09f92a9")
+	fmt.Println(marshal.Unmarshal(data, []any{&record}), record)
+	// Output:
+	// <nil> map[4895187:42 5097222:💩]
+}
+
+func ExampleUnmarshal_vector() {
+	var vec []any
+	data, _ := hex.DecodeString("4449444c016d7c01000400010203")
+	fmt.Println(marshal.Unmarshal(data, []any{&vec}), vec)
+	// Output:
+	// <nil> [0 1 2 3]
+}
+
+func TestUnmarshal_opt(t *testing.T) {
+	var optNat marshal.Optional[typ.Nat]
+	data, _ := hex.DecodeString("4449444c016e7d010000")
+	if err := marshal.Unmarshal(data, []any{&optNat}); err != nil {
+		t.Fatal(err)
+	}
+	if optNat.Value != nil {
+		t.Error(optNat)
+	}
+}
+
+func ExampleUnmarshal_optNat() {
+	var optNat marshal.Optional[typ.Nat]
+	data, _ := hex.DecodeString("4449444c016e7d01000101")
+	fmt.Println(marshal.Unmarshal(data, []any{&optNat}), optNat)
+	// Output:
+	// <nil> {1}
 }

@@ -8,17 +8,17 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type Vec struct {
+type VectorType struct {
 	Type Type
 }
 
-func NewVec(t Type) *Vec {
-	return &Vec{
+func NewVectorType(t Type) *VectorType {
+	return &VectorType{
 		Type: t,
 	}
 }
 
-func (v Vec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
+func (v VectorType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	if err := v.Type.AddTypeDefinition(tdt); err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (v Vec) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (v Vec) Decode(r *bytes.Reader) (interface{}, error) {
+func (v VectorType) Decode(r *bytes.Reader) (interface{}, error) {
 	l, err := leb128.DecodeUnsigned(r)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (v Vec) Decode(r *bytes.Reader) (interface{}, error) {
 	return vs, nil
 }
 
-func (v Vec) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
+func (v VectorType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	idx, ok := tdt.Indexes[v.String()]
 	if !ok {
 		return nil, fmt.Errorf("missing type index for: %s", v)
@@ -59,7 +59,7 @@ func (v Vec) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (v Vec) EncodeValue(value interface{}) ([]byte, error) {
+func (v VectorType) EncodeValue(value interface{}) ([]byte, error) {
 	vs_, ok := value.([]interface{})
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
@@ -79,6 +79,6 @@ func (v Vec) EncodeValue(value interface{}) ([]byte, error) {
 	return concat(l, vs), nil
 }
 
-func (v Vec) String() string {
+func (v VectorType) String() string {
 	return fmt.Sprintf("vec %s", v.Type)
 }

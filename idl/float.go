@@ -11,28 +11,28 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type Float struct {
+type FloatType struct {
 	size uint8
 	primType
 }
 
-func Float32() *Float {
-	return &Float{
+func Float32Type() *FloatType {
+	return &FloatType{
 		size: 4,
 	}
 }
 
-func Float64() *Float {
-	return &Float{
+func Float64Type() *FloatType {
+	return &FloatType{
 		size: 8,
 	}
 }
 
-func (f Float) Base() uint {
+func (f FloatType) Base() uint {
 	return uint(f.size)
 }
 
-func (f *Float) Decode(r *bytes.Reader) (interface{}, error) {
+func (f FloatType) Decode(r *bytes.Reader) (interface{}, error) {
 	switch f.size {
 	case 4:
 		v := make([]byte, f.size)
@@ -63,7 +63,7 @@ func (f *Float) Decode(r *bytes.Reader) (interface{}, error) {
 	}
 }
 
-func (f Float) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
+func (f FloatType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	floatXType := new(big.Int).Set(big.NewInt(floatXType))
 	if f.size == 8 {
 		floatXType.Add(floatXType, big.NewInt(-1))
@@ -71,7 +71,7 @@ func (f Float) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(floatXType)
 }
 
-func (f Float) EncodeValue(v interface{}) ([]byte, error) {
+func (f FloatType) EncodeValue(v interface{}) ([]byte, error) {
 	return encode(reflect.ValueOf(v), func(k reflect.Kind, v reflect.Value) ([]byte, error) {
 		switch k {
 		case reflect.Float32:
@@ -91,6 +91,6 @@ func (f Float) EncodeValue(v interface{}) ([]byte, error) {
 	})
 }
 
-func (f Float) String() string {
+func (f FloatType) String() string {
 	return fmt.Sprintf("float%d", f.size*8)
 }

@@ -55,39 +55,39 @@ func getType(t int64, tds []Type) (Type, error) {
 
 	switch t {
 	case nullType:
-		return new(Null), nil
+		return new(NullType), nil
 	case boolType:
-		return new(Bool), nil
+		return new(BoolType), nil
 	case natType:
-		return new(Nat), nil
+		return new(NatType), nil
 	case intType:
-		return new(Int), nil
+		return new(IntType), nil
 	case natXType:
-		return Nat8(), nil
+		return Nat8Type(), nil
 	case natXType - 1:
-		return Nat16(), nil
+		return Nat16Type(), nil
 	case natXType - 2:
-		return Nat32(), nil
+		return Nat32Type(), nil
 	case natXType - 3:
-		return Nat64(), nil
+		return Nat64Type(), nil
 	case intXType:
-		return Int8(), nil
+		return Int8Type(), nil
 	case intXType - 1:
-		return Int16(), nil
+		return Int16Type(), nil
 	case intXType - 2:
-		return Int32(), nil
+		return Int32Type(), nil
 	case intXType - 3:
-		return Int64(), nil
+		return Int64Type(), nil
 	case floatXType:
-		return Float32(), nil
+		return Float32Type(), nil
 	case floatXType - 1:
-		return Float64(), nil
+		return Float64Type(), nil
 	case textType:
-		return new(Text), nil
+		return new(TextType), nil
 	case reservedType:
 		return new(Reserved), nil
 	case emptyType:
-		return new(Empty), nil
+		return new(EmptyType), nil
 	case principalType:
 		return new(Principal), nil
 	default:

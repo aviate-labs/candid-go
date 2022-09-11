@@ -2,16 +2,16 @@ package idl_test
 
 import "github.com/aviate-labs/candid-go/idl"
 
-func ExampleVariant() {
+func ExampleVariantType() {
 	result := map[string]idl.Type{
-		"ok":  new(idl.Text),
-		"err": new(idl.Text),
+		"ok":  new(idl.TextType),
+		"err": new(idl.TextType),
 	}
-	test_([]idl.Type{idl.NewVariant(result)}, []interface{}{idl.FieldValue{
+	test_([]idl.Type{idl.NewVariantType(result)}, []interface{}{idl.FieldValue{
 		Name:  "ok",
 		Value: "good",
 	}})
-	test_([]idl.Type{idl.NewVariant(result)}, []interface{}{idl.FieldValue{
+	test_([]idl.Type{idl.NewVariantType(result)}, []interface{}{idl.FieldValue{
 		Name:  "err",
 		Value: "uhoh",
 	}})

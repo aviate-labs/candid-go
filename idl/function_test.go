@@ -5,13 +5,13 @@ import (
 	"github.com/aviate-labs/principal-go"
 )
 
-func ExampleFunc() {
+func ExampleFunctionType() {
 	p, _ := principal.Decode("w7x7r-cok77-xa")
 	test_(
 		[]idl.Type{
-			idl.NewFunc(
-				[]idl.Type{new(idl.Text)},
-				[]idl.Type{new(idl.Nat)},
+			idl.NewFunctionType(
+				[]idl.Type{new(idl.TextType)},
+				[]idl.Type{new(idl.NatType)},
 				nil,
 			),
 		},

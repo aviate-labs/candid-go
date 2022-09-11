@@ -57,7 +57,7 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 				if err != nil {
 					return nil, nil, err
 				}
-				tds = append(tds, &Opt[Type]{v})
+				tds = append(tds, &OptionalType[Type]{v})
 			case vecType:
 				tid, err := leb128.DecodeSigned(r)
 				if err != nil {
@@ -67,13 +67,13 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 				if err != nil {
 					return nil, nil, err
 				}
-				tds = append(tds, &Vec{v})
+				tds = append(tds, &VectorType{v})
 			case recType:
 				l, err := leb128.DecodeUnsigned(r)
 				if err != nil {
 					return nil, nil, err
 				}
-				var fields []Field
+				var fields []FieldType
 				for i := 0; i < int(l.Int64()); i++ {
 					h, err := leb128.DecodeUnsigned(r)
 					if err != nil {
@@ -87,18 +87,18 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 					if err != nil {
 						return nil, nil, err
 					}
-					fields = append(fields, Field{
+					fields = append(fields, FieldType{
 						Name: h.String(),
 						Type: v,
 					})
 				}
-				tds = append(tds, &Rec{Fields: fields})
+				tds = append(tds, &RecordType{Fields: fields})
 			case varType:
 				l, err := leb128.DecodeUnsigned(r)
 				if err != nil {
 					return nil, nil, err
 				}
-				var fields []Field
+				var fields []FieldType
 				for i := 0; i < int(l.Int64()); i++ {
 					h, err := leb128.DecodeUnsigned(r)
 					if err != nil {
@@ -112,12 +112,12 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 					if err != nil {
 						return nil, nil, err
 					}
-					fields = append(fields, Field{
+					fields = append(fields, FieldType{
 						Name: h.String(),
 						Type: v,
 					})
 				}
-				tds = append(tds, &Variant{Fields: fields})
+				tds = append(tds, &VariantType{Fields: fields})
 			case funcType:
 				la, err := leb128.DecodeUnsigned(r)
 				if err != nil {
@@ -163,7 +163,7 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 				if len(ann) != 0 {
 					anns = append(anns, string(ann))
 				}
-				tds = append(tds, &Func{
+				tds = append(tds, &FunctionType{
 					ArgTypes:    args,
 					RetTypes:    rets,
 					Annotations: anns,
@@ -196,7 +196,7 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 					if err != nil {
 						return nil, nil, err
 					}
-					f, ok := v.(*Func)
+					f, ok := v.(*FunctionType)
 					if !ok {
 						fmt.Println(reflect.TypeOf(v))
 					}

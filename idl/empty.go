@@ -8,22 +8,22 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type Empty struct {
+type EmptyType struct {
 	primType
 }
 
-func (Empty) Decode(*bytes.Reader) (interface{}, error) {
+func (EmptyType) Decode(*bytes.Reader) (interface{}, error) {
 	return nil, fmt.Errorf("cannot decode empty type")
 }
 
-func (Empty) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
+func (EmptyType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(emptyType))
 }
 
-func (Empty) EncodeValue(_ interface{}) ([]byte, error) {
+func (EmptyType) EncodeValue(_ interface{}) ([]byte, error) {
 	return []byte{}, nil
 }
 
-func (Empty) String() string {
+func (EmptyType) String() string {
 	return "empty"
 }

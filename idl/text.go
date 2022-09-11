@@ -10,11 +10,11 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type Text struct {
+type TextType struct {
 	primType
 }
 
-func (t *Text) Decode(r *bytes.Reader) (interface{}, error) {
+func (TextType) Decode(r *bytes.Reader) (interface{}, error) {
 	n, err := leb128.DecodeUnsigned(r)
 	if err != nil {
 		return nil, err
@@ -34,11 +34,11 @@ func (t *Text) Decode(r *bytes.Reader) (interface{}, error) {
 	return string(bs), nil
 }
 
-func (t Text) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
+func (TextType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(textType))
 }
 
-func (t Text) EncodeValue(v interface{}) ([]byte, error) {
+func (TextType) EncodeValue(v interface{}) ([]byte, error) {
 	v_, ok := v.(string)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
@@ -50,6 +50,6 @@ func (t Text) EncodeValue(v interface{}) ([]byte, error) {
 	return append(bs, []byte(v_)...), nil
 }
 
-func (t Text) String() string {
+func (TextType) String() string {
 	return "text"
 }
