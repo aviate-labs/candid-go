@@ -9,11 +9,11 @@ import (
 	"github.com/aviate-labs/principal-go"
 )
 
-type Principal struct {
+type PrincipalType struct {
 	primType
 }
 
-func (Principal) Decode(r *bytes.Reader) (interface{}, error) {
+func (PrincipalType) Decode(r *bytes.Reader) (any, error) {
 	b, err := r.ReadByte()
 	if err != nil {
 		return nil, err
@@ -35,11 +35,11 @@ func (Principal) Decode(r *bytes.Reader) (interface{}, error) {
 	return &principal.Principal{Raw: v}, nil
 }
 
-func (Principal) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
+func (PrincipalType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(principalType))
 }
 
-func (Principal) EncodeValue(v interface{}) ([]byte, error) {
+func (PrincipalType) EncodeValue(v any) ([]byte, error) {
 	v_, ok := v.(principal.Principal)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
@@ -51,6 +51,6 @@ func (Principal) EncodeValue(v interface{}) ([]byte, error) {
 	return concat([]byte{0x01}, l, v_.Raw), nil
 }
 
-func (Principal) String() string {
+func (PrincipalType) String() string {
 	return "principal"
 }

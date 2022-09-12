@@ -16,16 +16,16 @@ type IDL struct {
 	Float32   *FloatType
 	Float64   *FloatType
 	Text      *TextType
-	Reserved  *Reserved
+	Reserved  *ReservedType
 	Empty     *EmptyType
-	Opt       func(typ Type) *OptionalType[Type]
+	Opt       func(typ Type) *OptionalType
 	Tuple     func(ts ...Type) *TupleType
 	Vec       func(t Type) *VectorType
 	Record    func(fields map[string]Type) *RecordType
 	Variant   func(fields map[string]Type) *VariantType
 	Func      func(args []Type, ret []Type, annotations []string) *FunctionType
 	Service   func(functions map[string]*FunctionType) *Service
-	Principal *Principal
+	Principal *PrincipalType
 }
 
 type IDLFactory = func(types IDL) *Service
@@ -47,10 +47,10 @@ func NewInterface(factory IDLFactory) *Service {
 		Text:     new(TextType),
 		Float32:  Float32Type(),
 		Float64:  Float64Type(),
-		Reserved: new(Reserved),
+		Reserved: new(ReservedType),
 		Empty:    new(EmptyType),
-		Opt: func(typ Type) *OptionalType[Type] {
-			return &OptionalType[Type]{Type: typ}
+		Opt: func(typ Type) *OptionalType {
+			return &OptionalType{Type: typ}
 		},
 		Tuple: func(ts ...Type) *TupleType {
 			tuple := TupleType(ts)
@@ -71,6 +71,6 @@ func NewInterface(factory IDLFactory) *Service {
 		Service: func(methods map[string]*FunctionType) *Service {
 			return NewServiceType(methods)
 		},
-		Principal: new(Principal),
+		Principal: new(PrincipalType),
 	})
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func ExampleOpt() {
-	var optNat *idl.OptionalType[*idl.NatType] = idl.NewOptionalType(new(idl.NatType))
+	var optNat *idl.OptionalType = idl.NewOptionalType(new(idl.NatType))
 	test([]idl.Type{optNat}, []interface{}{nil})
 	test([]idl.Type{optNat}, []interface{}{big.NewInt(1)})
 	// Output:

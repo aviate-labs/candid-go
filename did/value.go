@@ -62,11 +62,11 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 			args  []interface{}
 		)
 		for _, n := range n.Children() {
-			typ, arg, err := ConvertValues(n)
+			idl, arg, err := ConvertValues(n)
 			if err != nil {
 				return nil, nil, err
 			}
-			types = append(types, typ...)
+			types = append(types, idl...)
 			args = append(args, arg...)
 		}
 		return types, args, nil
@@ -76,7 +76,7 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 		switch len(n) {
 		case 1:
 			typ := idl.NewVariantType(map[string]idl.Type{id: new(idl.NullType)})
-			arg := idl.FieldValue{Name: id, Value: nil}
+			arg := idl.Variant{Name: id, Value: nil, Type: typ}
 			return []idl.Type{typ}, []interface{}{arg}, nil
 		case 2:
 			varType, varArg, err := ConvertValues(n[1])
@@ -84,7 +84,7 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 				return nil, nil, err
 			}
 			typ := idl.NewVariantType(map[string]idl.Type{id: varType[0]})
-			arg := idl.FieldValue{Name: id, Value: varArg[0]}
+			arg := idl.Variant{Name: id, Value: varArg[0], Type: typ}
 			return []idl.Type{typ}, []interface{}{arg}, nil
 		default:
 			panic(n)
@@ -110,7 +110,7 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 	}
 }
 
-func convertNum(n *ast.Node) (idl.Type, interface{}, error) {
+func convertNum(n *ast.Node) (idl.Type, any, error) {
 	switch n := n.Children(); len(n) {
 	case 1:
 		n := n[0]

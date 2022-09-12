@@ -32,7 +32,7 @@ func (f FloatType) Base() uint {
 	return uint(f.size)
 }
 
-func (f FloatType) Decode(r *bytes.Reader) (interface{}, error) {
+func (f FloatType) Decode(r *bytes.Reader) (any, error) {
 	switch f.size {
 	case 4:
 		v := make([]byte, f.size)
@@ -71,7 +71,7 @@ func (f FloatType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(floatXType)
 }
 
-func (f FloatType) EncodeValue(v interface{}) ([]byte, error) {
+func (f FloatType) EncodeValue(v any) ([]byte, error) {
 	return encode(reflect.ValueOf(v), func(k reflect.Kind, v reflect.Value) ([]byte, error) {
 		switch k {
 		case reflect.Float32:

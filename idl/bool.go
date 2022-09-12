@@ -12,7 +12,7 @@ type BoolType struct {
 	primType
 }
 
-func (b BoolType) Decode(r *bytes.Reader) (interface{}, error) {
+func (b BoolType) Decode(r *bytes.Reader) (any, error) {
 	v, err := r.ReadByte()
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func (BoolType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(boolType))
 }
 
-func (BoolType) EncodeValue(v interface{}) ([]byte, error) {
+func (BoolType) EncodeValue(v any) ([]byte, error) {
 	v_, ok := v.(bool)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)

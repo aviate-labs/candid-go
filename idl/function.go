@@ -84,7 +84,7 @@ func (f FunctionType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (f FunctionType) Decode(r *bytes.Reader) (interface{}, error) {
+func (f FunctionType) Decode(r *bytes.Reader) (any, error) {
 	{
 		bs := make([]byte, 2)
 		n, err := r.Read(bs)
@@ -137,7 +137,7 @@ func (f FunctionType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (f FunctionType) EncodeValue(v interface{}) ([]byte, error) {
+func (f FunctionType) EncodeValue(v any) ([]byte, error) {
 	pm, ok := v.(PrincipalMethod)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)

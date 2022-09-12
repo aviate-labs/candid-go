@@ -14,7 +14,7 @@ type TextType struct {
 	primType
 }
 
-func (TextType) Decode(r *bytes.Reader) (interface{}, error) {
+func (TextType) Decode(r *bytes.Reader) (any, error) {
 	n, err := leb128.DecodeUnsigned(r)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (TextType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(textType))
 }
 
-func (TextType) EncodeValue(v interface{}) ([]byte, error) {
+func (TextType) EncodeValue(v any) ([]byte, error) {
 	v_, ok := v.(string)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)

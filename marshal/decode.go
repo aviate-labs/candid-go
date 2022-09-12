@@ -67,7 +67,7 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 			}
 		case reflect.Struct:
 			switch v.Type().String() {
-			case "typ.Nat":
+			case "idl.Nat":
 			default:
 				return fmt.Errorf("invalid type match: %s %s", v.Type(), t)
 			}
@@ -94,7 +94,7 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 			}
 		case reflect.Struct:
 			switch v.Type().String() {
-			case "typ.Int":
+			case "idl.Int":
 			default:
 				return fmt.Errorf("invalid type match: %s %s", v.Type(), t)
 			}
@@ -120,6 +120,14 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 		default:
 			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
 		}
+	case *idl.OptionalType:
+		if dv == nil {
+			return nil
+		}
+		dv = idl.Optional{
+			V: dv,
+			T: t.Type,
+		}
 	case *idl.VectorType:
 		switch v.Kind() {
 		case reflect.Slice:
@@ -138,7 +146,7 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 		default:
 			return fmt.Errorf("invalid type match: %s %s", v.Kind(), t)
 		}
-	case *idl.Principal:
+	case *idl.PrincipalType:
 		switch v.Kind() {
 		case reflect.Struct:
 			switch v.Type().String() {
@@ -148,20 +156,7 @@ func unmarshal(typ idl.Type, dv any, value any) error {
 			}
 		}
 	default:
-		switch reflect.TypeOf(typ).String() {
-		case "*idl.OptionalType[github.com/aviate-labs/candid-go/idl.Type]":
-			if dv == nil {
-				return nil
-			}
-			opt := typ.(*idl.OptionalType[idl.Type])
-			var err error
-			if dv, err = optionalOf(opt.Type, dv, value); err != nil {
-				return err
-			}
-
-		default:
-			panic(fmt.Sprintf("%s, %v", typ, dv))
-		}
+		panic(fmt.Sprintf("%s, %v", typ, dv))
 	}
 
 	// Default behavior: there is no need to check/convert dv.

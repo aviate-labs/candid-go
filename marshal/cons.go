@@ -9,20 +9,6 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type DecodeFunc = func(*bytes.Reader, Context[idl.Type]) (any, error)
-
-func DecodeRecord(r *bytes.Reader, ctx Context[*idl.RecordType]) (map[string]any, error) {
-	record := make(map[string]interface{})
-	for _, f := range ctx.typ.Fields {
-		v, err := f.Type.Decode(r)
-		if err != nil {
-			return nil, err
-		}
-		record[f.Name] = v
-	}
-	return record, nil
-}
-
 func DecodeOpt(r *bytes.Reader, ctx Context[idl.Type]) (any, error) {
 	l, err := r.ReadByte()
 	if err != nil {
@@ -36,6 +22,18 @@ func DecodeOpt(r *bytes.Reader, ctx Context[idl.Type]) (any, error) {
 	default:
 		return nil, fmt.Errorf("invalid option value")
 	}
+}
+
+func DecodeRecord(r *bytes.Reader, ctx Context[*idl.RecordType]) (map[string]any, error) {
+	record := make(map[string]interface{})
+	for _, f := range ctx.typ.Fields {
+		v, err := f.Type.Decode(r)
+		if err != nil {
+			return nil, err
+		}
+		record[f.Name] = v
+	}
+	return record, nil
 }
 
 func DecodeVariant(r *bytes.Reader, ctx Context[*idl.VariantType]) (map[string]any, error) {
@@ -70,3 +68,5 @@ func DecodeVector(r *bytes.Reader, ctx idl.Type) ([]any, error) {
 	}
 	return vs, nil
 }
+
+type DecodeFunc = func(*bytes.Reader, Context[idl.Type]) (any, error)

@@ -8,17 +8,30 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type OptionalType[typ Type] struct {
-	Type typ
+type Optional struct {
+	V any
+	T Type
 }
 
-func NewOptionalType[typ Type](t typ) *OptionalType[typ] {
-	return &OptionalType[typ]{
+func (o Optional) SubType() Type {
+	return o.T
+}
+
+func (o Optional) Value() any {
+	return o.V
+}
+
+type OptionalType struct {
+	Type Type
+}
+
+func NewOptionalType(t Type) *OptionalType {
+	return &OptionalType{
 		Type: t,
 	}
 }
 
-func (o OptionalType[t]) AddTypeDefinition(tdt *TypeDefinitionTable) error {
+func (o OptionalType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	if err := o.Type.AddTypeDefinition(tdt); err != nil {
 		return err
 	}
@@ -35,7 +48,7 @@ func (o OptionalType[t]) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (o OptionalType[t]) Decode(r *bytes.Reader) (interface{}, error) {
+func (o OptionalType) Decode(r *bytes.Reader) (any, error) {
 	l, err := r.ReadByte()
 	if err != nil {
 		return nil, err
@@ -50,7 +63,7 @@ func (o OptionalType[t]) Decode(r *bytes.Reader) (interface{}, error) {
 	}
 }
 
-func (o OptionalType[t]) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
+func (o OptionalType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	idx, ok := tdt.Indexes[o.String()]
 	if !ok {
 		return nil, fmt.Errorf("missing type index for: %s", o)
@@ -58,7 +71,7 @@ func (o OptionalType[t]) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (o OptionalType[t]) EncodeValue(v interface{}) ([]byte, error) {
+func (o OptionalType) EncodeValue(v any) ([]byte, error) {
 	if v == nil {
 		return []byte{0x00}, nil
 	}
@@ -69,6 +82,11 @@ func (o OptionalType[t]) EncodeValue(v interface{}) ([]byte, error) {
 	return concat([]byte{0x01}, v_), nil
 }
 
-func (o OptionalType[t]) String() string {
+func (o OptionalType) String() string {
 	return fmt.Sprintf("opt %s", o.Type)
+}
+
+type OptionalValue interface {
+	Value() any
+	SubType() Type
 }

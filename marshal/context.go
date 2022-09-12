@@ -7,6 +7,13 @@ type Context[T idl.Type] struct {
 	typ T
 }
 
+func ContextToType[T idl.Type, M idl.Type](ctx Context[T], t M) Context[M] {
+	return Context[M]{
+		tdt: ctx.tdt,
+		typ: t,
+	}
+}
+
 func NewContext() Context[idl.Type] {
 	return Context[idl.Type]{
 		tdt: &idl.TypeDefinitionTable{
@@ -20,13 +27,6 @@ func NewContextWithType[T idl.Type](t T) Context[T] {
 		tdt: &idl.TypeDefinitionTable{
 			Indexes: make(map[string]int),
 		},
-		typ: t,
-	}
-}
-
-func ContextToType[T idl.Type, M idl.Type](ctx Context[T], t M) Context[M] {
-	return Context[M]{
-		tdt: ctx.tdt,
 		typ: t,
 	}
 }

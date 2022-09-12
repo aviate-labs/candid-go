@@ -1,8 +1,8 @@
 package marshal_test
 
 import (
+	"github.com/aviate-labs/candid-go/idl"
 	"github.com/aviate-labs/candid-go/marshal"
-	"github.com/aviate-labs/candid-go/typ"
 )
 
 func ExampleDecodeBool() {
@@ -185,11 +185,11 @@ func ExampleEncodeFloat64() {
 }
 
 func ExampleEncodeInt() {
-	printEncode(marshal.EncodeInt(typ.NewInt(0)))
-	printEncode(marshal.EncodeInt(typ.NewInt(42)))
-	printEncode(marshal.EncodeInt(typ.NewInt(1234567890)))
-	printEncode(marshal.EncodeInt(typ.NewInt(-1234567890)))
-	printEncode(marshal.EncodeInt(typ.NewIntFromString("60000000000000000")))
+	printEncode(marshal.EncodeInt(idl.NewInt(0)))
+	printEncode(marshal.EncodeInt(idl.NewInt(42)))
+	printEncode(marshal.EncodeInt(idl.NewInt(1234567890)))
+	printEncode(marshal.EncodeInt(idl.NewInt(-1234567890)))
+	printEncode(marshal.EncodeInt(idl.NewIntFromString("60000000000000000")))
 	// Output:
 	// 7c00
 	// 7c2a
@@ -229,10 +229,10 @@ func ExampleEncodeInt8() {
 }
 
 func ExampleEncodeNat() {
-	printEncode(marshal.EncodeNat(typ.NewNat[uint](0)))
-	printEncode(marshal.EncodeNat(typ.NewNat[uint](42)))
-	printEncode(marshal.EncodeNat(typ.NewNat[uint](1234567890)))
-	printEncode(marshal.EncodeNat(typ.NewNatFromString("60000000000000000")))
+	printEncode(marshal.EncodeNat(idl.NewNat[uint](0)))
+	printEncode(marshal.EncodeNat(idl.NewNat[uint](42)))
+	printEncode(marshal.EncodeNat(idl.NewNat[uint](1234567890)))
+	printEncode(marshal.EncodeNat(idl.NewNatFromString("60000000000000000")))
 	// Output:
 	// 7d00
 	// 7d2a

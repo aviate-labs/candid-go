@@ -35,7 +35,7 @@ func (v VectorType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (v VectorType) Decode(r *bytes.Reader) (interface{}, error) {
+func (v VectorType) Decode(r *bytes.Reader) (any, error) {
 	l, err := leb128.DecodeUnsigned(r)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (v VectorType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (v VectorType) EncodeValue(value interface{}) ([]byte, error) {
+func (v VectorType) EncodeValue(value any) ([]byte, error) {
 	vs_, ok := value.([]interface{})
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)

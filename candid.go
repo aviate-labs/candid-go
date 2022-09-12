@@ -78,7 +78,7 @@ func ParseDID(raw []byte) (did.Description, error) {
 	return did.ConvertDescription(n), nil
 }
 
-func valueToString(typ idl.Type, value interface{}) (string, error) {
+func valueToString(typ idl.Type, value any) (string, error) {
 	switch t := typ.(type) {
 	case *idl.NullType:
 		return "null", nil
@@ -96,11 +96,11 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 		return fmt.Sprintf("%.f : %s", f, t), nil
 	case *idl.TextType:
 		return fmt.Sprintf("%q", value), nil
-	case *idl.Reserved:
+	case *idl.ReservedType:
 		return "reserved", nil
 	case *idl.EmptyType:
 		return "empty", nil
-	case *idl.OptionalType[idl.Type]:
+	case *idl.OptionalType:
 		if value == nil {
 			return "opt null", nil
 		}
@@ -138,7 +138,7 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 		return fmt.Sprintf("record { %s }", strings.Join(ss, "; ")), nil
 	case *idl.VariantType:
 		f := t.Fields[0]
-		v := value.(*idl.FieldValue).Value
+		v := value.(*idl.Variant).Value
 		var s string
 		switch t := f.Type.(type) {
 		case *idl.NullType:
@@ -151,7 +151,7 @@ func valueToString(typ idl.Type, value interface{}) (string, error) {
 			s = fmt.Sprintf("%s = %s", f.Name, sv)
 		}
 		return fmt.Sprintf("variant { %s }", s), nil
-	case *idl.Principal:
+	case *idl.PrincipalType:
 		p, _ := value.(principal.Principal)
 		return fmt.Sprintf("principal %q", p), nil
 	default:

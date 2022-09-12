@@ -67,7 +67,7 @@ func (s Service) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (s Service) Decode(r *bytes.Reader) (interface{}, error) {
+func (s Service) Decode(r *bytes.Reader) (any, error) {
 	{
 		bs := make([]byte, 1)
 		n, err := r.Read(bs)
@@ -101,7 +101,7 @@ func (s Service) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (s Service) EncodeValue(v interface{}) ([]byte, error) {
+func (s Service) EncodeValue(v any) ([]byte, error) {
 	p, ok := v.(principal.Principal)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)

@@ -7,22 +7,24 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type Reserved struct {
+type Reserved struct{}
+
+type ReservedType struct {
 	primType
 }
 
-func (Reserved) Decode(*bytes.Reader) (interface{}, error) {
+func (ReservedType) Decode(*bytes.Reader) (any, error) {
 	return nil, nil
 }
 
-func (Reserved) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
+func (ReservedType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(reservedType))
 }
 
-func (Reserved) EncodeValue(_ interface{}) ([]byte, error) {
+func (ReservedType) EncodeValue(_ any) ([]byte, error) {
 	return []byte{}, nil
 }
 
-func (Reserved) String() string {
+func (ReservedType) String() string {
 	return "reserved"
 }

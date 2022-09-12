@@ -60,7 +60,7 @@ func (r RecordType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (r RecordType) Decode(r_ *bytes.Reader) (interface{}, error) {
+func (r RecordType) Decode(r_ *bytes.Reader) (any, error) {
 	rec := make(map[string]interface{})
 	for _, f := range r.Fields {
 		v, err := f.Type.Decode(r_)
@@ -83,7 +83,7 @@ func (r RecordType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (r RecordType) EncodeValue(v interface{}) ([]byte, error) {
+func (r RecordType) EncodeValue(v any) ([]byte, error) {
 	if v == nil {
 		return nil, nil
 	}

@@ -34,13 +34,13 @@ type Type interface {
 	AddTypeDefinition(*TypeDefinitionTable) error
 
 	// Decodes the value from the reader.
-	Decode(*bytes.Reader) (interface{}, error)
+	Decode(*bytes.Reader) (any, error)
 
 	// Encodes the type.
 	EncodeType(*TypeDefinitionTable) ([]byte, error)
 
 	// Encodes the value.
-	EncodeValue(v interface{}) ([]byte, error)
+	EncodeValue(v any) ([]byte, error)
 
 	fmt.Stringer
 }
@@ -85,11 +85,11 @@ func getType(t int64, tds []Type) (Type, error) {
 	case textType:
 		return new(TextType), nil
 	case reservedType:
-		return new(Reserved), nil
+		return new(ReservedType), nil
 	case emptyType:
 		return new(EmptyType), nil
 	case principalType:
-		return new(Principal), nil
+		return new(PrincipalType), nil
 	default:
 		if t < -24 {
 			return nil, &FormatError{

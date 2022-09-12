@@ -5,16 +5,40 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/aviate-labs/candid-go/idl"
 	"github.com/aviate-labs/candid-go/marshal"
-	"github.com/aviate-labs/candid-go/typ"
 )
 
+func ExampleUnmarshal_optNat() {
+	var optNat idl.Optional
+	data, _ := hex.DecodeString("4449444c016e7d01000101")
+	fmt.Println(marshal.Unmarshal(data, []any{&optNat}), optNat)
+	// Output:
+	// <nil> {1 nat}
+}
+
+func ExampleUnmarshal_record() {
+	record := make(map[string]any)
+	data, _ := hex.DecodeString("4449444c016c02d3e3aa027c868eb7027101002a04f09f92a9")
+	fmt.Println(marshal.Unmarshal(data, []any{&record}), record)
+	// Output:
+	// <nil> map[4895187:42 5097222:💩]
+}
+
+func ExampleUnmarshal_vector() {
+	var vec []any
+	data, _ := hex.DecodeString("4449444c016d7c01000400010203")
+	fmt.Println(marshal.Unmarshal(data, []any{&vec}), vec)
+	// Output:
+	// <nil> [0 1 2 3]
+}
+
 func TestUnmarshal_nat(t *testing.T) {
-	data, err := marshal.Marshal([]any{typ.NewNat[uint](5)})
+	data, err := marshal.Marshal([]any{idl.NewNat[uint](5)})
 	if err != nil {
 		t.Fatal(err)
 	}
-	var num typ.Nat
+	var num idl.Nat
 	if err := marshal.Unmarshal(data, []any{&num}); err != nil {
 		t.Fatal(err)
 	}
@@ -34,6 +58,28 @@ func TestUnmarshal_nat(t *testing.T) {
 		if num != 5 {
 			t.Errorf("unexpected num: %d", num)
 		}
+	}
+}
+
+func TestUnmarshal_opt(t *testing.T) {
+	var optNat idl.Optional
+	data, _ := hex.DecodeString("4449444c016e7d010000")
+	if err := marshal.Unmarshal(data, []any{&optNat}); err != nil {
+		t.Fatal(err)
+	}
+	if optNat.V != nil {
+		t.Error(optNat)
+	}
+}
+
+func TestUnmarshal_string_invalid(t *testing.T) {
+	data, err := marshal.Marshal([]any{true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var name string
+	if err := marshal.Unmarshal(data, []any{&name}); err == nil {
+		t.Fatal(err)
 	}
 }
 
@@ -70,50 +116,4 @@ func TestUnmarshal_string_valid(t *testing.T) {
 			t.Errorf("unexpected last name: %q", lastName)
 		}
 	}
-}
-
-func TestUnmarshal_string_invalid(t *testing.T) {
-	data, err := marshal.Marshal([]any{true})
-	if err != nil {
-		t.Fatal(err)
-	}
-	var name string
-	if err := marshal.Unmarshal(data, []any{&name}); err == nil {
-		t.Fatal(err)
-	}
-}
-
-func ExampleUnmarshal_record() {
-	record := make(map[string]any)
-	data, _ := hex.DecodeString("4449444c016c02d3e3aa027c868eb7027101002a04f09f92a9")
-	fmt.Println(marshal.Unmarshal(data, []any{&record}), record)
-	// Output:
-	// <nil> map[4895187:42 5097222:💩]
-}
-
-func ExampleUnmarshal_vector() {
-	var vec []any
-	data, _ := hex.DecodeString("4449444c016d7c01000400010203")
-	fmt.Println(marshal.Unmarshal(data, []any{&vec}), vec)
-	// Output:
-	// <nil> [0 1 2 3]
-}
-
-func TestUnmarshal_opt(t *testing.T) {
-	var optNat marshal.Optional[typ.Nat]
-	data, _ := hex.DecodeString("4449444c016e7d010000")
-	if err := marshal.Unmarshal(data, []any{&optNat}); err != nil {
-		t.Fatal(err)
-	}
-	if optNat.Value != nil {
-		t.Error(optNat)
-	}
-}
-
-func ExampleUnmarshal_optNat() {
-	var optNat marshal.Optional[typ.Nat]
-	data, _ := hex.DecodeString("4449444c016e7d01000101")
-	fmt.Println(marshal.Unmarshal(data, []any{&optNat}), optNat)
-	// Output:
-	// <nil> {1}
 }

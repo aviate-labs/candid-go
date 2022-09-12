@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"github.com/aviate-labs/candid-go/idl"
-	"github.com/aviate-labs/candid-go/typ"
 	"github.com/aviate-labs/leb128"
 	"github.com/aviate-labs/principal-go"
 )
@@ -37,9 +36,9 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 	case reflect.Bool:
 		return EncodeBool(v.Bool())
 	case reflect.Uint:
-		return nil, nil, fmt.Errorf("use typ.Nat instead of uint")
+		return nil, nil, fmt.Errorf("use idl.Nat instead of uint")
 	case reflect.Int:
-		return nil, nil, fmt.Errorf("use typ.Int instead of int")
+		return nil, nil, fmt.Errorf("use idl.Int instead of int")
 	case reflect.Uint8:
 		return EncodeNat8(uint8(v.Uint()))
 	case reflect.Uint16:
@@ -64,17 +63,17 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 		return EncodeText(v.String())
 	case reflect.Struct:
 		switch v.Type().String() {
-		case "typ.Empty":
+		case "idl.Empty":
 			return EncodeEmpty()
-		case "typ.Int":
-			bi := v.Interface().(typ.Int)
+		case "idl.Int":
+			bi := v.Interface().(idl.Int)
 			return EncodeInt(bi)
-		case "typ.Nat":
-			bi := v.Interface().(typ.Nat)
+		case "idl.Nat":
+			bi := v.Interface().(idl.Nat)
 			return EncodeNat(bi)
-		case "typ.Null":
+		case "idl.Null":
 			return EncodeNull()
-		case "typ.Reserved":
+		case "idl.Reserved":
 			return EncodeReserved()
 		case "principal.Principal":
 			p := v.Interface().(principal.Principal)

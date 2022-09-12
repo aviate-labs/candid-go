@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/aviate-labs/candid-go/typ"
 	"github.com/aviate-labs/leb128"
 )
 
-func encodeNat16(v interface{}) (uint16, error) {
+func encodeNat16(v any) (uint16, error) {
 	if v, ok := v.(uint16); ok {
 		return v, nil
 	}
@@ -18,7 +17,7 @@ func encodeNat16(v interface{}) (uint16, error) {
 	return uint16(v_), err
 }
 
-func encodeNat32(v interface{}) (uint32, error) {
+func encodeNat32(v any) (uint32, error) {
 	if v, ok := v.(uint32); ok {
 		return v, nil
 	}
@@ -26,7 +25,7 @@ func encodeNat32(v interface{}) (uint32, error) {
 	return uint32(v_), err
 }
 
-func encodeNat64(v interface{}) (uint64, error) {
+func encodeNat64(v any) (uint64, error) {
 	if v, ok := v.(uint); ok {
 		return uint64(v), nil
 	}
@@ -37,11 +36,42 @@ func encodeNat64(v interface{}) (uint64, error) {
 	return uint64(v_), err
 }
 
-func encodeNat8(v interface{}) (uint8, error) {
+func encodeNat8(v any) (uint8, error) {
 	if v, ok := v.(uint8); ok {
 		return v, nil
 	}
 	return 0, fmt.Errorf("invalid value: %v", v)
+}
+
+type Nat struct {
+	n *big.Int
+}
+
+func NewBigNat(bi *big.Int) Nat {
+	return Nat{bi}
+}
+
+func NewNat[number Natural](n number) Nat {
+	return Nat{new(big.Int).SetUint64(uint64(n))}
+}
+
+func NewNatFromString(n string) Nat {
+	bi, ok := new(big.Int).SetString(n, 10)
+	if !ok {
+		panic("number: invalid string: " + n)
+	}
+	if bi.Sign() < 0 {
+		panic("number: negative nat")
+	}
+	return Nat{bi}
+}
+
+func (n Nat) BigInt() *big.Int {
+	return n.n
+}
+
+func (n Nat) String() string {
+	return n.n.String()
 }
 
 type NatType struct {
@@ -77,14 +107,14 @@ func (n NatType) Base() uint {
 	return uint(n.size)
 }
 
-func (n NatType) Decode(r *bytes.Reader) (interface{}, error) {
+func (n NatType) Decode(r *bytes.Reader) (any, error) {
 	switch n.size {
 	case 0:
 		bi, err := leb128.DecodeUnsigned(r)
 		if err != nil {
 			return nil, err
 		}
-		return typ.NewBigNat(bi), nil
+		return NewBigNat(bi), nil
 	case 8:
 		v := make([]byte, 8)
 		n, err := r.Read(v)
@@ -134,7 +164,7 @@ func (n NatType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(natXType)
 }
 
-func (n NatType) EncodeValue(v interface{}) ([]byte, error) {
+func (n NatType) EncodeValue(v any) ([]byte, error) {
 	switch n.size {
 	case 0:
 		v, ok := v.(*big.Int)
@@ -182,4 +212,8 @@ func (n NatType) String() string {
 		return "nat"
 	}
 	return fmt.Sprintf("nat%d", n.size*8)
+}
+
+type Natural interface {
+	uint | uint64 | uint32 | uint16 | uint8
 }

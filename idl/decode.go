@@ -57,7 +57,7 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 				if err != nil {
 					return nil, nil, err
 				}
-				tds = append(tds, &OptionalType[Type]{v})
+				tds = append(tds, &OptionalType{v})
 			case vecType:
 				tid, err := leb128.DecodeSigned(r)
 				if err != nil {

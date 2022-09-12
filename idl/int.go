@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/aviate-labs/candid-go/typ"
 	"github.com/aviate-labs/leb128"
 )
 
-func encodeInt16(v interface{}) (int16, error) {
+func encodeInt16(v any) (int16, error) {
 	if v, ok := v.(int16); ok {
 		return v, nil
 	}
@@ -18,7 +17,7 @@ func encodeInt16(v interface{}) (int16, error) {
 	return int16(v_), err
 }
 
-func encodeInt32(v interface{}) (int32, error) {
+func encodeInt32(v any) (int32, error) {
 	if v, ok := v.(int32); ok {
 		return v, nil
 	}
@@ -26,7 +25,7 @@ func encodeInt32(v interface{}) (int32, error) {
 	return int32(v_), err
 }
 
-func encodeInt64(v interface{}) (int64, error) {
+func encodeInt64(v any) (int64, error) {
 	if v, ok := v.(int); ok {
 		return int64(v), nil
 	}
@@ -37,11 +36,39 @@ func encodeInt64(v interface{}) (int64, error) {
 	return int64(v_), err
 }
 
-func encodeInt8(v interface{}) (int8, error) {
+func encodeInt8(v any) (int8, error) {
 	if v, ok := v.(int8); ok {
 		return v, nil
 	}
 	return 0, fmt.Errorf("invalid value: %v", v)
+}
+
+type Int struct {
+	i *big.Int
+}
+
+func NewBigInt(bi *big.Int) Int {
+	return Int{bi}
+}
+
+func NewInt[number Integer](i number) Int {
+	return Int{i: big.NewInt(int64(i))}
+}
+
+func NewIntFromString(n string) Int {
+	bi, ok := new(big.Int).SetString(n, 10)
+	if !ok {
+		panic("number: invalid string: " + n)
+	}
+	return Int{bi}
+}
+
+func (i Int) BigInt() *big.Int {
+	return i.i
+}
+
+func (i Int) String() string {
+	return i.i.String()
 }
 
 type IntType struct {
@@ -77,14 +104,14 @@ func (n IntType) Base() uint {
 	return uint(n.size)
 }
 
-func (n *IntType) Decode(r *bytes.Reader) (interface{}, error) {
+func (n IntType) Decode(r *bytes.Reader) (any, error) {
 	switch n.size {
 	case 0:
 		bi, err := leb128.DecodeSigned(r)
 		if err != nil {
 			return nil, err
 		}
-		return typ.NewBigInt(bi), nil
+		return NewBigInt(bi), nil
 	case 8:
 		v := make([]byte, 8)
 		n, err := r.Read(v)
@@ -154,7 +181,7 @@ func (n IntType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(intXType)
 }
 
-func (n IntType) EncodeValue(v interface{}) ([]byte, error) {
+func (n IntType) EncodeValue(v any) ([]byte, error) {
 	switch n.size {
 	case 0:
 		v, ok := v.(*big.Int)
@@ -196,4 +223,8 @@ func (n IntType) String() string {
 		return "int"
 	}
 	return fmt.Sprintf("int%d", n.size*8)
+}
+
+type Integer interface {
+	int | int64 | int32 | int16 | int8
 }

@@ -6,23 +6,6 @@ import (
 	"github.com/aviate-labs/candid-go/idl"
 )
 
-func ExampleNatType() {
-	test([]idl.Type{new(idl.NatType)}, []interface{}{big.NewInt(-1)})
-	test([]idl.Type{new(idl.NatType)}, []interface{}{big.NewInt(0)})
-	test([]idl.Type{new(idl.NatType)}, []interface{}{big.NewInt(42)})
-	test([]idl.Type{new(idl.NatType)}, []interface{}{big.NewInt(1234567890)})
-	test([]idl.Type{new(idl.NatType)}, []interface{}{func() *big.Int {
-		bi, _ := new(big.Int).SetString("60000000000000000", 10)
-		return bi
-	}()})
-	// Output:
-	// enc: can not leb128 encode negative values
-	// 4449444c00017d00
-	// 4449444c00017d2a
-	// 4449444c00017dd285d8cc04
-	// 4449444c00017d808098f4e9b5ca6a
-}
-
 func ExampleNat16Type() {
 	test([]idl.Type{idl.Nat16Type()}, []interface{}{uint16(0)})
 	test([]idl.Type{idl.Nat16Type()}, []interface{}{uint16(42)})
@@ -67,4 +50,21 @@ func ExampleNat8Type() {
 	// 4449444c00017b2a
 	// 4449444c00017bff
 	// enc: invalid value: 256
+}
+
+func ExampleNatType() {
+	test([]idl.Type{new(idl.NatType)}, []interface{}{big.NewInt(-1)})
+	test([]idl.Type{new(idl.NatType)}, []interface{}{big.NewInt(0)})
+	test([]idl.Type{new(idl.NatType)}, []interface{}{big.NewInt(42)})
+	test([]idl.Type{new(idl.NatType)}, []interface{}{big.NewInt(1234567890)})
+	test([]idl.Type{new(idl.NatType)}, []interface{}{func() *big.Int {
+		bi, _ := new(big.Int).SetString("60000000000000000", 10)
+		return bi
+	}()})
+	// Output:
+	// enc: can not leb128 encode negative values
+	// 4449444c00017d00
+	// 4449444c00017d2a
+	// 4449444c00017dd285d8cc04
+	// 4449444c00017d808098f4e9b5ca6a
 }

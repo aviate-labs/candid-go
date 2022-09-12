@@ -10,9 +10,10 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-type FieldValue struct {
+type Variant struct {
 	Name  string
 	Value any
+	Type  Type
 }
 
 type VariantType struct {
@@ -65,7 +66,7 @@ func (v VariantType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 	return nil
 }
 
-func (v VariantType) Decode(r *bytes.Reader) (interface{}, error) {
+func (v VariantType) Decode(r *bytes.Reader) (any, error) {
 	id, err := leb128.DecodeUnsigned(r)
 	if err != nil {
 		return nil, err
@@ -77,9 +78,10 @@ func (v VariantType) Decode(r *bytes.Reader) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &FieldValue{
+	return &Variant{
 		Name:  id.String(),
 		Value: v_,
+		Type:  v,
 	}, nil
 }
 
@@ -91,8 +93,8 @@ func (v VariantType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 	return leb128.EncodeSigned(big.NewInt(int64(idx)))
 }
 
-func (v VariantType) EncodeValue(value interface{}) ([]byte, error) {
-	fs, ok := value.(FieldValue)
+func (v VariantType) EncodeValue(value any) ([]byte, error) {
+	fs, ok := value.(Variant)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}

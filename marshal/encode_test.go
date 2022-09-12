@@ -7,7 +7,6 @@ import (
 	"github.com/aviate-labs/candid-go"
 	"github.com/aviate-labs/candid-go/idl"
 	"github.com/aviate-labs/candid-go/marshal"
-	"github.com/aviate-labs/candid-go/typ"
 	"github.com/aviate-labs/principal-go"
 )
 
@@ -21,14 +20,26 @@ func ExampleMarshal_bool() {
 	// [68 73 68 76 0 1 126 1] <nil>
 }
 
+func ExampleMarshal_empty() {
+	fmt.Println(marshal.Marshal([]any{new(idl.Empty)}))
+	// Output:
+	// [68 73 68 76 0 1 111] <nil>
+}
+
 func ExampleMarshal_nat() {
 	fmt.Println(idl.Encode([]idl.Type{new(idl.NatType)}, []any{big.NewInt(5)}))
 	fmt.Println(candid.EncodeValue("(5 : nat)"))
-	fmt.Println(marshal.Marshal([]any{typ.NewNat[uint](5)}))
+	fmt.Println(marshal.Marshal([]any{idl.NewNat[uint](5)}))
 	// Output:
 	// [68 73 68 76 0 1 125 5] <nil>
 	// [68 73 68 76 0 1 125 5] <nil>
 	// [68 73 68 76 0 1 125 5] <nil>
+}
+
+func ExampleMarshal_null() {
+	fmt.Println(marshal.Marshal([]any{new(idl.Null)}))
+	// Output:
+	// [68 73 68 76 0 1 127] <nil>
 }
 
 func ExampleMarshal_principal() {
@@ -41,19 +52,7 @@ func ExampleMarshal_principal() {
 }
 
 func ExampleMarshal_reserved() {
-	fmt.Println(marshal.Marshal([]any{new(typ.Reserved)}))
+	fmt.Println(marshal.Marshal([]any{new(idl.Reserved)}))
 	// Output:
 	// [68 73 68 76 0 1 112] <nil>
-}
-
-func ExampleMarshal_null() {
-	fmt.Println(marshal.Marshal([]any{new(typ.Null)}))
-	// Output:
-	// [68 73 68 76 0 1 127] <nil>
-}
-
-func ExampleMarshal_empty() {
-	fmt.Println(marshal.Marshal([]any{new(typ.Empty)}))
-	// Output:
-	// [68 73 68 76 0 1 111] <nil>
 }
