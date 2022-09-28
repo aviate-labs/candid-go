@@ -61,7 +61,7 @@ func (r RecordType) AddTypeDefinition(tdt *TypeDefinitionTable) error {
 }
 
 func (r RecordType) Decode(r_ *bytes.Reader) (any, error) {
-	rec := make(map[string]interface{})
+	rec := make(map[string]any)
 	for _, f := range r.Fields {
 		v, err := f.Type.Decode(r_)
 		if err != nil {
@@ -87,11 +87,11 @@ func (r RecordType) EncodeValue(v any) ([]byte, error) {
 	if v == nil {
 		return nil, nil
 	}
-	fs, ok := v.(map[string]interface{})
+	fs, ok := v.(map[string]any)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}
-	var vs_ []interface{}
+	var vs_ []any
 	for _, f := range r.Fields {
 		vs_ = append(vs_, fs[f.Name])
 	}

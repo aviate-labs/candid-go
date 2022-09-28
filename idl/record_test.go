@@ -1,21 +1,19 @@
 package idl_test
 
 import (
-	"math/big"
-
 	"github.com/aviate-labs/candid-go/idl"
 )
 
 func ExampleRecordType() {
-	test([]idl.Type{idl.NewRecordType(nil)}, []interface{}{nil})
+	test([]idl.Type{idl.NewRecordType(nil)}, []any{nil})
 	test_([]idl.Type{idl.NewRecordType(map[string]idl.Type{
 		"foo": new(idl.TextType),
 		"bar": new(idl.IntType),
-	})}, []interface{}{
-		map[string]interface{}{
+	})}, []any{
+		map[string]any{
 			"foo": "💩",
-			"bar": big.NewInt(42),
-			"baz": big.NewInt(0),
+			"bar": idl.NewInt(42),
+			"baz": idl.NewInt(0),
 		},
 	})
 	// Output:

@@ -15,7 +15,7 @@ func ExampleFunctionType() {
 				nil,
 			),
 		},
-		[]interface{}{
+		[]any{
 			idl.PrincipalMethod{
 				Principal: p,
 				Method:    "foo",

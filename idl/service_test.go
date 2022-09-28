@@ -17,7 +17,7 @@ func ExampleService() {
 				),
 			},
 		)},
-		[]interface{}{
+		[]any{
 			p,
 		},
 	)

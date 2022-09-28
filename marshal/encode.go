@@ -12,7 +12,7 @@ import (
 
 func Marshal(args []any) ([]byte, error) {
 	e := newEncodeState()
-	tdt, err := types(args, e)
+	types, err := types(args, e)
 	if err != nil {
 		return nil, err
 	}
@@ -20,10 +20,10 @@ func Marshal(args []any) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return concat([]byte{'D', 'I', 'D', 'L'}, tdt, data), nil
+	return concat([]byte{'D', 'I', 'D', 'L'}, types, data), nil
 }
 
-func encode(v reflect.Value) ([]byte, []byte, error) {
+func encode(v reflect.Value, tdt *idl.TypeDefinitionTable) ([]byte, []byte, error) {
 	if v.Kind() == reflect.Interface {
 		if v.IsNil() {
 			return EncodeNull()
@@ -32,7 +32,7 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 	}
 	switch v.Kind() {
 	case reflect.Ptr:
-		return encode(v.Elem())
+		return encode(v.Elem(), tdt)
 	case reflect.Bool:
 		return EncodeBool(v.Bool())
 	case reflect.Uint:
@@ -61,6 +61,16 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 		return EncodeFloat64(v.Float())
 	case reflect.String:
 		return EncodeText(v.String())
+	case reflect.Slice:
+		if a, ok := (v.Interface()).([]any); ok {
+			return EncodeCons(a, tdt)
+		}
+		return nil, nil, fmt.Errorf("invalid array type: %s", v.Type())
+	case reflect.Map:
+		if m, ok := (v.Interface()).(map[string]any); ok {
+			return EncodeCons(m, tdt)
+		}
+		return nil, nil, fmt.Errorf("invalid map type: %s", v.Type())
 	case reflect.Struct:
 		switch v.Type().String() {
 		case "idl.Empty":
@@ -75,6 +85,12 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 			return EncodeNull()
 		case "idl.Reserved":
 			return EncodeReserved()
+		case "idl.Optional":
+			v := v.Interface().(idl.Optional)
+			return EncodeCons(v, tdt)
+		case "idl.Variant":
+			v := v.Interface().(idl.Variant)
+			return EncodeCons(v, tdt)
 		case "principal.Principal":
 			p := v.Interface().(principal.Principal)
 			return EncodePrincipal(p)
@@ -86,9 +102,15 @@ func encode(v reflect.Value) ([]byte, []byte, error) {
 }
 
 func types(args []any, e *encodeState) ([]byte, error) {
-	for _, v := range args {
-		v := reflect.ValueOf(v)
-		_ = v // TODO
+	// T
+	for _, a := range args {
+		t, err := idl.TypeOf(a)
+		if err != nil {
+			return nil, err
+		}
+		if err := t.AddTypeDefinition(e.tdt); err != nil {
+			return nil, err
+		}
 	}
 
 	tdtl, err := leb128.EncodeSigned(big.NewInt(int64(len(e.tdt.Indexes))))
@@ -112,7 +134,7 @@ func values(args []any, e *encodeState) ([]byte, error) {
 		vs []byte
 	)
 	for _, v := range args {
-		t, v, err := encode(reflect.ValueOf(v))
+		t, v, err := encode(reflect.ValueOf(v), e.tdt)
 		if err != nil {
 			return nil, err
 		}

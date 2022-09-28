@@ -10,37 +10,37 @@ import (
 	"github.com/di-wu/parser/ast"
 )
 
-func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
+func ConvertValues(n *ast.Node) ([]idl.Type, []any, error) {
 	switch n.Type {
 	case candidvalue.BoolValueT:
 		switch n.Value {
 		case "true":
-			return []idl.Type{new(idl.BoolType)}, []interface{}{true}, nil
+			return []idl.Type{new(idl.BoolType)}, []any{true}, nil
 		case "false":
-			return []idl.Type{new(idl.BoolType)}, []interface{}{false}, nil
+			return []idl.Type{new(idl.BoolType)}, []any{false}, nil
 		default:
 			panic(n)
 		}
 	case candidvalue.NullT:
-		return []idl.Type{new(idl.NullType)}, []interface{}{nil}, nil
+		return []idl.Type{new(idl.NullType)}, []any{nil}, nil
 	case candidvalue.NumT:
 		typ, arg, err := convertNum(n)
 		if err != nil {
 			return nil, nil, err
 		}
-		return []idl.Type{typ}, []interface{}{arg}, nil
+		return []idl.Type{typ}, []any{arg}, nil
 	case candidvalue.OptValueT:
 		types, args, err := ConvertValues(n.Children()[0])
 		if err != nil {
 			return nil, nil, err
 		}
-		return []idl.Type{idl.NewOptionalType(types[0])}, []interface{}{args[0]}, nil
+		return []idl.Type{idl.NewOptionalType(types[0])}, []any{args[0]}, nil
 	case candidvalue.RecordT:
 		if len(n.Children()) == 0 {
-			return []idl.Type{idl.NewRecordType(nil)}, []interface{}{nil}, nil
+			return []idl.Type{idl.NewRecordType(nil)}, []any{nil}, nil
 		}
 		types := make(map[string]idl.Type)
-		args := make(map[string]interface{})
+		args := make(map[string]any)
 		for _, n := range n.Children() {
 			n := n.Children()
 			id := n[0].Value
@@ -51,15 +51,15 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 			types[id] = typ[0]
 			args[id] = arg[0]
 		}
-		return []idl.Type{idl.NewRecordType(types)}, []interface{}{args}, nil
+		return []idl.Type{idl.NewRecordType(types)}, []any{args}, nil
 	case candidvalue.TextT:
 		n := n.Children()[0]
 		s := strings.TrimPrefix(strings.TrimSuffix(n.Value, "\""), "\"")
-		return []idl.Type{new(idl.TextType)}, []interface{}{s}, nil
+		return []idl.Type{new(idl.TextType)}, []any{s}, nil
 	case candidvalue.ValuesT:
 		var (
 			types []idl.Type
-			args  []interface{}
+			args  []any
 		)
 		for _, n := range n.Children() {
 			idl, arg, err := ConvertValues(n)
@@ -77,7 +77,7 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 		case 1:
 			typ := idl.NewVariantType(map[string]idl.Type{id: new(idl.NullType)})
 			arg := idl.Variant{Name: id, Value: nil, Type: typ}
-			return []idl.Type{typ}, []interface{}{arg}, nil
+			return []idl.Type{typ}, []any{arg}, nil
 		case 2:
 			varType, varArg, err := ConvertValues(n[1])
 			if err != nil {
@@ -85,17 +85,17 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 			}
 			typ := idl.NewVariantType(map[string]idl.Type{id: varType[0]})
 			arg := idl.Variant{Name: id, Value: varArg[0], Type: typ}
-			return []idl.Type{typ}, []interface{}{arg}, nil
+			return []idl.Type{typ}, []any{arg}, nil
 		default:
 			panic(n)
 		}
 	case candidvalue.VecT:
 		n := n.Children()
 		if len(n) == 0 {
-			return []idl.Type{idl.NewVectorType(new(idl.NullType))}, []interface{}{[]interface{}{}}, nil
+			return []idl.Type{idl.NewVectorType(new(idl.NullType))}, []any{[]any{}}, nil
 		}
 		var types idl.Type
-		var args []interface{}
+		var args []any
 		for _, n := range n {
 			typ, arg, err := ConvertValues(n)
 			if err != nil {
@@ -104,7 +104,7 @@ func ConvertValues(n *ast.Node) ([]idl.Type, []interface{}, error) {
 			types = typ[0]
 			args = append(args, arg[0])
 		}
-		return []idl.Type{idl.NewVectorType(types)}, []interface{}{args}, nil
+		return []idl.Type{idl.NewVectorType(types)}, []any{args}, nil
 	default:
 		panic(n)
 	}
@@ -131,7 +131,7 @@ func convertNum(n *ast.Node) (idl.Type, any, error) {
 		if err != nil {
 			return nil, nil, err
 		}
-		return new(idl.IntType), big.NewInt(i), nil
+		return new(idl.IntType), idl.NewInt(i), nil
 	case 2:
 		vArg := n[0].Value
 		vType := n[1].Value
@@ -164,7 +164,7 @@ func convertNum(n *ast.Node) (idl.Type, any, error) {
 		switch vType {
 		case "nat":
 			bi := big.NewInt(i)
-			return new(idl.NatType), bi, nil
+			return new(idl.NatType), idl.NewBigNat(bi), nil
 		case "nat8":
 			return idl.Nat8Type(), uint8(i), nil
 		case "nat16":
@@ -175,7 +175,7 @@ func convertNum(n *ast.Node) (idl.Type, any, error) {
 			return idl.Nat64Type(), uint64(i), nil
 		case "int":
 			bi := big.NewInt(i)
-			return new(idl.IntType), bi, nil
+			return new(idl.IntType), idl.NewBigInt(bi), nil
 		case "int8":
 			return idl.Int8Type(), int8(i), nil
 		case "int16":

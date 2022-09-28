@@ -167,11 +167,11 @@ func (n NatType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 func (n NatType) EncodeValue(v any) ([]byte, error) {
 	switch n.size {
 	case 0:
-		v, ok := v.(*big.Int)
+		v, ok := v.(Nat)
 		if !ok {
 			return nil, fmt.Errorf("invalid value: %v", v)
 		}
-		return leb128.EncodeUnsigned(v)
+		return leb128.EncodeUnsigned(v.BigInt())
 	case 8:
 		v, err := encodeNat64(v)
 		if err != nil {

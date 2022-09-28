@@ -25,7 +25,7 @@ func DecodeOpt(r *bytes.Reader, ctx Context[idl.Type]) (any, error) {
 }
 
 func DecodeRecord(r *bytes.Reader, ctx Context[*idl.RecordType]) (map[string]any, error) {
-	record := make(map[string]interface{})
+	record := make(map[string]any)
 	for _, f := range ctx.typ.Fields {
 		v, err := f.Type.Decode(r)
 		if err != nil {
@@ -67,6 +67,22 @@ func DecodeVector(r *bytes.Reader, ctx idl.Type) ([]any, error) {
 		vs = append(vs, v_)
 	}
 	return vs, nil
+}
+
+func EncodeCons(value any, tdt *idl.TypeDefinitionTable) ([]byte, []byte, error) {
+	typ, err := idl.TypeOf(value)
+	if err != nil {
+		return nil, nil, err
+	}
+	t, err := typ.EncodeType(tdt)
+	if err != nil {
+		return nil, nil, err
+	}
+	v, err := typ.EncodeValue(value)
+	if err != nil {
+		return nil, nil, err
+	}
+	return t, v, nil
 }
 
 type DecodeFunc = func(*bytes.Reader, Context[idl.Type]) (any, error)

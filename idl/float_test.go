@@ -5,10 +5,10 @@ import (
 )
 
 func ExampleFloat32Type() {
-	test([]idl.Type{idl.Float32Type()}, []interface{}{float32(-0.5)})
-	test([]idl.Type{idl.Float32Type()}, []interface{}{float32(0)})
-	test([]idl.Type{idl.Float32Type()}, []interface{}{float32(0.5)})
-	test([]idl.Type{idl.Float32Type()}, []interface{}{float32(3)})
+	test([]idl.Type{idl.Float32Type()}, []any{float32(-0.5)})
+	test([]idl.Type{idl.Float32Type()}, []any{float32(0)})
+	test([]idl.Type{idl.Float32Type()}, []any{float32(0.5)})
+	test([]idl.Type{idl.Float32Type()}, []any{float32(3)})
 	// Output:
 	// 4449444c000173000000bf
 	// 4449444c00017300000000
@@ -17,10 +17,10 @@ func ExampleFloat32Type() {
 }
 
 func ExampleFloat64Type() {
-	test([]idl.Type{idl.Float64Type()}, []interface{}{-0.5})
-	test([]idl.Type{idl.Float64Type()}, []interface{}{float32(0)})
-	test([]idl.Type{idl.Float64Type()}, []interface{}{0.5})
-	test([]idl.Type{idl.Float64Type()}, []interface{}{float64(3)})
+	test([]idl.Type{idl.Float64Type()}, []any{-0.5})
+	test([]idl.Type{idl.Float64Type()}, []any{float32(0)})
+	test([]idl.Type{idl.Float64Type()}, []any{0.5})
+	test([]idl.Type{idl.Float64Type()}, []any{float64(3)})
 	// Output:
 	// 4449444c000172000000000000e0bf
 	// 4449444c0001720000000000000000

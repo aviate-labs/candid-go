@@ -8,7 +8,7 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-func Encode(argumentTypes []Type, arguments []interface{}) ([]byte, error) {
+func Encode(argumentTypes []Type, arguments []any) ([]byte, error) {
 	if len(arguments) < len(argumentTypes) {
 		return nil, fmt.Errorf("invalid number of arguments")
 	}

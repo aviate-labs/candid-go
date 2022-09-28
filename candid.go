@@ -28,7 +28,7 @@ func DecodeValue(value []byte) (string, error) {
 	return fmt.Sprintf("(%s)", s), nil
 }
 
-func DecodeValues(types []idl.Type, values []interface{}) (string, error) {
+func DecodeValues(types []idl.Type, values []any) (string, error) {
 	var ss []string
 	if len(types) != len(values) {
 		return "", fmt.Errorf("unequal length")
@@ -111,7 +111,7 @@ func valueToString(typ idl.Type, value any) (string, error) {
 		return fmt.Sprintf("opt %s", s), nil
 	case *idl.VectorType:
 		var ss []string
-		for _, a := range value.([]interface{}) {
+		for _, a := range value.([]any) {
 			s, err := valueToString(t.Type, a)
 			if err != nil {
 				return "", err
@@ -125,7 +125,7 @@ func valueToString(typ idl.Type, value any) (string, error) {
 	case *idl.RecordType:
 		var ss []string
 		for _, f := range t.Fields {
-			v := value.(map[string]interface{})
+			v := value.(map[string]any)
 			s, err := valueToString(f.Type, v[f.Name])
 			if err != nil {
 				return "", nil

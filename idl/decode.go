@@ -8,7 +8,7 @@ import (
 	"github.com/aviate-labs/leb128"
 )
 
-func Decode(bs []byte) ([]Type, []interface{}, error) {
+func Decode(bs []byte) ([]Type, []any, error) {
 	if len(bs) == 0 {
 		return nil, nil, &FormatError{
 			Description: "empty",
@@ -232,7 +232,7 @@ func Decode(bs []byte) ([]Type, []interface{}, error) {
 		}
 	}
 
-	var vs []interface{}
+	var vs []any
 	{ // M
 		for i := 0; i < int(tsl.Int64()); i++ {
 			v, err := ts[i].Decode(r)

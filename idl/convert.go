@@ -138,7 +138,7 @@ func TypeOf(v any) (Type, error) {
 		return new(EmptyType), nil
 	case Optional:
 		return NewOptionalType(v.SubType()), nil
-	case []interface{}:
+	case []any:
 		typ, err := TypeOf(v[0])
 		if err != nil {
 			return nil, err
@@ -163,7 +163,7 @@ func TypeOf(v any) (Type, error) {
 		fields[v.Name] = typ
 		// TODO: what about other fields?
 		return NewVariantType(fields), nil
-	case principal.Principal:
+	case principal.Principal, *principal.Principal:
 		return new(PrincipalType), nil
 	default:
 		// Optional interface.

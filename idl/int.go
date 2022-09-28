@@ -184,11 +184,11 @@ func (n IntType) EncodeType(_ *TypeDefinitionTable) ([]byte, error) {
 func (n IntType) EncodeValue(v any) ([]byte, error) {
 	switch n.size {
 	case 0:
-		v, ok := v.(*big.Int)
+		v, ok := v.(Int)
 		if !ok {
 			return nil, fmt.Errorf("invalid value: %v", v)
 		}
-		return leb128.EncodeSigned(v)
+		return leb128.EncodeSigned(v.BigInt())
 	case 8:
 		v, err := encodeInt64(v)
 		if err != nil {

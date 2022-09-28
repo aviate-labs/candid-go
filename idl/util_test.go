@@ -17,7 +17,7 @@ func TestHash(t *testing.T) {
 	}
 }
 
-func test(types []idl.Type, args []interface{}) {
+func test(types []idl.Type, args []any) {
 	e, err := idl.Encode(types, args)
 	if err != nil {
 		fmt.Println("enc:", err)
@@ -42,7 +42,7 @@ func test(types []idl.Type, args []interface{}) {
 	}
 }
 
-func test_(types []idl.Type, args []interface{}) {
+func test_(types []idl.Type, args []any) {
 	e, err := idl.Encode(types, args)
 	if err != nil {
 		fmt.Println("enc:", err)

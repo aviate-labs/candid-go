@@ -8,12 +8,12 @@ func ExampleVariantType() {
 		"err": new(idl.TextType),
 	}
 	typ := idl.NewVariantType(result)
-	test_([]idl.Type{typ}, []interface{}{idl.Variant{
+	test_([]idl.Type{typ}, []any{idl.Variant{
 		Name:  "ok",
 		Value: "good",
 		Type:  typ,
 	}})
-	test_([]idl.Type{idl.NewVariantType(result)}, []interface{}{idl.Variant{
+	test_([]idl.Type{idl.NewVariantType(result)}, []any{idl.Variant{
 		Name:  "err",
 		Value: "uhoh",
 		Type:  typ,

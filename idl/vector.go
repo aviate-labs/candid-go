@@ -40,7 +40,7 @@ func (v VectorType) Decode(r *bytes.Reader) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	var vs []interface{}
+	var vs []any
 	for i := 0; i < int(l.Int64()); i++ {
 		v_, err := v.Type.Decode(r)
 		if err != nil {
@@ -60,7 +60,7 @@ func (v VectorType) EncodeType(tdt *TypeDefinitionTable) ([]byte, error) {
 }
 
 func (v VectorType) EncodeValue(value any) ([]byte, error) {
-	vs_, ok := value.([]interface{})
+	vs_, ok := value.([]any)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument: %v", v)
 	}

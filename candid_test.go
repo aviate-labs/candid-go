@@ -88,12 +88,12 @@ func TestDecodeValues(t *testing.T) {
 	for _, test := range []struct {
 		value  string
 		types  []idl.Type
-		values []interface{}
+		values []any
 	}{
 		{
 			value:  "(0 : nat)",
 			types:  []idl.Type{new((idl.NatType))},
-			values: []interface{}{new(big.Int)},
+			values: []any{new(big.Int)},
 		},
 	} {
 		d, err := candid.DecodeValues(test.types, test.values)

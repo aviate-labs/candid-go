@@ -7,13 +7,13 @@ import (
 )
 
 func ExampleInt() {
-	test([]idl.Type{new(idl.IntType)}, []interface{}{big.NewInt(0)})
-	test([]idl.Type{new(idl.IntType)}, []interface{}{big.NewInt(42)})
-	test([]idl.Type{new(idl.IntType)}, []interface{}{big.NewInt(1234567890)})
-	test([]idl.Type{new(idl.IntType)}, []interface{}{big.NewInt(-1234567890)})
-	test([]idl.Type{new(idl.IntType)}, []interface{}{func() *big.Int {
+	test([]idl.Type{new(idl.IntType)}, []any{idl.NewInt(0)})
+	test([]idl.Type{new(idl.IntType)}, []any{idl.NewInt(42)})
+	test([]idl.Type{new(idl.IntType)}, []any{idl.NewInt(1234567890)})
+	test([]idl.Type{new(idl.IntType)}, []any{idl.NewInt(-1234567890)})
+	test([]idl.Type{new(idl.IntType)}, []any{func() idl.Int {
 		bi, _ := new(big.Int).SetString("60000000000000000", 10)
-		return bi
+		return idl.NewBigInt(bi)
 	}()})
 	// Output:
 	// 4449444c00017c00
@@ -24,10 +24,10 @@ func ExampleInt() {
 }
 
 func ExampleInt32Type() {
-	test([]idl.Type{idl.Int32Type()}, []interface{}{int32(-1234567890)})
-	test([]idl.Type{idl.Int32Type()}, []interface{}{int32(-42)})
-	test([]idl.Type{idl.Int32Type()}, []interface{}{int32(42)})
-	test([]idl.Type{idl.Int32Type()}, []interface{}{int32(1234567890)})
+	test([]idl.Type{idl.Int32Type()}, []any{int32(-1234567890)})
+	test([]idl.Type{idl.Int32Type()}, []any{int32(-42)})
+	test([]idl.Type{idl.Int32Type()}, []any{int32(42)})
+	test([]idl.Type{idl.Int32Type()}, []any{int32(1234567890)})
 	// Output:
 	// 4449444c0001752efd69b6
 	// 4449444c000175d6ffffff
@@ -36,15 +36,15 @@ func ExampleInt32Type() {
 }
 
 func ExampleInt8Type() {
-	test([]idl.Type{idl.Int8Type()}, []interface{}{int16(-129)})
-	test([]idl.Type{idl.Int8Type()}, []interface{}{int8(-128)})
-	test([]idl.Type{idl.Int8Type()}, []interface{}{int8(-42)})
-	test([]idl.Type{idl.Int8Type()}, []interface{}{int8(-1)})
-	test([]idl.Type{idl.Int8Type()}, []interface{}{int8(0)})
-	test([]idl.Type{idl.Int8Type()}, []interface{}{int8(1)})
-	test([]idl.Type{idl.Int8Type()}, []interface{}{int8(42)})
-	test([]idl.Type{idl.Int8Type()}, []interface{}{int8(127)})
-	test([]idl.Type{idl.Int8Type()}, []interface{}{int16(128)})
+	test([]idl.Type{idl.Int8Type()}, []any{int16(-129)})
+	test([]idl.Type{idl.Int8Type()}, []any{int8(-128)})
+	test([]idl.Type{idl.Int8Type()}, []any{int8(-42)})
+	test([]idl.Type{idl.Int8Type()}, []any{int8(-1)})
+	test([]idl.Type{idl.Int8Type()}, []any{int8(0)})
+	test([]idl.Type{idl.Int8Type()}, []any{int8(1)})
+	test([]idl.Type{idl.Int8Type()}, []any{int8(42)})
+	test([]idl.Type{idl.Int8Type()}, []any{int8(127)})
+	test([]idl.Type{idl.Int8Type()}, []any{int16(128)})
 	// Output:
 	// enc: invalid value: -129
 	// 4449444c00017780

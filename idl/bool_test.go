@@ -5,10 +5,10 @@ import (
 )
 
 func ExampleBool() {
-	test([]idl.Type{new(idl.BoolType)}, []interface{}{true})
-	test([]idl.Type{new(idl.BoolType)}, []interface{}{false})
-	test([]idl.Type{new(idl.BoolType)}, []interface{}{0})
-	test([]idl.Type{new(idl.BoolType)}, []interface{}{"false"})
+	test([]idl.Type{new(idl.BoolType)}, []any{true})
+	test([]idl.Type{new(idl.BoolType)}, []any{false})
+	test([]idl.Type{new(idl.BoolType)}, []any{0})
+	test([]idl.Type{new(idl.BoolType)}, []any{"false"})
 	// Output:
 	// 4449444c00017e01
 	// 4449444c00017e00
